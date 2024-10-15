@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "esp-idf/esp-zigbee-console",
+		"source" : "/home/gauteron-nathan/T\u00e9l\u00e9chargements/esp-zigbee-sdk-main/components/esp-zigbee-console"
+	}
+}

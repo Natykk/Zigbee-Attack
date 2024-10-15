@@ -1,0 +1,153 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 8,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 12,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include/mbedtls",
+			"paths" : 
+			[
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aes.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aria.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/asn1.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/asn1write.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/base64.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/block_cipher.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/build_info.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/camellia.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ccm.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/chacha20.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/chachapoly.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/check_config.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/cipher.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/cmac.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/compat-2.x.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_adjust_legacy_crypto.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_adjust_legacy_from_psa.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_adjust_psa_from_legacy.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_adjust_psa_superset_legacy.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_adjust_ssl.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_adjust_x509.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_psa.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/constant_time.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/debug.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/des.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/dhm.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecdh.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecdsa.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecjpake.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/entropy.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/error.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/gcm.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/hkdf.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/hmac_drbg.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/lms.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/mbedtls_config.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md5.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/memory_buffer_alloc.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/net_sockets.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/nist_kw.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/oid.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pem.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pk.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pkcs12.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pkcs5.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pkcs7.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_time.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_util.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/poly1305.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/private_access.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/psa_util.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ripemd160.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/rsa.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha1.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha256.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha3.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha512.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_cache.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_cookie.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_ticket.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/threading.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/timing.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/version.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509_crl.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509_crt.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509_csr.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include/psa",
+			"paths" : 
+			[
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/build_info.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_adjust_auto_enabled.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_adjust_config_key_pair_types.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_adjust_config_synonyms.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_builtin_composites.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_builtin_key_derivation.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_builtin_primitives.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_compat.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_config.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_driver_common.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_driver_contexts_composites.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_driver_contexts_key_derivation.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_driver_contexts_primitives.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_extra.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_legacy.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_platform.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_se_driver.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_sizes.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_struct.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_types.h",
+				"/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_values.h"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "esp-idf/mbedtls/mbedtls/include",
+		"source" : "/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/mbedtls/mbedtls/include"
+	}
+}

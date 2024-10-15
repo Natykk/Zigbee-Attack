@@ -1,0 +1,76 @@
+[1/5] cd /home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/esp-idf/esptool_py && /home/gauteron-nathan/.espressif/python_env/idf5.3_py3.12_env/bin/python /home/gauteron-nathan/esp/v5.3.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/partition_table/partition-table.bin /home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/esp_zigbee_all_device_types_app.bin
+esp_zigbee_all_device_types_app.bin binary size 0xc7920 bytes. Smallest app partition is 0x100000 bytes. 0x386e0 bytes (22%) free.
+[2/5] Performing build step for 'bootloader'
+[1/1] cd /home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader/esp-idf/esptool_py && /home/gauteron-nathan/.espressif/python_env/idf5.3_py3.12_env/bin/python /home/gauteron-nathan/esp/v5.3.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader/bootloader.bin
+Bootloader binary size 0x4aa0 bytes. 0x3560 bytes (42%) free.
+[3/5] No install step for 'bootloader'
+[4/5] Completed 'bootloader'
+[4/5] cd /home/gauteron-nathan/esp/v5.3.1/esp-idf/components/esptool_py && /usr/bin/cmake -D IDF_PATH=/home/gauteron-nathan/esp/v5.3.1/esp-idf -D "SERIAL_TOOL=/home/gauteron-nathan/.espressif/python_env/idf5.3_py3.12_env/bin/python;;/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32h2" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build -P /home/gauteron-nathan/esp/v5.3.1/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32h2 -p /dev/ttyUSB0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 48m --flash_size 2MB 0x0 bootloader/bootloader.bin 0x20000 esp_zigbee_all_device_types_app.bin 0x8000 partition_table/partition-table.bin 0xf000 ota_data_initial.bin
+esptool.py v4.8.1
+Serial port /dev/ttyUSB0
+Connecting....
+Chip is ESP32-H2 (revision v0.1)
+Features: BLE, IEEE802.15.4
+Crystal is 32MHz
+MAC: 74:4d:bd:ff:fe:60:28:9e
+BASE MAC: 74:4d:bd:60:28:9e
+MAC_EXT: ff:fe
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00004fff...
+Flash will be erased from 0x00020000 to 0x000e7fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000f000 to 0x00010fff...
+SHA digest in image updated
+Compressed 19104 bytes to 11857...
+Writing at 0x00000000... (100 %)
+Wrote 19104 bytes (11857 compressed) at 0x00000000 in 0.6 seconds (effective 269.9 kbit/s)...
+Hash of data verified.
+Compressed 817440 bytes to 472803...
+Writing at 0x00020000... (3 %)
+Writing at 0x0002e5dc... (6 %)
+Writing at 0x00036d6d... (10 %)
+Writing at 0x0003ddd1... (13 %)
+Writing at 0x00045b0e... (17 %)
+Writing at 0x0004d4b2... (20 %)
+Writing at 0x000557ac... (24 %)
+Writing at 0x0005c0c5... (27 %)
+Writing at 0x00061e1d... (31 %)
+Writing at 0x00067ec4... (34 %)
+Writing at 0x0006d7f7... (37 %)
+Writing at 0x0007365c... (41 %)
+Writing at 0x000793f3... (44 %)
+Writing at 0x0007f645... (48 %)
+Writing at 0x0008593a... (51 %)
+Writing at 0x0008bed4... (55 %)
+Writing at 0x00093219... (58 %)
+Writing at 0x0009a3ea... (62 %)
+Writing at 0x000a0406... (65 %)
+Writing at 0x000a627f... (68 %)
+Writing at 0x000ac3ae... (72 %)
+Writing at 0x000b21fa... (75 %)
+Writing at 0x000b840b... (79 %)
+Writing at 0x000bfc6a... (82 %)
+Writing at 0x000c59d1... (86 %)
+Writing at 0x000cc781... (89 %)
+Writing at 0x000d350d... (93 %)
+Writing at 0x000da0ff... (96 %)
+Writing at 0x000e0bd0... (100 %)
+Wrote 817440 bytes (472803 compressed) at 0x00020000 in 11.2 seconds (effective 581.7 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 151...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (151 compressed) at 0x00008000 in 0.1 seconds (effective 425.2 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 31...
+Writing at 0x0000f000... (100 %)
+Wrote 8192 bytes (31 compressed) at 0x0000f000 in 0.1 seconds (effective 798.6 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...

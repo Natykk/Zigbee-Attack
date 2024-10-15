@@ -1,0 +1,8 @@
+esptool.py v4.8.1
+Serial port /dev/ttyUBS0
+
+A fatal error occurred: Could not open /dev/ttyUBS0, the port is busy or doesn't exist.
+([Errno 2] could not open port /dev/ttyUBS0: [Errno 2] No such file or directory: '/dev/ttyUBS0')
+
+Hint: Check if the port is correct and ESP connected
+

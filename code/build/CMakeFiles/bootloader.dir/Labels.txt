@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/CMakeFiles/bootloader
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/CMakeFiles/bootloader.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/CMakeFiles/bootloader-complete.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/examples/esp_zigbee_all_device_types_app/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

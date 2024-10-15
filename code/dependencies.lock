@@ -1,0 +1,56 @@
+dependencies:
+  espressif/cmake_utilities:
+    component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.1'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 0.5.3
+  espressif/esp-zboss-lib:
+    component_hash: 5a97b85339c49541c70332de19a210b86abd72f2614f3e8e521e72a358697cac
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.5.1
+  espressif/esp-zigbee-console:
+    dependencies:
+    - name: espressif/esp-zboss-lib
+      version: '>=1.5.0'
+    - name: espressif/esp-zigbee-lib
+      version: '>=1.5.0'
+    - name: idf
+      version: '>=5.0'
+    source:
+      path: /home/gauteron-nathan/Téléchargements/esp-zigbee-sdk-main/components/esp-zigbee-console
+      type: local
+    version: 1.0.0
+  espressif/esp-zigbee-lib:
+    component_hash: 1c50543fc947ba8a6c58bb27b485b8ae0f4133965eafd445dd7cec9a674fcab0
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.5.1
+  idf:
+    source:
+      type: idf
+    version: 5.3.1
+direct_dependencies:
+- espressif/cmake_utilities
+- espressif/esp-zboss-lib
+- espressif/esp-zigbee-console
+- espressif/esp-zigbee-lib
+- idf
+manifest_hash: 21adcf20bec2a02006ca49294be8eaf45291c5fd7400c694c5ffd254be48b6bc
+target: esp32h2
+version: 2.0.0

@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "esp-idf/lwip",
+		"source" : "/home/gauteron-nathan/esp/v5.3.1/esp-idf/components/lwip"
+	}
+}
