@@ -14,12 +14,11 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 ### Matériel et Frameworks Utilisés :
 - **Matériel** :
   - Dongle USB TI CC2531
-  - CC Debugger
-  - Raspbee II
+  - Dongle nRF52840
   - ESP32-H2
 - **Frameworks** :
   - Killerbee
-  - ZigDiggity
+  - WHAD
 
 ## 🛠️ Liste des Tâches
 
