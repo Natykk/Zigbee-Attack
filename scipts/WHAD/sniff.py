@@ -3,20 +3,20 @@ from whad.device import WhadDevice
 from whad.zigbee import Sniffer
 
 # Clé par défaut de l'ESP32-H2 pour le décryptage ZigBee (par exemple)
-DEFAULT_KEY = b"00124b0001a2b3c4d5e6f7a8b9c0d1e2"  # Remplacez cela par la clé réelle de votre ESP32-H2
+DEFAULT_KEY = b"00112233445566778899AABBCCDDEEFF"  # Remplacez cela par la clé réelle de votre ESP32-H2
 
 # Créer l'objet WhadDevice (même si nous n'utilisons pas de périphérique physique)
-#device = WhadDevice.create("uart0")
+device = WhadDevice.create("uart0")
 
 # Créer l'instance du sniffer ZigBee
-#sniffer = Sniffer(device)
+sniffer = Sniffer(device)
 
 # Ajouter la clé de chiffrement par défaut de l'ESP32-H2
-#sniffer.add_key(DEFAULT_KEY)
+sniffer.add_key(DEFAULT_KEY)
 
 # Définir le canal et activer le décryptage
-#sniffer.channel = 13
-#sniffer.decrypt = True
+sniffer.channel = 13
+sniffer.decrypt = True
 
 # Fonction pour traiter un fichier pcap
 def process_pcap(pcap_file):
