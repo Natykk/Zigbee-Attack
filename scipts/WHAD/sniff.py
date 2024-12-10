@@ -1,59 +1,87 @@
-from scapy.all import rdpcap
-from whad.device import WhadDevice
-from whad.zigbee import Sniffer
+import logging
+import pyshark
 
-# Clé par défaut de l'ESP32-H2 pour le décryptage ZigBee (par exemple)
-DEFAULT_KEY = b"00112233445566778899AABBCCDDEEFF"  # Remplacez cela par la clé réelle de votre ESP32-H2
+# Configuration du journal (logging)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# Créer l'objet WhadDevice (même si nous n'utilisons pas de périphérique physique)
-device = WhadDevice.create("uart0")
+def traiter_paquet(paquet, numero_paquet):
+    """
+    Traite un paquet ZigBee individuel et affiche les détails pertinents, 
+    y compris les clés, compteurs, étiquettes de clés et clusters.
 
-# Créer l'instance du sniffer ZigBee
-sniffer = Sniffer(device)
+    Args:
+        paquet: Paquet Pyshark à traiter.
+        numero_paquet (int): Numéro du paquet pour les besoins de journalisation.
+    """
+    try:
+        logger.info(f"Traitement du paquet {numero_paquet}...")
 
-# Ajouter la clé de chiffrement par défaut de l'ESP32-H2
-sniffer.add_key(DEFAULT_KEY)
+        # Couche WPAN (802.15.4)
+        if hasattr(paquet, 'wpan'):
+            print("\n *** Couche WPAN (802.15.4) ***")
+            #print(paquet.wpan)
+            if hasattr(paquet.wpan, 'wpan_frame_counter'):
+                print(f"Compteur de trame : {paquet.wpan.wpan_frame_counter}")
 
-# Définir le canal et activer le décryptage
-sniffer.channel = 13
-sniffer.decrypt = True
+        # Couche NWK ZigBee
+        if hasattr(paquet, 'zbee_nwk'):
+            print("\n *** Couche NWK ***")
+            #print(paquet.zbee_nwk)
+            if hasattr(paquet.zbee_nwk, 'zbee_nwk_key_seqno'):
+                print(f"Numéro de séquence de clé : {paquet.zbee_nwk.zbee_nwk_key_seqno}")
+            if hasattr(paquet.zbee_nwk, 'zbee_nwk_frame_counter'):
+                print(f"Compteur de trame NWK : {paquet.zbee_nwk.zbee_nwk_frame_counter}")
 
-# Fonction pour traiter un fichier pcap
-def process_pcap(pcap_file):
-    # Lire le fichier pcap avec Scapy
-    packets = rdpcap(pcap_file)
-    print(f"[i] Ouverture du fichier pcap '{pcap_file}' avec {len(packets)} paquets.")
-    
-    # Traiter chaque paquet du fichier pcap
-    for packet in packets:
-        # Traiter le paquet avec le sniffer
-        processed_packet = sniffer.process_packet(packet)
-        
-        if processed_packet:
-            print(f"[i] Paquet traité : {processed_packet.summary()}")  # Résumé du paquet
+        # Couche APS ZigBee
+        if hasattr(paquet, 'zbee_aps'):
+            print("\n *** Couche APS ***")
+            #print(paquet.zbee_aps)
+            if hasattr(paquet.zbee_aps, 'zbee_aps_key_label'):
+                print(f"Étiquette de clé : {paquet.zbee_aps.zbee_aps_key_label}")
+            if hasattr(paquet.zbee_aps, 'zbee_aps_frame_counter'):
+                print(f"Compteur de trame APS : {paquet.zbee_aps.zbee_aps_frame_counter}")
 
-            # Extraire des informations détaillées du ZigBee Security Header
-            try:
-                couche_802_15_4 = processed_packet[0]  # Extraire la couche 802.15.4
-                print("[i] Couche 802.15.4:")
-                #couche_802_15_4.show()  # Afficher la couche 802.15.4
-            except IndexError:
-                print("[!] 802.15.4 inexistant")
+        # Couche ZCL ZigBee
+        if hasattr(paquet, 'zbee_zcl'):
+            print("\n *** Couche ZCL ***")
+            #print(paquet.zbee_zcl)
+            if hasattr(paquet.zbee_zcl, 'zbee_zcl_cluster_id'):
+                cluster_id = paquet.zbee_zcl.zbee_zcl_cluster_id
+                print(f"ID du cluster : {cluster_id}")
+                if cluster_id == "0x0006":  # Cluster On/Off
+                    print("Cluster : On/Off")
+                elif cluster_id == "0x0008":  # Cluster Level Control
+                    print("Cluster : Level Control")
 
-            try:
-                couche_zigbee = processed_packet[1]  # Extraire la couche ZigBee
-                print("[i] Couche ZigBee:")
-                #couche_zigbee.show()  # Afficher la couche ZigBee
-            except IndexError:
-                print("[!] ZigBee inexistant")
-            
-        else:
-            print("[!] Paquet non traité.")
-        
-        print("=========================================================================")
+    except Exception as e:
+        logger.error(f"Erreur lors du traitement du paquet {numero_paquet} : {e}")
 
-# Ouvrir et traiter le fichier pcap
-process_pcap("../Wireshark/light_switch.pcapng")
+def traiter_pcap(fichier_pcap):
+    """
+    Traite un fichier PCAP ZigBee et affiche les détails de chaque paquet.
 
-# Fermer le périphérique (bien que nous ne l'utilisions pas ici)
-device.close()
+    Args:
+        fichier_pcap (str): Chemin vers le fichier PCAP à traiter.
+    """
+    try:
+        capture = pyshark.FileCapture(fichier_pcap, display_filter="wpan")
+        logger.info(f"Fichier PCAP ouvert : '{fichier_pcap}'")
+
+        for idx, paquet in enumerate(capture, 1):
+            traiter_paquet(paquet, idx)
+
+    except FileNotFoundError:
+        logger.error(f"Fichier PCAP non trouvé : {fichier_pcap}")
+    except Exception as e:
+        logger.error(f"Erreur inattendue lors du traitement du fichier PCAP : {e}")
+
+def main():
+    """
+    Fonction principale pour démontrer le traitement de fichiers PCAP ZigBee.
+    """
+    fichier_pcap = "../Wireshark/light_switch.pcapng"  # Remplacez par le chemin réel de votre fichier
+    traiter_pcap(fichier_pcap)
+
+if __name__ == "__main__":
+    main()
