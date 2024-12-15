@@ -1,87 +1,162 @@
-import logging
 import pyshark
+import logging
+import threading
+import queue
+import time
+import json
+import glob
+from datetime import datetime
 
-# Configuration du journal (logging)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configurer la journalisation
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-def traiter_paquet(paquet, numero_paquet):
+def trouver_peripheriques_serie_usb():
     """
-    Traite un paquet ZigBee individuel et affiche les détails pertinents, 
-    y compris les clés, compteurs, étiquettes de clés et clusters.
-
-    Args:
-        paquet: Paquet Pyshark à traiter.
-        numero_paquet (int): Numéro du paquet pour les besoins de journalisation.
+    Trouver les périphériques série USB disponibles
+    
+    :return: Liste des chemins de périphériques série USB
     """
-    try:
-        logger.info(f"Traitement du paquet {numero_paquet}...")
+    return glob.glob('/dev/ttyACM*')
 
-        # Couche WPAN (802.15.4)
-        if hasattr(paquet, 'wpan'):
-            print("\n *** Couche WPAN (802.15.4) ***")
-            #print(paquet.wpan)
-            if hasattr(paquet.wpan, 'wpan_frame_counter'):
-                print(f"Compteur de trame : {paquet.wpan.wpan_frame_counter}")
-
-        # Couche NWK ZigBee
-        if hasattr(paquet, 'zbee_nwk'):
-            print("\n *** Couche NWK ***")
-            #print(paquet.zbee_nwk)
-            if hasattr(paquet.zbee_nwk, 'zbee_nwk_key_seqno'):
-                print(f"Numéro de séquence de clé : {paquet.zbee_nwk.zbee_nwk_key_seqno}")
-            if hasattr(paquet.zbee_nwk, 'zbee_nwk_frame_counter'):
-                print(f"Compteur de trame NWK : {paquet.zbee_nwk.zbee_nwk_frame_counter}")
-
-        # Couche APS ZigBee
-        if hasattr(paquet, 'zbee_aps'):
-            print("\n *** Couche APS ***")
-            #print(paquet.zbee_aps)
-            if hasattr(paquet.zbee_aps, 'zbee_aps_key_label'):
-                print(f"Étiquette de clé : {paquet.zbee_aps.zbee_aps_key_label}")
-            if hasattr(paquet.zbee_aps, 'zbee_aps_frame_counter'):
-                print(f"Compteur de trame APS : {paquet.zbee_aps.zbee_aps_frame_counter}")
-
-        # Couche ZCL ZigBee
-        if hasattr(paquet, 'zbee_zcl'):
-            print("\n *** Couche ZCL ***")
-            #print(paquet.zbee_zcl)
-            if hasattr(paquet.zbee_zcl, 'zbee_zcl_cluster_id'):
-                cluster_id = paquet.zbee_zcl.zbee_zcl_cluster_id
-                print(f"ID du cluster : {cluster_id}")
-                if cluster_id == "0x0006":  # Cluster On/Off
-                    print("Cluster : On/Off")
-                elif cluster_id == "0x0008":  # Cluster Level Control
-                    print("Cluster : Level Control")
-
-    except Exception as e:
-        logger.error(f"Erreur lors du traitement du paquet {numero_paquet} : {e}")
-
-def traiter_pcap(fichier_pcap):
-    """
-    Traite un fichier PCAP ZigBee et affiche les détails de chaque paquet.
-
-    Args:
-        fichier_pcap (str): Chemin vers le fichier PCAP à traiter.
-    """
-    try:
-        capture = pyshark.FileCapture(fichier_pcap, display_filter="wpan")
-        logger.info(f"Fichier PCAP ouvert : '{fichier_pcap}'")
-
-        for idx, paquet in enumerate(capture, 1):
-            traiter_paquet(paquet, idx)
-
-    except FileNotFoundError:
-        logger.error(f"Fichier PCAP non trouvé : {fichier_pcap}")
-    except Exception as e:
-        logger.error(f"Erreur inattendue lors du traitement du fichier PCAP : {e}")
+class SniffeurZigbee:
+    def __init__(self, canal=13, fichier_sortie='captures_zigbee.json'):
+        """
+        Initialiser le Sniffeur Zigbee avec sélection dynamique de périphérique
+        
+        :param canal: Canal Zigbee à sniffer
+        :param fichier_sortie: Fichier pour sauvegarder les captures de paquets
+        """
+        self.canal = canal
+        self.fichier_sortie = fichier_sortie
+        self.file_paquets = queue.Queue()
+        self.en_cours = False
+        self.capture = None
+        self.interface = self.selectionner_interface()
+    
+    def selectionner_interface(self):
+        """
+        Sélectionner le premier périphérique série USB disponible
+        
+        :return: Chemin de l'interface sélectionnée
+        """
+        peripheriques = trouver_peripheriques_serie_usb()
+        if not peripheriques:
+            raise RuntimeError("Aucun périphérique série USB trouvé")
+        
+        logger.info(f"Périphériques disponibles : {peripheriques}")
+        peripherique_selectionne = peripheriques[0]
+        logger.info(f"Périphérique sélectionné : {peripherique_selectionne}")
+        return peripherique_selectionne
+    
+    def capturer_paquets(self):
+        """
+        Capturer les paquets et les placer dans la file d'attente
+        """
+        try:
+            self.capture = pyshark.LiveCapture(
+                interface=self.interface, 
+                display_filter=f"wpan and chan == {self.canal}",
+                debug=True  # Activer le mode débogage
+            )
+            
+            logger.info(f"Démarrage de la capture sur {self.interface}, canal {self.canal}")
+            
+            for paquet in self.capture.sniff_continuously():
+                if not self.en_cours:
+                    break
+                self.file_paquets.put(paquet)
+        
+        except Exception as e:
+            logger.error(f"Erreur de capture : {e}")
+        finally:
+            if self.capture:
+                self.capture.close()
+    
+    def traiter_paquets(self):
+        """
+        Traiter les paquets de la file d'attente et les sauvegarder dans un fichier
+        """
+        captures = []
+        try:
+            while self.en_cours:
+                try:
+                    paquet = self.file_paquets.get(timeout=1)
+                    metadata = self.extraire_metadata_paquet(paquet)
+                    captures.append(metadata)
+                
+                except queue.Empty:
+                    continue
+        
+        except Exception as e:
+            logger.error(f"Erreur de traitement : {e}")
+        
+        finally:
+            # Sauvegarder les paquets capturés en JSON
+            with open(self.fichier_sortie, 'w') as f:
+                json.dump(captures, f, indent=2)
+            logger.info(f"Captures sauvegardées dans {self.fichier_sortie}")
+    
+    def extraire_metadata_paquet(self, paquet):
+        """
+        Extraire les métadonnées détaillées du paquet capturé
+        
+        :param paquet: Paquet Pyshark
+        :return: Dictionnaire avec les métadonnées du paquet
+        """
+        metadata = {
+            'horodatage': datetime.now().isoformat(),
+            'paquet_brut': str(paquet)
+        }
+        
+        # Extraire dynamiquement les informations de couche
+        couches = ['wpan', 'zbee_nwk', 'zbee_aps', 'zbee_zcl']
+        for couche in couches:
+            if hasattr(paquet, couche):
+                donnees_couche = {}
+                objet_couche = getattr(paquet, couche)
+                
+                # Extraire dynamiquement tous les attributs
+                for attr in dir(objet_couche):
+                    if not attr.startswith('_'):
+                        try:
+                            valeur = getattr(objet_couche, attr)
+                            donnees_couche[attr] = str(valeur)
+                        except Exception:
+                            pass
+                
+                metadata[couche] = donnees_couche
+        
+        return metadata
+    
+    def commencer_sniffing(self, duree=60):
+        """
+        Commencer le sniffing avec des threads séparés
+        
+        :param duree: Durée de capture en secondes
+        """
+        self.en_cours = True
+        
+        # Créer les threads
+        thread_capture = threading.Thread(target=self.capturer_paquets)
+        thread_traitement = threading.Thread(target=self.traiter_paquets)
+        
+        # Démarrer les threads
+        thread_capture.start()
+        thread_traitement.start()
+        
+        # Attendre la durée spécifiée
+        time.sleep(duree)
+        
+        # Arrêter les threads
+        self.en_cours = False
+        thread_capture.join()
+        thread_traitement.join()
 
 def main():
-    """
-    Fonction principale pour démontrer le traitement de fichiers PCAP ZigBee.
-    """
-    fichier_pcap = "../Wireshark/light_switch.pcapng"  # Remplacez par le chemin réel de votre fichier
-    traiter_pcap(fichier_pcap)
+    sniffeur = SniffeurZigbee(canal=13)
+    sniffeur.commencer_sniffing()
 
 if __name__ == "__main__":
     main()
