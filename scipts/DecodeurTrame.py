@@ -29,21 +29,25 @@ class DecodeurTrameZigbee:
 
     def decoder_trame_command(self, octets_trame):
         """Décoder une trame de commande."""
-        offset = 2
+        
+        offset =2
         sequence_number = octets_trame[offset]
         offset += 1
-
+        
         pan_id = octets_trame[offset:offset + 2].hex()
         offset += 2
-
+        
+   
         destination = octets_trame[offset:offset + 2].hex()
         offset += 2
 
         source = octets_trame[offset:offset + 2].hex()
+        
         offset += 2
-
         command_id = octets_trame[offset]  # Identifiant de commande
+        
         offset += 1
+     
 
         return {
             'type_trame': 'Command',
@@ -181,11 +185,16 @@ class DecodeurTrameZigbee:
 
 
 # Tests
-#trame_ack = bytes.fromhex("020030")
-#trame_command = bytes.fromhex("63880500190000146e044bfc")
-#trame_data = bytes.fromhex("6188300019146e0000481a146e00001e222f3c60feffbd4d749e2860feffbd4d7428247002009e2860feffbd4d74005ca080848585055c298eab1c1c9f41")
+#trame_ack = bytes.fromhex("02002c")
 
-#decoder = DecodeurTrameZigbee()
+#trame_command = bytes.fromhex("63884a00190000146e04")
+
+trame_data = bytes.fromhex("6188300019146e0000481a146e00001e222f3c60feffbd4d749e2860feffbd4d7428247002009e2860feffbd4d74005ca080848585055c298eab1c1c9f41")
+decoder = DecodeurTrameZigbee()
 #print(json.dumps(decoder.decoder_trame_zigbee(trame_ack), indent=2))
 #print(json.dumps(decoder.decoder_trame_zigbee(trame_command), indent=2))
 #print(json.dumps(decoder.decoder_trame_zigbee(trame_data), indent=2))
+
+#Ecriture dans un fichier
+with open('captures_zigbee.json', 'w') as f:
+    json.dump(decoder.decoder_trame_zigbee(trame_data), f, indent=2)
