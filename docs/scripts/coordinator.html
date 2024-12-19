@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
 <title>scripts.coordinator API documentation</title>
-<meta name="description" content="Ce module implémente un coordinateur Zigbee avec WHAD.
-Il crée et initialise un réseau Zigbee avec un périphérique compatible et permet la réception …">
+<meta name="description" content="Ce module implémente un coordinateur Zigbee avec WHAD …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -37,8 +36,9 @@ el.replaceWith(d);
 <h1 class="title">Module <code>scripts.coordinator</code></h1>
 </header>
 <section id="section-intro">
-<p>Ce module implémente un coordinateur Zigbee avec WHAD.
-Il crée et initialise un réseau Zigbee avec un périphérique compatible et permet la réception des données.</p>
+<p>Ce module implémente un coordinateur Zigbee avec WHAD.</p>
+<h2 id="classes">Classes</h2>
+<p>CodeurTrameZigbee : Classe pour encoder des trames Zigbee.</p>
 </section>
 <section>
 </section>
@@ -57,13 +57,21 @@ Il crée et initialise un réseau Zigbee avec un périphérique compatible et pe
 </summary>
 <pre><code class="python">def create_device_instance():
     &#34;&#34;&#34;
-    Crée une instance de périphérique compatible en utilisant \n l&#39;interface série spécifiée.
+    Crée une instance de périphérique compatible en utilisant l&#39;interface série spécifiée.
     
-    Retourne une instance de `WhadDevice` pour l&#39;interface série &#34;uart2&#34;.
-    Si une erreur survient lors de la création, une exception est levée.
-    
-    - `return :` instance de `WhadDevice`
-    - `raises :` Exception si l&#39;instance ne peut pas être créée
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    WhadDevice
+        Une instance de `WhadDevice` pour l&#39;interface série &#34;uart2&#34;.
+
+    Raises
+    ------
+    Exception
+        Si l&#39;instance ne peut pas être créée.
     &#34;&#34;&#34;
     try:
         # Création de l&#39;instance de périphérique sur &#34;uart2&#34;
@@ -72,14 +80,22 @@ Il crée et initialise un réseau Zigbee avec un périphérique compatible et pe
     except Exception as e:
         raise Exception(&#34;Erreur lors de la création du périphérique: &#34; + str(e))</code></pre>
 </details>
-<div class="desc"><p>Crée une instance de périphérique compatible en utilisant
-l'interface série spécifiée.</p>
-<p>Retourne une instance de <code>WhadDevice</code> pour l'interface série "uart2".
-Si une erreur survient lors de la création, une exception est levée.</p>
-<ul>
-<li><code>return :</code> instance de <code>WhadDevice</code></li>
-<li><code>raises :</code> Exception si l'instance ne peut pas être créée</li>
-</ul></div>
+<div class="desc"><p>Crée une instance de périphérique compatible en utilisant l'interface série spécifiée.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>None</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>WhadDevice</code></dt>
+<dd>Une instance de <code>WhadDevice</code> pour l'interface série "uart2".</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>Si l'instance ne peut pas être créée.</dd>
+</dl></div>
 </dd>
 <dt id="scripts.coordinator.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
@@ -98,6 +114,14 @@ Si une erreur survient lors de la création, une exception est levée.</p>
     - Affiche le résultat du démarrage du réseau Zigbee.
     
     Si une erreur survient à n&#39;importe quelle étape, un message d&#39;erreur est affiché.
+    
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
     &#34;&#34;&#34;
     try:
         # Création du périphérique compatible
@@ -117,7 +141,17 @@ Si une erreur survient lors de la création, une exception est levée.</p>
 <li>Démarre un réseau Zigbee et active la réception des données.</li>
 <li>Affiche le résultat du démarrage du réseau Zigbee.</li>
 </ul>
-<p>Si une erreur survient à n'importe quelle étape, un message d'erreur est affiché.</p></div>
+<p>Si une erreur survient à n'importe quelle étape, un message d'erreur est affiché.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>None</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 <dt id="scripts.coordinator.start_zigbee_network"><code class="name flex">
 <span>def <span class="ident">start_zigbee_network</span></span>(<span>device)</span>
@@ -131,12 +165,20 @@ Si une erreur survient lors de la création, une exception est levée.</p>
     &#34;&#34;&#34;
     Démarre un réseau Zigbee en tant que coordinateur avec les paramètres spécifiés.
     
-    Ce réseau utilise le canal 13, un PAN ID étendu 1122334455667788990 et aucune clé de chiffrement.
-    Active également la réception des données sur le réseau.
-    
-    - `param device :` instance de `WhadDevice` utilisée pour la connexion au réseau
-    - `return :` résultat de la méthode `start_network` indiquant le succès ou l&#39;échec de l&#39;initialisation
-    - `raises :` Exception si le réseau ne peut pas être démarré
+    Parameters
+    ----------
+    device : WhadDevice
+        L&#39;instance de périphérique utilisée pour la connexion au réseau.
+
+    Returns
+    -------
+    str
+        Le résultat de la méthode `start_network` indiquant le succès ou l&#39;échec de l&#39;initialisation.
+
+    Raises
+    ------
+    Exception
+        Si le réseau ne peut pas être démarré.
     &#34;&#34;&#34;
     try:
         # Création d&#39;un coordinateur Zigbee
@@ -153,13 +195,21 @@ Si une erreur survient lors de la création, une exception est levée.</p>
         raise Exception(&#34;Erreur lors du démarrage du réseau Zigbee: &#34; + str(e))</code></pre>
 </details>
 <div class="desc"><p>Démarre un réseau Zigbee en tant que coordinateur avec les paramètres spécifiés.</p>
-<p>Ce réseau utilise le canal 13, un PAN ID étendu 1122334455667788990 et aucune clé de chiffrement.
-Active également la réception des données sur le réseau.</p>
-<ul>
-<li><code>param device :</code> instance de <code>WhadDevice</code> utilisée pour la connexion au réseau</li>
-<li><code>return :</code> résultat de la méthode <code>start_network</code> indiquant le succès ou l'échec de l'initialisation</li>
-<li><code>raises :</code> Exception si le réseau ne peut pas être démarré</li>
-</ul></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>device</code></strong> :&ensp;<code>WhadDevice</code></dt>
+<dd>L'instance de périphérique utilisée pour la connexion au réseau.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Le résultat de la méthode <code>start_network</code> indiquant le succès ou l'échec de l'initialisation.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>Si le réseau ne peut pas être démarré.</dd>
+</dl></div>
 </dd>
 </dl>
 </section>
@@ -168,7 +218,9 @@ Active également la réception des données sur le réseau.</p>
 </article>
 <nav id="sidebar">
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#classes">Classes</a></li>
+</ul>
 </div>
 <ul id="index">
 <li><h3>Super-module</h3>

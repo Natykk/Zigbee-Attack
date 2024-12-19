@@ -1,5 +1,8 @@
 """
-Ce Module implémente un sniffeur de trames Zigbee.
+Module implémentant un sniffeur de trames Zigbee.
+
+Ce module fournit les fonctionnalités pour capturer et analyser les trames Zigbee
+depuis une interface série.
 """
 import serial
 import logging
@@ -26,22 +29,28 @@ logger = logging.getLogger(__name__)
 
 def trouver_peripheriques_serie():
     """
-    @brief Recherche des périphériques série USB compatibles.
-    
-    @return: Liste des périphériques série trouvés.
-    @rtype: list
+    Recherche les périphériques série USB compatibles.
+
+    Retours
+    -------
+    list
+        Liste des périphériques série trouvés.
     """
     return glob.glob('/dev/ttyACM*')
 
 def calculer_entropie(donnees):
     """
-    @brief Calcule l'entropie d'un jeu de données.
-    
-    @param donnees: Données pour lesquelles l'entropie est calculée, sous forme de bytes.
-    @type donnees: bytes
-    
-    @return: Entropie des données.
-    @rtype: float
+    Calcule l'entropie d'un jeu de données.
+
+    Paramètres
+    ----------
+    donnees : bytes
+        Données pour lesquelles l'entropie est calculée.
+
+    Retours
+    -------
+    float
+        Entropie des données.
     """
     if not donnees:
         return 0.0
@@ -51,15 +60,29 @@ def calculer_entropie(donnees):
 
 def decrypter_payload_zigbee(payload_hex, cle_hex):
     """
-    @brief Décrypte un payload Zigbee chiffré avec AES en mode CCM.
-    
-    @param payload_hex: Payload chiffré en hexadécimal.
-    @type payload_hex: str
-    @param cle_hex: Clé de chiffrement en hexadécimal.
-    @type cle_hex: str
-    
-    @return: Dictionnaire contenant le résultat du décryptage.
-    @rtype: dict
+    Décrypte un payload Zigbee chiffré avec AES en mode CCM.
+
+    Paramètres
+    ----------
+    payload_hex : str
+        Payload chiffré en format hexadécimal.
+    cle_hex : str
+        Clé de chiffrement en format hexadécimal.
+
+    Retours
+    -------
+    dict
+        Dictionnaire contenant les résultats du déchiffrement avec les clés suivantes :
+        - succes : bool
+            Indique si le déchiffrement a réussi
+        - nonce : str, optionnel
+            Nonce utilisé pour le déchiffrement (uniquement si succès)
+        - tag : str, optionnel
+            Tag d'authentification (uniquement si succès)
+        - payload_dechiffre : str, optionnel
+            Payload déchiffré (uniquement si succès)
+        - erreur : str, optionnel
+            Message d'erreur (uniquement en cas d'échec)
     """
     try:
         payload = bytes.fromhex(payload_hex)
@@ -84,23 +107,46 @@ def decrypter_payload_zigbee(payload_hex, cle_hex):
 
 class SniffeurZigbee:
     """
-    @class SniffeurZigbee
-    @brief Classe pour capturer et analyser les trames ZigBee.
-    @details Cette classe gère la capture des trames ZigBee depuis un périphérique série, les décodent et les sauvegardent dans un fichier JSON.
-    Elle prend également en charge le décryptage des trames lorsque nécessaire.
+    Classe pour capturer et analyser les trames ZigBee.
+
+    Cette classe gère la capture des trames ZigBee depuis un périphérique série,
+    leur décodage et leur sauvegarde dans un fichier JSON. Elle prend également
+    en charge le déchiffrement des trames lorsque nécessaire.
+
+    Paramètres
+    ----------
+    canal : int, optionnel
+        Canal ZigBee sur lequel écouter (par défaut 13)
+    fichier_sortie : str, optionnel
+        Nom du fichier de sortie pour les captures (par défaut 'captures_zigbee.json')
+    vitesse_bauds : int, optionnel
+        Vitesse de transmission série (par défaut 115200)
+
+    Attributs
+    ----------
+    canal : int
+        Canal ZigBee sélectionné
+    fichier_sortie : str
+        Chemin vers le fichier de sortie
+    vitesse_bauds : int
+        Vitesse de transmission en bauds
+    file_paquets : Queue
+        File d'attente pour stocker les paquets capturés
+    est_en_cours : bool
+        Drapeau indiquant si la capture est active
+    port_serie : serial.Serial
+        Objet port série
+    interface : str
+        Interface série sélectionnée
+    captures : list
+        Liste des trames capturées
+    cle_dechiffrement : str
+        Clé de déchiffrement
+    metadonnees : list
+        Liste des métadonnées de capture
     """
 
     def __init__(self, canal=13, fichier_sortie='captures_zigbee.json', vitesse_bauds=115200):
-        """
-        @brief Constructeur de la classe SniffeurZigbee.
-        
-        @param canal: Canal ZigBee sur lequel écouter. Valeur par défaut : 13.
-        @type canal: int
-        @param fichier_sortie: Nom du fichier de sortie pour les captures. Valeur par défaut : 'captures_zigbee.json'.
-        @type fichier_sortie: str
-        @param vitesse_bauds: Vitesse de transmission série. Valeur par défaut : 115200.
-        @type vitesse_bauds: int
-        """
         self.canal = canal
         self.fichier_sortie = fichier_sortie
         self.vitesse_bauds = vitesse_bauds
@@ -114,12 +160,17 @@ class SniffeurZigbee:
 
     def _selectionner_interface(self):
         """
-        @brief Sélectionne le périphérique série disponible pour le sniffer.
-        
-        @return: Nom du périphérique série sélectionné.
-        @rtype: str
-        
-        @raise RuntimeError: Si aucun périphérique série n'est trouvé.
+        Sélectionne le périphérique série disponible pour le sniffer.
+
+        Retours
+        -------
+        str
+            Nom du périphérique série sélectionné.
+
+        Lève
+        ----
+        RuntimeError
+            Si aucun périphérique série n'est trouvé.
         """
         peripheriques = trouver_peripheriques_erie()
         if not peripheriques:
@@ -129,9 +180,12 @@ class SniffeurZigbee:
 
     def _configurer_sniffer(self):
         """
-        @brief Configure le sniffer pour capturer les trames ZigBee via un port série.
-        
-        @raise RuntimeError: Si la configuration échoue.
+        Configure le sniffer pour capturer les trames ZigBee via le port série.
+
+        Lève
+        ----
+        RuntimeError
+            Si la configuration échoue.
         """
         try:
             self.port_serie = serial.Serial(self.interface, baudrate=self.vitesse_bauds, timeout=1)
@@ -143,14 +197,17 @@ class SniffeurZigbee:
 
     def _fermer_port_serie(self):
         """
-        @brief Ferme le port série s'il est ouvert.
+        Ferme le port série s'il est ouvert.
         """
         if self.port_serie and self.port_serie.is_open:
             self.port_serie.close()
 
     def _capturer_paquets(self):
         """
-        @brief Capture les paquets depuis le port série et les ajoute à la file d'attente.
+        Capture les paquets depuis le port série et les ajoute à la file d'attente.
+
+        Cette méthode s'exécute dans un thread séparé et lit en continu depuis le
+        port série, ajoutant les paquets reçus à la file d'attente.
         """
         try:
             logger.info(f"Début de capture sur {self.interface}, canal {self.canal}")
@@ -169,24 +226,25 @@ class SniffeurZigbee:
 
     def _traiter_paquets(self, decoder=DecodeurTrameZigbee()):
         """
-        @brief Traite les paquets capturés, les décode et les ajoute à la liste des captures.
-        
-        @param decoder: Instance de la classe DecodeurTrameZigbee utilisée pour décoder les trames.
-        @type decoder: DecodeurTrameZigbee
+        Traite les paquets capturés, les décode et les ajoute à la liste des captures.
+
+        Paramètres
+        ----------
+        decoder : DecodeurTrameZigbee, optionnel
+            Instance de la classe de décodage des trames ZigBee (par défaut DecodeurTrameZigbee())
         """
         while self.est_en_cours:
             try:
                 paquet = self.file_paquets.get(timeout=1)
                 try:
                     logger.info(f"Paquet brut reçu : {paquet}")
-                    paquet_received = paquet.split(" ")[1]  # Extraction des données reçues
-                    paquet_bytes = bytes.fromhex(paquet_received)  # Conversion hex->bytes
+                    paquet_received = paquet.split(" ")[1]
+                    paquet_bytes = bytes.fromhex(paquet_received)
 
-                    # Extraction des métadonnées depuis la chaîne de paquet
                     metadonnees = {
-                        'power': paquet.split(" ")[3],  # Valeur de power
-                        'lqi': paquet.split(" ")[5],    # Valeur de lqi
-                        'timestamp': paquet.split(" ")[7]  # Valeur du timestamp
+                        'power': paquet.split(" ")[3],
+                        'lqi': paquet.split(" ")[5],
+                        'timestamp': paquet.split(" ")[7]
                     }
                     
                     decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
@@ -194,7 +252,6 @@ class SniffeurZigbee:
                         logger.info(f"Trame Zigbee décodée : {decoded_frame}")
                         decoded_frame['metadonnees'] = metadonnees
                         self.captures.append(decoded_frame)
-                        
                     else:
                         logger.warning(f"Impossible de décoder la trame : {paquet_received}")
                 except Exception as e:
@@ -204,9 +261,10 @@ class SniffeurZigbee:
 
     def demarrer_sniffer(self):
         """
-        @brief Démarre le sniffer pour commencer à capturer les trames ZigBee.
-        
-        Cette méthode démarre deux threads : un pour capturer les paquets et un autre pour les traiter.
+        Démarre le sniffer pour commencer à capturer les trames ZigBee.
+
+        Cette méthode démarre deux threads : un pour la capture des paquets
+        et un autre pour leur traitement.
         """
         try:
             self.est_en_cours = True
@@ -218,16 +276,25 @@ class SniffeurZigbee:
 
     def arreter_sniffer(self):
         """
-        @brief Arrête le sniffer.
+        Arrête le sniffer.
+
+        Cette méthode met le drapeau d'exécution à False, ce qui provoquera
+        l'arrêt des threads de capture et de traitement.
         """
         self.est_en_cours = False
         logger.info("Arrêt du sniffer")
 
     def sauvegarder_captures(self):
         """
-        @brief Sauvegarde les captures dans un fichier JSON.
-        
-        Cette méthode écrit les captures dans un fichier spécifié lors de l'initialisation de la classe.
+        Sauvegarde les captures dans un fichier JSON.
+
+        Cette méthode écrit les captures dans le fichier spécifié lors de
+        l'initialisation de la classe.
+
+        Lève
+        ----
+        Exception
+            Si une erreur survient lors de la sauvegarde des captures.
         """
         try:
             with open(self.fichier_sortie, 'w', encoding='utf-8') as f:
@@ -235,13 +302,3 @@ class SniffeurZigbee:
             logger.info(f"Captures sauvegardées dans {self.fichier_sortie}")
         except Exception as e:
             logger.error(f"Erreur lors de la sauvegarde des captures : {e}")
-
-'''
-# Exemple d'utilisation
-if __name__ == "__main__":
-    sniffer = SniffeurZigbee()
-    sniffer.demarrer_sniffer()
-    time.sleep(10)  # Capture pendant 10 secondes
-    sniffer.arreter_sniffer()
-    sniffer.sauvegarder_captures()
-'''

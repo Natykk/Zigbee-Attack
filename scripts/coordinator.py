@@ -1,6 +1,9 @@
 """
 Ce module implémente un coordinateur Zigbee avec WHAD.
-Il crée et initialise un réseau Zigbee avec un périphérique compatible et permet la réception des données.
+
+Classes
+-------
+CodeurTrameZigbee : Classe pour encoder des trames Zigbee. 
 """
 
 import whad.zigbee.connector.coordinator
@@ -12,11 +15,19 @@ def create_device_instance():
     """
     Crée une instance de périphérique compatible en utilisant l'interface série spécifiée.
     
-    Retourne une instance de `WhadDevice` pour l'interface série "uart2".
-    Si une erreur survient lors de la création, une exception est levée.
-    
-    - `return :` instance de `WhadDevice`
-    - `raises :` Exception si l'instance ne peut pas être créée
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    WhadDevice
+        Une instance de `WhadDevice` pour l'interface série "uart2".
+
+    Raises
+    ------
+    Exception
+        Si l'instance ne peut pas être créée.
     """
     try:
         # Création de l'instance de périphérique sur "uart2"
@@ -25,16 +36,25 @@ def create_device_instance():
     except Exception as e:
         raise Exception("Erreur lors de la création du périphérique: " + str(e))
 
+
 def start_zigbee_network(device):
     """
     Démarre un réseau Zigbee en tant que coordinateur avec les paramètres spécifiés.
     
-    Ce réseau utilise le canal 13, un PAN ID étendu 1122334455667788990 et aucune clé de chiffrement.
-    Active également la réception des données sur le réseau.
-    
-    - `param device :` instance de `WhadDevice` utilisée pour la connexion au réseau
-    - `return :` résultat de la méthode `start_network` indiquant le succès ou l'échec de l'initialisation
-    - `raises :` Exception si le réseau ne peut pas être démarré
+    Parameters
+    ----------
+    device : WhadDevice
+        L'instance de périphérique utilisée pour la connexion au réseau.
+
+    Returns
+    -------
+    str
+        Le résultat de la méthode `start_network` indiquant le succès ou l'échec de l'initialisation.
+
+    Raises
+    ------
+    Exception
+        Si le réseau ne peut pas être démarré.
     """
     try:
         # Création d'un coordinateur Zigbee
@@ -50,6 +70,7 @@ def start_zigbee_network(device):
     except Exception as e:
         raise Exception("Erreur lors du démarrage du réseau Zigbee: " + str(e))
 
+
 def main():
     """
     Fonction principale qui gère la création du périphérique et du réseau Zigbee.
@@ -59,6 +80,14 @@ def main():
     - Affiche le résultat du démarrage du réseau Zigbee.
     
     Si une erreur survient à n'importe quelle étape, un message d'erreur est affiché.
+    
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
     """
     try:
         # Création du périphérique compatible

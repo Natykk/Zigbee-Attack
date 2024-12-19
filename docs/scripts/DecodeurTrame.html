@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
 <title>scripts.DecodeurTrame API documentation</title>
-<meta name="description" content="Ce Module implémente un décodeur de trames ZigBee.">
+<meta name="description" content="Décodeur de trames ZigBee.
+Ce module implémente un décodeur pour analyser et interpréter différents types
+de trames ZigBee.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,7 +38,9 @@ el.replaceWith(d);
 <h1 class="title">Module <code>scripts.DecodeurTrame</code></h1>
 </header>
 <section id="section-intro">
-<p>Ce Module implémente un décodeur de trames ZigBee.</p>
+<p>Décodeur de trames ZigBee.
+Ce module implémente un décodeur pour analyser et interpréter différents types
+de trames ZigBee.</p>
 </section>
 <section>
 </section>
@@ -58,37 +62,48 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">class DecodeurTrameZigbee:
     &#34;&#34;&#34;
-    @class DecodeurTrameZigbee
-    @brief Classe pour décoder des trames ZigBee.
-    @details Cette classe fournit des méthodes pour décoder différents types de trames ZigBee, telles que les trames ACK,
-             les trames de commande et les trames de données. Elle extrait et structure les informations contenues dans
-             les trames afin de faciliter leur analyse et leur traitement.
+    Classe pour décoder des trames ZigBee.
+
+    Cette classe fournit des méthodes pour décoder différents types de trames ZigBee,
+    telles que les trames ACK, les trames de commande et les trames de données.
+    Elle extrait et structure les informations contenues dans les trames afin de
+    faciliter leur analyse et leur traitement.
     &#34;&#34;&#34;
 
     def __init__(self, logger=None):
         &#34;&#34;&#34;
-        @brief Constructeur de la classe DecodeurTrameZigbee.
-        
-        @param logger: Objet logger pour la journalisation des erreurs et des informations. Si aucun logger n&#39;est fourni,
-                       un logger par défaut est utilisé.
+        Initialise le décodeur de trames ZigBee.
+
+        Parameters
+        ----------
+        logger : logging.Logger, optional
+            Objet logger pour la journalisation des erreurs et des informations.
+            Si non fourni, un logger par défaut est utilisé.
         &#34;&#34;&#34;
         self.logger = logger or logging.getLogger(__name__)
 
     def decoder_champ_controle_trame(self, controle_trame):
         &#34;&#34;&#34;
-        @brief Décoder le champ de contrôle MAC d&#39;une trame ZigBee.
-        
-        @param controle_trame: Champ de contrôle MAC sous forme d&#39;entier, représentant les premiers octets du champ de contrôle.
-        
-        @return: Un dictionnaire contenant les différents champs du contrôle de trame décodés :
-                 - frame_type: Type de la trame
-                 - securite_activee: Indicateur de sécurité
-                 - trame_en_attente: Indicateur de trame en attente
-                 - ack_requis: Indicateur d&#39;ACK requis
-                 - compression_pan_id: Indicateur de compression du PAN ID
-                 - version_trame: Version de la trame
-                 - mode_adresse_dst: Mode d&#39;adresse de destination
-                 - mode_adresse_src: Mode d&#39;adresse source
+        Décode le champ de contrôle MAC d&#39;une trame ZigBee.
+
+        Parameters
+        ----------
+        controle_trame : int
+            Champ de contrôle MAC sous forme d&#39;entier, représentant les premiers
+            octets du champ de contrôle.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les différents champs du contrôle de trame décodés :
+            - frame_type : Type de la trame
+            - securite_activee : Indicateur de sécurité
+            - trame_en_attente : Indicateur de trame en attente
+            - ack_requis : Indicateur d&#39;ACK requis
+            - compression_pan_id : Indicateur de compression du PAN ID
+            - version_trame : Version de la trame
+            - mode_adresse_dst : Mode d&#39;adresse de destination
+            - mode_adresse_src : Mode d&#39;adresse source
         &#34;&#34;&#34;
         return {
             &#39;frame_type&#39;: controle_trame &amp; 0x07,  # Bits 0-2
@@ -103,13 +118,19 @@ el.replaceWith(d);
 
     def decoder_trame_ack(self, octets_trame):
         &#34;&#34;&#34;
-        @brief Décoder une trame ACK ZigBee.
-        
-        @param octets_trame: Les octets de la trame ACK à décoder.
-        
-        @return: Un dictionnaire contenant les informations suivantes :
-                 - type_trame: Type de la trame (&#39;Ack&#39;)
-                 - sequence_number: Numéro de séquence de la trame
+        Décode une trame ACK ZigBee.
+
+        Parameters
+        ----------
+        octets_trame : bytes
+            Les octets de la trame ACK à décoder.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les informations de la trame ACK :
+            - type_trame : Type de la trame (&#39;Ack&#39;)
+            - sequence_number : Numéro de séquence de la trame
         &#34;&#34;&#34;
         sequence_number = octets_trame[2]
         return {
@@ -119,17 +140,23 @@ el.replaceWith(d);
 
     def decoder_trame_command(self, octets_trame):
         &#34;&#34;&#34;
-        @brief Décoder une trame de commande ZigBee.
-        
-        @param octets_trame: Les octets de la trame de commande à décoder.
-        
-        @return: Un dictionnaire contenant les informations suivantes :
-                 - type_trame: Type de la trame (&#39;Command&#39;)
-                 - sequence_number: Numéro de séquence de la trame
-                 - pan_id: PAN ID
-                 - destination: Adresse de destination
-                 - source: Adresse source
-                 - command_id: Identifiant de la commande
+        Décode une trame de commande ZigBee.
+
+        Parameters
+        ----------
+        octets_trame : bytes
+            Les octets de la trame de commande à décoder.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les informations de la trame de commande :
+            - type_trame : Type de la trame (&#39;Command&#39;)
+            - sequence_number : Numéro de séquence de la trame
+            - pan_id : PAN ID
+            - destination : Adresse de destination
+            - source : Adresse source
+            - command_id : Identifiant de la commande
         &#34;&#34;&#34;
         offset = 2
         sequence_number = octets_trame[offset]
@@ -143,7 +170,7 @@ el.replaceWith(d);
 
         source = octets_trame[offset:offset + 2].hex()
         offset += 2
-        command_id = octets_trame[offset]  # Identifiant de commande
+        command_id = octets_trame[offset]
         
         offset += 1
 
@@ -158,28 +185,32 @@ el.replaceWith(d);
 
     def decoder_trame_data(self, octets_trame):
         &#34;&#34;&#34;
-        @brief Décoder une trame Data ZigBee complète.
-        
-        @param octets_trame: Les octets de la trame Data à décoder.
-        
-        @return: Un dictionnaire contenant les informations suivantes :
-                 - type_trame: Type de la trame (&#39;Data&#39;)
-                 - couche_mac: Informations sur la couche MAC
-                 - couche_reseau: Informations sur la couche réseau
-                 - security_header: Informations sur l&#39;en-tête de sécurité
-                 - payload: Données utiles de la trame (payload)
+        Décode une trame Data ZigBee complète.
+
+        Parameters
+        ----------
+        octets_trame : bytes
+            Les octets de la trame Data à décoder.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les informations de la trame Data :
+            - type_trame : Type de la trame (&#39;Data&#39;)
+            - couche_mac : Informations sur la couche MAC
+            - couche_reseau : Informations sur la couche réseau
+            - security_header : Informations sur l&#39;en-tête de sécurité
+            - payload : Données utiles de la trame (payload)
         &#34;&#34;&#34;
         couche_mac = self.decoder_couche_mac(octets_trame)
         offset = couche_mac[&#39;offset&#39;]
 
-        # Couche réseau et sécurité ZigBee
         couche_reseau = self.decoder_couche_reseau(octets_trame, offset)
         offset = couche_reseau[&#39;offset&#39;]
 
         security_header = self.decoder_security_header(octets_trame, offset)
         offset = security_header[&#39;offset&#39;]
 
-        # Extraction du payload
         payload = octets_trame[offset:].hex()
 
         return {
@@ -192,23 +223,27 @@ el.replaceWith(d);
 
     def decoder_trame_zigbee(self, octets_trame):
         &#34;&#34;&#34;
-        @brief Décoder une trame ZigBee en fonction du type de trame.
-        
-        @param octets_trame: Les octets de la trame ZigBee à décoder.
-        
-        @return: Un dictionnaire contenant les informations de la trame décodée, y compris le type de trame
-                 (ACK, Command ou Data) et les détails associés. Si la trame est inconnue, retourne un dictionnaire
-                 avec le type &#39;Inconnu&#39;.
+        Décode une trame ZigBee en fonction de son type.
+
+        Parameters
+        ----------
+        octets_trame : bytes
+            Les octets de la trame ZigBee à décoder.
+
+        Returns
+        -------
+        dict or None
+            Dictionnaire contenant les informations de la trame décodée, incluant
+            le type de trame (ACK, Command ou Data) et les détails associés.
+            Retourne None si la trame est vide.
         &#34;&#34;&#34;
         if not octets_trame:
             return None
 
-        # Décoder le champ de contrôle MAC pour identifier le Frame Type
         champ_controle_trame = int.from_bytes(octets_trame[:2], &#39;little&#39;)
         controle_trame = self.decoder_champ_controle_trame(champ_controle_trame)
         frame_type = controle_trame[&#39;frame_type&#39;]
 
-        # Rediriger vers le bon décodeur en fonction du type de trame
         if frame_type == 0x2:  # Trame ACK
             return self.decoder_trame_ack(octets_trame)
         elif frame_type == 0x3:  # Trame Command
@@ -220,17 +255,23 @@ el.replaceWith(d);
 
     def decoder_couche_mac(self, octets_trame_mac):
         &#34;&#34;&#34;
-        @brief Décoder la couche MAC d&#39;une trame ZigBee.
-        
-        @param octets_trame_mac: Les octets de la trame MAC à décoder.
-        
-        @return: Un dictionnaire contenant les informations suivantes :
-                 - controle_trame: Champ de contrôle décodé
-                 - numero_sequence: Numéro de séquence
-                 - pan_id_destination: PAN ID de destination
-                 - adresse_destination: Adresse de destination
-                 - adresse_source: Adresse source
-                 - offset: Décalage après la couche MAC
+        Décode la couche MAC d&#39;une trame ZigBee.
+
+        Parameters
+        ----------
+        octets_trame_mac : bytes
+            Les octets de la trame MAC à décoder.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les informations de la couche MAC :
+            - controle_trame : Champ de contrôle décodé
+            - numero_sequence : Numéro de séquence
+            - pan_id_destination : PAN ID de destination
+            - adresse_destination : Adresse de destination
+            - adresse_source : Adresse source
+            - offset : Décalage après la couche MAC
         &#34;&#34;&#34;
         offset = 0
         champ_controle_trame = int.from_bytes(octets_trame_mac[offset:offset + 2], byteorder=&#39;little&#39;)
@@ -260,20 +301,27 @@ el.replaceWith(d);
 
     def decoder_couche_reseau(self, octets_trame, offset):
         &#34;&#34;&#34;
-        @brief Décoder la couche réseau d&#39;une trame ZigBee.
-        
-        @param octets_trame: Les octets de la trame à décoder.
-        @param offset: Décalage après la couche MAC.
-        
-        @return: Un dictionnaire contenant les informations suivantes :
-                 - champ_controle_reseau: Champ de contrôle réseau
-                 - radius: Rayon de la trame
-                 - sequence_number: Numéro de séquence
-                 - adresse_destination: Adresse de destination
-                 - extended_source: Source étendue
-                 - offset: Décalage après la couche réseau
-                 - addr_dest: Adresse de destination
-                 - addr_src: Adresse source
+        Décode la couche réseau d&#39;une trame ZigBee.
+
+        Parameters
+        ----------
+        octets_trame : bytes
+            Les octets de la trame à décoder.
+        offset : int
+            Décalage après la couche MAC.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les informations de la couche réseau :
+            - champ_controle_reseau : Champ de contrôle réseau
+            - radius : Rayon de la trame
+            - sequence_number : Numéro de séquence
+            - adresse_destination : Adresse de destination
+            - extended_source : Source étendue
+            - offset : Décalage après la couche réseau
+            - addr_dest : Adresse de destination
+            - addr_src : Adresse source
         &#34;&#34;&#34;
         champ_controle_reseau = octets_trame[offset:offset + 2].hex()
         offset += 2
@@ -308,17 +356,24 @@ el.replaceWith(d);
 
     def decoder_security_header(self, octets_trame, offset):
         &#34;&#34;&#34;
-        @brief Décoder l&#39;en-tête de sécurité ZigBee.
-        
-        @param octets_trame: Les octets de la trame à décoder.
-        @param offset: Décalage après la couche réseau.
-        
-        @return: Un dictionnaire contenant les informations suivantes :
-                 - extended_nonce: Nonce étendu
-                 - frame_counter: Compteur de trame
-                 - extended_source: Source étendue
-                 - key_sequence_number: Numéro de séquence de la clé
-                 - offset: Décalage après l&#39;en-tête de sécurité
+        Décode l&#39;en-tête de sécurité ZigBee.
+
+        Parameters
+        ----------
+        octets_trame : bytes
+            Les octets de la trame à décoder.
+        offset : int
+            Décalage après la couche réseau.
+
+        Returns
+        -------
+        dict
+            Dictionnaire contenant les informations de l&#39;en-tête de sécurité :
+            - extended_nonce : Nonce étendu
+            - frame_counter : Compteur de trame
+            - extended_source : Source étendue
+            - key_sequence_number : Numéro de séquence de la clé
+            - offset : Décalage après l&#39;en-tête de sécurité
         &#34;&#34;&#34;
         extended_nonce = hex(octets_trame[offset])
         offset += 1
@@ -340,14 +395,18 @@ el.replaceWith(d);
             &#39;offset&#39;: offset
         }</code></pre>
 </details>
-<div class="desc"><p>@class DecodeurTrameZigbee
-@brief Classe pour décoder des trames ZigBee.
-@details Cette classe fournit des méthodes pour décoder différents types de trames ZigBee, telles que les trames ACK,
-les trames de commande et les trames de données. Elle extrait et structure les informations contenues dans
-les trames afin de faciliter leur analyse et leur traitement.</p>
-<p>@brief Constructeur de la classe DecodeurTrameZigbee.</p>
-<p>@param logger: Objet logger pour la journalisation des erreurs et des informations. Si aucun logger n'est fourni,
-un logger par défaut est utilisé.</p></div>
+<div class="desc"><p>Classe pour décoder des trames ZigBee.</p>
+<p>Cette classe fournit des méthodes pour décoder différents types de trames ZigBee,
+telles que les trames ACK, les trames de commande et les trames de données.
+Elle extrait et structure les informations contenues dans les trames afin de
+faciliter leur analyse et leur traitement.</p>
+<p>Initialise le décodeur de trames ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>logger</code></strong> :&ensp;<code>logging.Logger</code>, optional</dt>
+<dd>Objet logger pour la journalisation des erreurs et des informations.
+Si non fourni, un logger par défaut est utilisé.</dd>
+</dl></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_champ_controle_trame"><code class="name flex">
@@ -360,19 +419,26 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_champ_controle_trame(self, controle_trame):
     &#34;&#34;&#34;
-    @brief Décoder le champ de contrôle MAC d&#39;une trame ZigBee.
-    
-    @param controle_trame: Champ de contrôle MAC sous forme d&#39;entier, représentant les premiers octets du champ de contrôle.
-    
-    @return: Un dictionnaire contenant les différents champs du contrôle de trame décodés :
-             - frame_type: Type de la trame
-             - securite_activee: Indicateur de sécurité
-             - trame_en_attente: Indicateur de trame en attente
-             - ack_requis: Indicateur d&#39;ACK requis
-             - compression_pan_id: Indicateur de compression du PAN ID
-             - version_trame: Version de la trame
-             - mode_adresse_dst: Mode d&#39;adresse de destination
-             - mode_adresse_src: Mode d&#39;adresse source
+    Décode le champ de contrôle MAC d&#39;une trame ZigBee.
+
+    Parameters
+    ----------
+    controle_trame : int
+        Champ de contrôle MAC sous forme d&#39;entier, représentant les premiers
+        octets du champ de contrôle.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les différents champs du contrôle de trame décodés :
+        - frame_type : Type de la trame
+        - securite_activee : Indicateur de sécurité
+        - trame_en_attente : Indicateur de trame en attente
+        - ack_requis : Indicateur d&#39;ACK requis
+        - compression_pan_id : Indicateur de compression du PAN ID
+        - version_trame : Version de la trame
+        - mode_adresse_dst : Mode d&#39;adresse de destination
+        - mode_adresse_src : Mode d&#39;adresse source
     &#34;&#34;&#34;
     return {
         &#39;frame_type&#39;: controle_trame &amp; 0x07,  # Bits 0-2
@@ -385,17 +451,26 @@ un logger par défaut est utilisé.</p></div>
         &#39;mode_adresse_src&#39;: (controle_trame &gt;&gt; 14) &amp; 0x03,  # Bits 14-15
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder le champ de contrôle MAC d'une trame ZigBee.</p>
-<p>@param controle_trame: Champ de contrôle MAC sous forme d'entier, représentant les premiers octets du champ de contrôle.</p>
-<p>@return: Un dictionnaire contenant les différents champs du contrôle de trame décodés :
-- frame_type: Type de la trame
-- securite_activee: Indicateur de sécurité
-- trame_en_attente: Indicateur de trame en attente
-- ack_requis: Indicateur d'ACK requis
-- compression_pan_id: Indicateur de compression du PAN ID
-- version_trame: Version de la trame
-- mode_adresse_dst: Mode d'adresse de destination
-- mode_adresse_src: Mode d'adresse source</p></div>
+<div class="desc"><p>Décode le champ de contrôle MAC d'une trame ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>controle_trame</code></strong> :&ensp;<code>int</code></dt>
+<dd>Champ de contrôle MAC sous forme d'entier, représentant les premiers
+octets du champ de contrôle.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les différents champs du contrôle de trame décodés :
+- frame_type : Type de la trame
+- securite_activee : Indicateur de sécurité
+- trame_en_attente : Indicateur de trame en attente
+- ack_requis : Indicateur d'ACK requis
+- compression_pan_id : Indicateur de compression du PAN ID
+- version_trame : Version de la trame
+- mode_adresse_dst : Mode d'adresse de destination
+- mode_adresse_src : Mode d'adresse source</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_couche_mac"><code class="name flex">
 <span>def <span class="ident">decoder_couche_mac</span></span>(<span>self, octets_trame_mac)</span>
@@ -407,17 +482,23 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_couche_mac(self, octets_trame_mac):
     &#34;&#34;&#34;
-    @brief Décoder la couche MAC d&#39;une trame ZigBee.
-    
-    @param octets_trame_mac: Les octets de la trame MAC à décoder.
-    
-    @return: Un dictionnaire contenant les informations suivantes :
-             - controle_trame: Champ de contrôle décodé
-             - numero_sequence: Numéro de séquence
-             - pan_id_destination: PAN ID de destination
-             - adresse_destination: Adresse de destination
-             - adresse_source: Adresse source
-             - offset: Décalage après la couche MAC
+    Décode la couche MAC d&#39;une trame ZigBee.
+
+    Parameters
+    ----------
+    octets_trame_mac : bytes
+        Les octets de la trame MAC à décoder.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les informations de la couche MAC :
+        - controle_trame : Champ de contrôle décodé
+        - numero_sequence : Numéro de séquence
+        - pan_id_destination : PAN ID de destination
+        - adresse_destination : Adresse de destination
+        - adresse_source : Adresse source
+        - offset : Décalage après la couche MAC
     &#34;&#34;&#34;
     offset = 0
     champ_controle_trame = int.from_bytes(octets_trame_mac[offset:offset + 2], byteorder=&#39;little&#39;)
@@ -445,15 +526,23 @@ un logger par défaut est utilisé.</p></div>
         &#39;offset&#39;: offset
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder la couche MAC d'une trame ZigBee.</p>
-<p>@param octets_trame_mac: Les octets de la trame MAC à décoder.</p>
-<p>@return: Un dictionnaire contenant les informations suivantes :
-- controle_trame: Champ de contrôle décodé
-- numero_sequence: Numéro de séquence
-- pan_id_destination: PAN ID de destination
-- adresse_destination: Adresse de destination
-- adresse_source: Adresse source
-- offset: Décalage après la couche MAC</p></div>
+<div class="desc"><p>Décode la couche MAC d'une trame ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame_mac</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame MAC à décoder.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les informations de la couche MAC :
+- controle_trame : Champ de contrôle décodé
+- numero_sequence : Numéro de séquence
+- pan_id_destination : PAN ID de destination
+- adresse_destination : Adresse de destination
+- adresse_source : Adresse source
+- offset : Décalage après la couche MAC</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_couche_reseau"><code class="name flex">
 <span>def <span class="ident">decoder_couche_reseau</span></span>(<span>self, octets_trame, offset)</span>
@@ -465,20 +554,27 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_couche_reseau(self, octets_trame, offset):
     &#34;&#34;&#34;
-    @brief Décoder la couche réseau d&#39;une trame ZigBee.
-    
-    @param octets_trame: Les octets de la trame à décoder.
-    @param offset: Décalage après la couche MAC.
-    
-    @return: Un dictionnaire contenant les informations suivantes :
-             - champ_controle_reseau: Champ de contrôle réseau
-             - radius: Rayon de la trame
-             - sequence_number: Numéro de séquence
-             - adresse_destination: Adresse de destination
-             - extended_source: Source étendue
-             - offset: Décalage après la couche réseau
-             - addr_dest: Adresse de destination
-             - addr_src: Adresse source
+    Décode la couche réseau d&#39;une trame ZigBee.
+
+    Parameters
+    ----------
+    octets_trame : bytes
+        Les octets de la trame à décoder.
+    offset : int
+        Décalage après la couche MAC.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les informations de la couche réseau :
+        - champ_controle_reseau : Champ de contrôle réseau
+        - radius : Rayon de la trame
+        - sequence_number : Numéro de séquence
+        - adresse_destination : Adresse de destination
+        - extended_source : Source étendue
+        - offset : Décalage après la couche réseau
+        - addr_dest : Adresse de destination
+        - addr_src : Adresse source
     &#34;&#34;&#34;
     champ_controle_reseau = octets_trame[offset:offset + 2].hex()
     offset += 2
@@ -511,18 +607,27 @@ un logger par défaut est utilisé.</p></div>
         &#39;addr_src&#39;: addr_src
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder la couche réseau d'une trame ZigBee.</p>
-<p>@param octets_trame: Les octets de la trame à décoder.
-@param offset: Décalage après la couche MAC.</p>
-<p>@return: Un dictionnaire contenant les informations suivantes :
-- champ_controle_reseau: Champ de contrôle réseau
-- radius: Rayon de la trame
-- sequence_number: Numéro de séquence
-- adresse_destination: Adresse de destination
-- extended_source: Source étendue
-- offset: Décalage après la couche réseau
-- addr_dest: Adresse de destination
-- addr_src: Adresse source</p></div>
+<div class="desc"><p>Décode la couche réseau d'une trame ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame à décoder.</dd>
+<dt><strong><code>offset</code></strong> :&ensp;<code>int</code></dt>
+<dd>Décalage après la couche MAC.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les informations de la couche réseau :
+- champ_controle_reseau : Champ de contrôle réseau
+- radius : Rayon de la trame
+- sequence_number : Numéro de séquence
+- adresse_destination : Adresse de destination
+- extended_source : Source étendue
+- offset : Décalage après la couche réseau
+- addr_dest : Adresse de destination
+- addr_src : Adresse source</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_security_header"><code class="name flex">
 <span>def <span class="ident">decoder_security_header</span></span>(<span>self, octets_trame, offset)</span>
@@ -534,17 +639,24 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_security_header(self, octets_trame, offset):
     &#34;&#34;&#34;
-    @brief Décoder l&#39;en-tête de sécurité ZigBee.
-    
-    @param octets_trame: Les octets de la trame à décoder.
-    @param offset: Décalage après la couche réseau.
-    
-    @return: Un dictionnaire contenant les informations suivantes :
-             - extended_nonce: Nonce étendu
-             - frame_counter: Compteur de trame
-             - extended_source: Source étendue
-             - key_sequence_number: Numéro de séquence de la clé
-             - offset: Décalage après l&#39;en-tête de sécurité
+    Décode l&#39;en-tête de sécurité ZigBee.
+
+    Parameters
+    ----------
+    octets_trame : bytes
+        Les octets de la trame à décoder.
+    offset : int
+        Décalage après la couche réseau.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les informations de l&#39;en-tête de sécurité :
+        - extended_nonce : Nonce étendu
+        - frame_counter : Compteur de trame
+        - extended_source : Source étendue
+        - key_sequence_number : Numéro de séquence de la clé
+        - offset : Décalage après l&#39;en-tête de sécurité
     &#34;&#34;&#34;
     extended_nonce = hex(octets_trame[offset])
     offset += 1
@@ -566,15 +678,24 @@ un logger par défaut est utilisé.</p></div>
         &#39;offset&#39;: offset
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder l'en-tête de sécurité ZigBee.</p>
-<p>@param octets_trame: Les octets de la trame à décoder.
-@param offset: Décalage après la couche réseau.</p>
-<p>@return: Un dictionnaire contenant les informations suivantes :
-- extended_nonce: Nonce étendu
-- frame_counter: Compteur de trame
-- extended_source: Source étendue
-- key_sequence_number: Numéro de séquence de la clé
-- offset: Décalage après l'en-tête de sécurité</p></div>
+<div class="desc"><p>Décode l'en-tête de sécurité ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame à décoder.</dd>
+<dt><strong><code>offset</code></strong> :&ensp;<code>int</code></dt>
+<dd>Décalage après la couche réseau.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les informations de l'en-tête de sécurité :
+- extended_nonce : Nonce étendu
+- frame_counter : Compteur de trame
+- extended_source : Source étendue
+- key_sequence_number : Numéro de séquence de la clé
+- offset : Décalage après l'en-tête de sécurité</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_trame_ack"><code class="name flex">
 <span>def <span class="ident">decoder_trame_ack</span></span>(<span>self, octets_trame)</span>
@@ -586,13 +707,19 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_trame_ack(self, octets_trame):
     &#34;&#34;&#34;
-    @brief Décoder une trame ACK ZigBee.
-    
-    @param octets_trame: Les octets de la trame ACK à décoder.
-    
-    @return: Un dictionnaire contenant les informations suivantes :
-             - type_trame: Type de la trame (&#39;Ack&#39;)
-             - sequence_number: Numéro de séquence de la trame
+    Décode une trame ACK ZigBee.
+
+    Parameters
+    ----------
+    octets_trame : bytes
+        Les octets de la trame ACK à décoder.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les informations de la trame ACK :
+        - type_trame : Type de la trame (&#39;Ack&#39;)
+        - sequence_number : Numéro de séquence de la trame
     &#34;&#34;&#34;
     sequence_number = octets_trame[2]
     return {
@@ -600,11 +727,19 @@ un logger par défaut est utilisé.</p></div>
         &#39;sequence_number&#39;: sequence_number
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder une trame ACK ZigBee.</p>
-<p>@param octets_trame: Les octets de la trame ACK à décoder.</p>
-<p>@return: Un dictionnaire contenant les informations suivantes :
-- type_trame: Type de la trame ('Ack')
-- sequence_number: Numéro de séquence de la trame</p></div>
+<div class="desc"><p>Décode une trame ACK ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame ACK à décoder.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les informations de la trame ACK :
+- type_trame : Type de la trame ('Ack')
+- sequence_number : Numéro de séquence de la trame</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_trame_command"><code class="name flex">
 <span>def <span class="ident">decoder_trame_command</span></span>(<span>self, octets_trame)</span>
@@ -616,17 +751,23 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_trame_command(self, octets_trame):
     &#34;&#34;&#34;
-    @brief Décoder une trame de commande ZigBee.
-    
-    @param octets_trame: Les octets de la trame de commande à décoder.
-    
-    @return: Un dictionnaire contenant les informations suivantes :
-             - type_trame: Type de la trame (&#39;Command&#39;)
-             - sequence_number: Numéro de séquence de la trame
-             - pan_id: PAN ID
-             - destination: Adresse de destination
-             - source: Adresse source
-             - command_id: Identifiant de la commande
+    Décode une trame de commande ZigBee.
+
+    Parameters
+    ----------
+    octets_trame : bytes
+        Les octets de la trame de commande à décoder.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les informations de la trame de commande :
+        - type_trame : Type de la trame (&#39;Command&#39;)
+        - sequence_number : Numéro de séquence de la trame
+        - pan_id : PAN ID
+        - destination : Adresse de destination
+        - source : Adresse source
+        - command_id : Identifiant de la commande
     &#34;&#34;&#34;
     offset = 2
     sequence_number = octets_trame[offset]
@@ -640,7 +781,7 @@ un logger par défaut est utilisé.</p></div>
 
     source = octets_trame[offset:offset + 2].hex()
     offset += 2
-    command_id = octets_trame[offset]  # Identifiant de commande
+    command_id = octets_trame[offset]
     
     offset += 1
 
@@ -653,15 +794,23 @@ un logger par défaut est utilisé.</p></div>
         &#39;command_id&#39;: command_id
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder une trame de commande ZigBee.</p>
-<p>@param octets_trame: Les octets de la trame de commande à décoder.</p>
-<p>@return: Un dictionnaire contenant les informations suivantes :
-- type_trame: Type de la trame ('Command')
-- sequence_number: Numéro de séquence de la trame
-- pan_id: PAN ID
-- destination: Adresse de destination
-- source: Adresse source
-- command_id: Identifiant de la commande</p></div>
+<div class="desc"><p>Décode une trame de commande ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame de commande à décoder.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les informations de la trame de commande :
+- type_trame : Type de la trame ('Command')
+- sequence_number : Numéro de séquence de la trame
+- pan_id : PAN ID
+- destination : Adresse de destination
+- source : Adresse source
+- command_id : Identifiant de la commande</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_trame_data"><code class="name flex">
 <span>def <span class="ident">decoder_trame_data</span></span>(<span>self, octets_trame)</span>
@@ -673,28 +822,32 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_trame_data(self, octets_trame):
     &#34;&#34;&#34;
-    @brief Décoder une trame Data ZigBee complète.
-    
-    @param octets_trame: Les octets de la trame Data à décoder.
-    
-    @return: Un dictionnaire contenant les informations suivantes :
-             - type_trame: Type de la trame (&#39;Data&#39;)
-             - couche_mac: Informations sur la couche MAC
-             - couche_reseau: Informations sur la couche réseau
-             - security_header: Informations sur l&#39;en-tête de sécurité
-             - payload: Données utiles de la trame (payload)
+    Décode une trame Data ZigBee complète.
+
+    Parameters
+    ----------
+    octets_trame : bytes
+        Les octets de la trame Data à décoder.
+
+    Returns
+    -------
+    dict
+        Dictionnaire contenant les informations de la trame Data :
+        - type_trame : Type de la trame (&#39;Data&#39;)
+        - couche_mac : Informations sur la couche MAC
+        - couche_reseau : Informations sur la couche réseau
+        - security_header : Informations sur l&#39;en-tête de sécurité
+        - payload : Données utiles de la trame (payload)
     &#34;&#34;&#34;
     couche_mac = self.decoder_couche_mac(octets_trame)
     offset = couche_mac[&#39;offset&#39;]
 
-    # Couche réseau et sécurité ZigBee
     couche_reseau = self.decoder_couche_reseau(octets_trame, offset)
     offset = couche_reseau[&#39;offset&#39;]
 
     security_header = self.decoder_security_header(octets_trame, offset)
     offset = security_header[&#39;offset&#39;]
 
-    # Extraction du payload
     payload = octets_trame[offset:].hex()
 
     return {
@@ -705,14 +858,22 @@ un logger par défaut est utilisé.</p></div>
         &#39;payload&#39;: payload
     }</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder une trame Data ZigBee complète.</p>
-<p>@param octets_trame: Les octets de la trame Data à décoder.</p>
-<p>@return: Un dictionnaire contenant les informations suivantes :
-- type_trame: Type de la trame ('Data')
-- couche_mac: Informations sur la couche MAC
-- couche_reseau: Informations sur la couche réseau
-- security_header: Informations sur l'en-tête de sécurité
-- payload: Données utiles de la trame (payload)</p></div>
+<div class="desc"><p>Décode une trame Data ZigBee complète.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame Data à décoder.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Dictionnaire contenant les informations de la trame Data :
+- type_trame : Type de la trame ('Data')
+- couche_mac : Informations sur la couche MAC
+- couche_reseau : Informations sur la couche réseau
+- security_header : Informations sur l'en-tête de sécurité
+- payload : Données utiles de la trame (payload)</dd>
+</dl></div>
 </dd>
 <dt id="scripts.DecodeurTrame.DecodeurTrameZigbee.decoder_trame_zigbee"><code class="name flex">
 <span>def <span class="ident">decoder_trame_zigbee</span></span>(<span>self, octets_trame)</span>
@@ -724,23 +885,27 @@ un logger par défaut est utilisé.</p></div>
 </summary>
 <pre><code class="python">def decoder_trame_zigbee(self, octets_trame):
     &#34;&#34;&#34;
-    @brief Décoder une trame ZigBee en fonction du type de trame.
-    
-    @param octets_trame: Les octets de la trame ZigBee à décoder.
-    
-    @return: Un dictionnaire contenant les informations de la trame décodée, y compris le type de trame
-             (ACK, Command ou Data) et les détails associés. Si la trame est inconnue, retourne un dictionnaire
-             avec le type &#39;Inconnu&#39;.
+    Décode une trame ZigBee en fonction de son type.
+
+    Parameters
+    ----------
+    octets_trame : bytes
+        Les octets de la trame ZigBee à décoder.
+
+    Returns
+    -------
+    dict or None
+        Dictionnaire contenant les informations de la trame décodée, incluant
+        le type de trame (ACK, Command ou Data) et les détails associés.
+        Retourne None si la trame est vide.
     &#34;&#34;&#34;
     if not octets_trame:
         return None
 
-    # Décoder le champ de contrôle MAC pour identifier le Frame Type
     champ_controle_trame = int.from_bytes(octets_trame[:2], &#39;little&#39;)
     controle_trame = self.decoder_champ_controle_trame(champ_controle_trame)
     frame_type = controle_trame[&#39;frame_type&#39;]
 
-    # Rediriger vers le bon décodeur en fonction du type de trame
     if frame_type == 0x2:  # Trame ACK
         return self.decoder_trame_ack(octets_trame)
     elif frame_type == 0x3:  # Trame Command
@@ -750,11 +915,19 @@ un logger par défaut est utilisé.</p></div>
     else:
         return {&#39;type_trame&#39;: &#39;Inconnu&#39;, &#39;details&#39;: octets_trame.hex()}</code></pre>
 </details>
-<div class="desc"><p>@brief Décoder une trame ZigBee en fonction du type de trame.</p>
-<p>@param octets_trame: Les octets de la trame ZigBee à décoder.</p>
-<p>@return: Un dictionnaire contenant les informations de la trame décodée, y compris le type de trame
-(ACK, Command ou Data) et les détails associés. Si la trame est inconnue, retourne un dictionnaire
-avec le type 'Inconnu'.</p></div>
+<div class="desc"><p>Décode une trame ZigBee en fonction de son type.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>octets_trame</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Les octets de la trame ZigBee à décoder.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code> or <code>None</code></dt>
+<dd>Dictionnaire contenant les informations de la trame décodée, incluant
+le type de trame (ACK, Command ou Data) et les détails associés.
+Retourne None si la trame est vide.</dd>
+</dl></div>
 </dd>
 </dl>
 </dd>

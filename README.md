@@ -24,37 +24,32 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 
 ### Étape 1 : Étude des attaques et du protocole Zigbee
 - [x] **1.1 Recherche Littérature Attaque Zigbee**
-  - [x] Recherche attaque brouillage et interception (Théo)
-  - [x] Recherche attaque usurpation d'identité et rejeu (Nathan)
+  - [x] Recherche attaque brouillage et interception 
+  - [x] Recherche attaque usurpation d'identité et rejeu 
 - [x] **1.2 Étude de la sécurité du Protocole Zigbee**
-  - [x] Étude des mécanismes d'authentification et gestion des clés (Théo)
-  - [x] Recherche des mécanismes de chiffrement et leurs vulnérabilités (Nathan)
+  - [x] Étude des mécanismes d'authentification et gestion des clés 
+  - [x] Recherche des mécanismes de chiffrement et leurs vulnérabilités 
 
 ### Étape 2 : Préparation Banc de Test Zigbee
-- [x] **2.1 Configuration Matériel et Logiciel** (Théo & Nathan)
+- [x] **2.1 Configuration Matériel et Logiciel** 
 - [ ] **2.2 Mise en place d'outils**
-  - [ ] Test d'attaques par brouillage et interception (Théo)
-  - [ ] Test d'attaques par rejeu et usurpation (Nathan)
+  - [x] Test d'attaques par brouillage et interception 
+  - [ ] Test d'attaques par rejeu et usurpation 
 
 ### Étape 3 : Reproduction des Scénarios d'attaques Zigbee
 - [ ] **3.1 Reproduction d'attaques simples**
-  - [ ] Attaque de brouillage (Théo)
-  - [ ] Attaque d'interception (Nathan)
+  - [x] Attaque de brouillage 
+  - [x] Attaque d'interception 
 - [ ] **3.2 Reproduction d'attaques complexes**
-  - [ ] Attaque par rejeu (Théo)
-  - [ ] Attaque par usurpation d'identité (Nathan)
+  - [ ] Attaque par rejeu 
+  - [ ] Attaque par usurpation d'identité 
 
 ### Étape 4 : Documentation et Code
 - [ ] **4.1 Documentation du Banc de Test et des Attaques**
-  - [ ] Attaques par brouillage et interception (Théo)
-  - [ ] Attaques par rejeu et usurpation (Nathan)
-- [ ] **4.2 Finalisation du Code et Documentation** (Théo & Nathan)
+  - [ ] Attaques par brouillage et interception 
+  - [ ] Attaques par rejeu et usurpation 
+- [ ] **4.2 Finalisation du Code et Documentation** 
 
-
-
-## 🤝 Contributeurs
-- **Gauteron Nathan**
-- **Peletier Théo**
 
 ## 📂 Structure du Dépôt
 - `/docs` : Tous les rapports et guides.

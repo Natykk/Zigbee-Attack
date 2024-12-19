@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
 <title>scripts API documentation</title>
-<meta name="description" content="">
+<meta name="description" content="README - Projet Zigbee …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -33,50 +33,157 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Namespace <code>scripts</code></h1>
+<h1 class="title">Package <code>scripts</code></h1>
 </header>
 <section id="section-intro">
+<h1 id="readme-projet-zigbee">README - Projet Zigbee</h1>
+<h2 id="description-du-projet">📖 Description du Projet</h2>
+<p>Le projet Zigbee consiste à implémenter un banc d’attaque sur des appareils utilisant le protocole Zigbee. Zigbee est un protocole de communication largement utilisé dans les réseaux IoT (Internet of Things), en particulier pour les environnements domestiques et industriels. Cependant, en raison de certaines vulnérabilités intrinsèques, Zigbee peut être une cible pour différentes attaques.</p>
+<p>Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigbee et reproduirons plusieurs scénarios d’attaques. Ces travaux permettront d’identifier les failles et d’améliorer la compréhension des menaces potentielles, tout en documentant les résultats et les solutions possibles.</p>
+<h3 id="objectifs">Objectifs :</h3>
+<ol>
+<li>Étudier les mécanismes de sécurité du protocole Zigbee et ses vulnérabilités.</li>
+<li>Configurer un banc de test matériel et logiciel pour exécuter des scénarios d’attaques.</li>
+<li>Reproduire des attaques simples (comme le brouillage) et complexes (comme l’usurpation d’identité).</li>
+<li>Documenter les travaux et proposer des recommandations pour améliorer la sécurité.</li>
+</ol>
+<h3 id="materiel-et-frameworks-utilises">Matériel et Frameworks Utilisés :</h3>
+<ul>
+<li><strong>Matériel</strong> :</li>
+<li>Dongle USB TI CC2531</li>
+<li>Dongle nRF52840</li>
+<li>ESP32-H2</li>
+<li><strong>Frameworks</strong> :</li>
+<li>Killerbee</li>
+<li>WHAD</li>
+</ul>
+<h2 id="liste-des-taches">🛠️ Liste des Tâches</h2>
+<h3 id="etape-1-etude-des-attaques-et-du-protocole-zigbee">Étape 1 : Étude des attaques et du protocole Zigbee</h3>
+<ul>
+<li>[x] <strong>1.1 Recherche Littérature Attaque Zigbee</strong></li>
+<li>[x] Recherche attaque brouillage et interception </li>
+<li>[x] Recherche attaque usurpation d'identité et rejeu </li>
+<li>[x] <strong>1.2 Étude de la sécurité du Protocole Zigbee</strong></li>
+<li>[x] Étude des mécanismes d'authentification et gestion des clés </li>
+<li>[x] Recherche des mécanismes de chiffrement et leurs vulnérabilités </li>
+</ul>
+<h3 id="etape-2-preparation-banc-de-test-zigbee">Étape 2 : Préparation Banc de Test Zigbee</h3>
+<ul>
+<li>[x] <strong>2.1 Configuration Matériel et Logiciel</strong> </li>
+<li>[ ] <strong>2.2 Mise en place d'outils</strong></li>
+<li>[x] Test d'attaques par brouillage et interception </li>
+<li>[ ] Test d'attaques par rejeu et usurpation </li>
+</ul>
+<h3 id="etape-3-reproduction-des-scenarios-dattaques-zigbee">Étape 3 : Reproduction des Scénarios d'attaques Zigbee</h3>
+<ul>
+<li>[ ] <strong>3.1 Reproduction d'attaques simples</strong></li>
+<li>[x] Attaque de brouillage </li>
+<li>[x] Attaque d'interception </li>
+<li>[ ] <strong>3.2 Reproduction d'attaques complexes</strong></li>
+<li>[ ] Attaque par rejeu </li>
+<li>[ ] Attaque par usurpation d'identité </li>
+</ul>
+<h3 id="etape-4-documentation-et-code">Étape 4 : Documentation et Code</h3>
+<ul>
+<li>[ ] <strong>4.1 Documentation du Banc de Test et des Attaques</strong></li>
+<li>[ ] Attaques par brouillage et interception </li>
+<li>[ ] Attaques par rejeu et usurpation </li>
+<li>[ ] <strong>4.2 Finalisation du Code et Documentation</strong> </li>
+</ul>
+<h2 id="structure-du-depot">📂 Structure du Dépôt</h2>
+<ul>
+<li><code>/docs</code> : Tous les rapports et guides.</li>
+<li><code>/scripts</code> : Scripts et configurations pour le banc de test.</li>
+<li><code>/report</code> : Résultats et logs des scénarios d'attaques.</li>
+</ul>
+<h2 id="references">📖 Références</h2>
+<p>Pour plus d’informations sur le protocole Zigbee et les attaques étudiées, consultez la documentation associée dans <code>/docs</code>.</p>
+<hr>
+<p>Vous pouvez utiliser les cases à cocher pour suivre l'avancement directement dans GitHub.</p>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
 <dt><code class="name"><a title="scripts.CodeurTrame" href="CodeurTrame.html">scripts.CodeurTrame</a></code></dt>
 <dd>
-<div class="desc"><p>Ce module fournit une classe pour encoder des trames Zigbee à partir de champs spécifiques.</p></div>
+<div class="desc"><p>Ce module fournit une classe pour encoder des trames ZigBee à partir de champs spécifiques …</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.DecodeurTrame" href="DecodeurTrame.html">scripts.DecodeurTrame</a></code></dt>
 <dd>
-<div class="desc"><p>Ce Module implémente un décodeur de trames ZigBee.</p></div>
+<div class="desc"><p>Décodeur de trames ZigBee.
+Ce module implémente un décodeur pour analyser et interpréter différents types
+de trames ZigBee.</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.beaconSpam" href="beaconSpam.html">scripts.beaconSpam</a></code></dt>
 <dd>
-<div class="desc"><p>Ce module implémente un spammer de beacons WiFi avec des informations sur la vitesse d'envoi des paquets.</p></div>
+<div class="desc"><p>Ce module implémente un spammer de paquets Beacon WiFi. Il permet de configurer une interface réseau pour envoyer des paquets Beacon sur un canal …</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.coordinator" href="coordinator.html">scripts.coordinator</a></code></dt>
 <dd>
-<div class="desc"><p>Ce module implémente un coordinateur Zigbee avec WHAD.
-Il crée et initialise un réseau Zigbee avec un périphérique compatible et permet la réception …</p></div>
+<div class="desc"><p>Ce module implémente un coordinateur Zigbee avec WHAD …</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.replay" href="replay.html">scripts.replay</a></code></dt>
 <dd>
-<div class="desc"><p>Ce Module implémente une attaque de replay sur le réseau ZigBee. Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les …</p></div>
+<div class="desc"><p>Attaque de replay sur le réseau ZigBee …</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.sniff" href="sniff.html">scripts.sniff</a></code></dt>
 <dd>
-<div class="desc"><p>Ce Module implémente un sniffeur de trames Zigbee.</p></div>
+<div class="desc"><p>Module implémentant un sniffeur de trames Zigbee …</p></div>
 </dd>
 </dl>
 </section>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="scripts.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+
+    attaque = ZigbeeReplayAttack(
+        capture_file=&#39;captures_zigbee.json&#39;,
+        channel=13,
+        pan_id=0x1900,
+        serial_port=&#39;/dev/ttyACM0&#39;,
+        aes_key=&#34;9b9494920170aeed67e90ce7d672face&#34;
+    )
+    attaque.lancer_attaque_replay(nombre_replays=3, capture_live=True)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
 </section>
 <section>
 </section>
 </article>
 <nav id="sidebar">
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#readme-projet-zigbee">README - Projet Zigbee</a><ul>
+<li><a href="#description-du-projet">📖 Description du Projet</a><ul>
+<li><a href="#objectifs">Objectifs :</a></li>
+<li><a href="#materiel-et-frameworks-utilises">Matériel et Frameworks Utilisés :</a></li>
+</ul>
+</li>
+<li><a href="#liste-des-taches">🛠️ Liste des Tâches</a><ul>
+<li><a href="#etape-1-etude-des-attaques-et-du-protocole-zigbee">Étape 1 : Étude des attaques et du protocole Zigbee</a></li>
+<li><a href="#etape-2-preparation-banc-de-test-zigbee">Étape 2 : Préparation Banc de Test Zigbee</a></li>
+<li><a href="#etape-3-reproduction-des-scenarios-dattaques-zigbee">Étape 3 : Reproduction des Scénarios d'attaques Zigbee</a></li>
+<li><a href="#etape-4-documentation-et-code">Étape 4 : Documentation et Code</a></li>
+</ul>
+</li>
+<li><a href="#structure-du-depot">📂 Structure du Dépôt</a></li>
+<li><a href="#references">📖 Références</a></li>
+</ul>
+</li>
+</ul>
 </div>
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
@@ -87,6 +194,11 @@ Il crée et initialise un réseau Zigbee avec un périphérique compatible et pe
 <li><code><a title="scripts.coordinator" href="coordinator.html">scripts.coordinator</a></code></li>
 <li><code><a title="scripts.replay" href="replay.html">scripts.replay</a></code></li>
 <li><code><a title="scripts.sniff" href="sniff.html">scripts.sniff</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="scripts.main" href="#scripts.main">main</a></code></li>
 </ul>
 </li>
 </ul>

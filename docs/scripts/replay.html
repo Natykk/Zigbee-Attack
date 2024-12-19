@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
 <title>scripts.replay API documentation</title>
-<meta name="description" content="Ce Module implémente une attaque de replay sur le réseau ZigBee. Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les …">
+<meta name="description" content="Attaque de replay sur le réseau ZigBee …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,45 +36,17 @@ el.replaceWith(d);
 <h1 class="title">Module <code>scripts.replay</code></h1>
 </header>
 <section id="section-intro">
-<p>Ce Module implémente une attaque de replay sur le réseau ZigBee. Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les rejouer sur le réseau ZigBee. Il gère également les mécanismes de protection contre les attaques de type replay et permet de personnaliser la configuration de l' attaque.</p>
+<p>Attaque de replay sur le réseau ZigBee.</p>
+<p>Ce module implémente une attaque de replay sur le réseau ZigBee. Il permet de
+capturer des trames ZigBee, de les analyser, de les modifier et de les rejouer
+sur le réseau ZigBee. Il gère également les mécanismes de protection contre les
+attaques de type replay et permet de personnaliser la configuration de l'attaque.</p>
 </section>
 <section>
 </section>
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="scripts.replay.main"><code class="name flex">
-<span>def <span class="ident">main</span></span>(<span>)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def main():
-    &#34;&#34;&#34;
-    @brief Fonction principale pour configurer et lancer l&#39;attaque de replay ZigBee.
-    &#34;&#34;&#34;
-    # Configuration de l&#39;attaque
-    attaque = ZigbeeReplayAttack(
-        capture_file=&#39;captures_zigbee.json&#39;,
-        channel=13,
-        pan_id=0x1900,
-        serial_port=&#39;/dev/ttyACM0&#39;,
-        aes_key=&#34;9b9494920170aeed67e90ce7d672face&#34;
-    )
-    
-    # Lancer l&#39;attaque avec capture live
-    attaque.lancer_attaque_replay(
-        nombre_replays=3,
-        capture_live=True
-    )</code></pre>
-</details>
-<div class="desc"><p>@brief Fonction principale pour configurer et lancer l'attaque de replay ZigBee.</p></div>
-</dd>
-</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
@@ -90,11 +62,13 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">class ZigbeeReplayAttack:
     &#34;&#34;&#34;
-    @class ZigbeeReplayAttack
-    @brief Classe pour effectuer une attaque de replay sur le réseau ZigBee.
-    @details Cette classe permet de capturer des trames ZigBee, de les analyser, de les modifier (par exemple, en modifiant
-             les numéros de séquence) et de les rejouer sur le réseau ZigBee. Elle gère également les mécanismes de 
-             protection contre les attaques de type replay et permet de personnaliser la configuration de l&#39;attaque.
+    Classe pour effectuer une attaque de replay sur le réseau ZigBee.
+    
+    Cette classe permet de capturer des trames ZigBee, de les analyser, 
+    de les modifier (par exemple, en modifiant les numéros de séquence) 
+    et de les rejouer sur le réseau ZigBee. Elle gère également les 
+    mécanismes de protection contre les attaques de type replay et permet 
+    de personnaliser la configuration de l&#39;attaque.
     &#34;&#34;&#34;
 
     def __init__(
@@ -106,13 +80,22 @@ el.replaceWith(d);
         aes_key: Optional[str] = None
     ):
         &#34;&#34;&#34;
-        @brief Constructeur de la classe ZigbeeReplayAttack.
-        
-        @param capture_file: Nom du fichier de capture pour stocker les trames ZigBee capturées.
-        @param channel: Canal ZigBee sur lequel l&#39;attaque de replay sera effectuée.
-        @param pan_id: PAN ID du réseau ZigBee.
-        @param serial_port: Port série utilisé pour envoyer les trames de replay.
-        @param aes_key: Clé AES pour la sécurité des trames, si applicable.
+        Initialise l&#39;attaque de replay ZigBee.
+
+        Parameters
+        ----------
+        capture_file : str, optional
+            Nom du fichier de capture pour stocker les trames ZigBee capturées.
+            Par défaut &#39;captures_zigbee.json&#39;.
+        channel : int, optional
+            Canal ZigBee sur lequel l&#39;attaque de replay sera effectuée.
+            Par défaut 13.
+        pan_id : int, optional
+            PAN ID du réseau ZigBee. Par défaut 0x1900.
+        serial_port : str, optional
+            Port série utilisé pour envoyer les trames de replay.
+        aes_key : str, optional
+            Clé AES pour la sécurité des trames, si applicable.
         &#34;&#34;&#34;
         self.capture_file = capture_file
         self.channel = channel
@@ -138,9 +121,12 @@ el.replaceWith(d);
 
     def capturer_trames_live(self, duree_capture: int = 10):
         &#34;&#34;&#34;
-        @brief Capture live des trames ZigBee pendant une durée spécifiée.
-        
-        @param duree_capture: Durée de la capture en secondes.
+        Capture live des trames ZigBee pendant une durée spécifiée.
+
+        Parameters
+        ----------
+        duree_capture : int, optional
+            Durée de la capture en secondes. Par défaut 10.
         &#34;&#34;&#34;
         logger.info(f&#34;Démarrage de la capture live pour {duree_capture} secondes&#34;)
         self.sniffer.demarrer_sniffer()
@@ -152,7 +138,10 @@ el.replaceWith(d);
 
     def charger_captures(self):
         &#34;&#34;&#34;
-        @brief Charger et analyser les captures ZigBee à partir d&#39;un fichier JSON.
+        Charge et analyse les captures ZigBee à partir d&#39;un fichier JSON.
+
+        Cette méthode lit le fichier de captures spécifié lors de l&#39;initialisation
+        et décode chaque trame pour préparer l&#39;attaque de replay.
         &#34;&#34;&#34;
         try:
             with open(self.capture_file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
@@ -179,7 +168,10 @@ el.replaceWith(d);
 
     def _extraire_sequences(self):
         &#34;&#34;&#34;
-        @brief Extraire les numéros de séquence des trames capturées.
+        Extrait les numéros de séquence des trames capturées.
+
+        Cette méthode privée analyse les trames capturées pour extraire
+        les numéros de séquence et initialiser la séquence de base.
         &#34;&#34;&#34;
         sequences = []
         for capture in self.captures:
@@ -196,7 +188,10 @@ el.replaceWith(d);
 
     def _generer_variations_sequence(self):
         &#34;&#34;&#34;
-        @brief Générer des variations de numéro de séquence basées sur la séquence de base.
+        Génère des variations de numéro de séquence basées sur la séquence de base.
+
+        Cette méthode privée crée différentes variations des numéros de séquence
+        pour éviter la détection des attaques de replay.
         &#34;&#34;&#34;
         if not self.sequence_base:
             return
@@ -213,9 +208,12 @@ el.replaceWith(d);
 
     def _generer_sequence_cryptographique(self) -&gt; int:
         &#34;&#34;&#34;
-        @brief Générer un numéro de séquence cryptographiquement sûr.
-        
-        @return: Numéro de séquence généré de manière cryptographique.
+        Génère un numéro de séquence cryptographiquement sûr.
+
+        Returns
+        -------
+        int
+            Numéro de séquence généré de manière cryptographique.
         &#34;&#34;&#34;
         seed = hashlib.sha256(
             str(self.sequence_base).encode() + 
@@ -225,11 +223,17 @@ el.replaceWith(d);
 
     def preparer_trame_replay(self, trame_originale: dict) -&gt; bytes:
         &#34;&#34;&#34;
-        @brief Préparer une trame pour le replay en modifiant le numéro de séquence.
-        
-        @param trame_originale: Trame ZigBee originale à modifier.
-        
-        @return: Trame prête à être envoyée en replay sous forme de bytes.
+        Prépare une trame pour le replay en modifiant le numéro de séquence.
+
+        Parameters
+        ----------
+        trame_originale : dict
+            Trame ZigBee originale à modifier.
+
+        Returns
+        -------
+        bytes
+            Trame prête à être envoyée en replay.
         &#34;&#34;&#34;
         sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
         
@@ -245,9 +249,12 @@ el.replaceWith(d);
 
     def preparer_trames_replay(self, nombre_trames: int = 20):
         &#34;&#34;&#34;
-        @brief Préparer plusieurs trames pour le replay.
-        
-        @param nombre_trames: Nombre de trames à préparer pour le replay.
+        Prépare plusieurs trames pour le replay.
+
+        Parameters
+        ----------
+        nombre_trames : int, optional
+            Nombre de trames à préparer pour le replay. Par défaut 20.
         &#34;&#34;&#34;
         self.replay_queue = queue.Queue()
         
@@ -261,9 +268,12 @@ el.replaceWith(d);
 
     def envoyer_trames_replay(self, nombre_replays: int = 5):
         &#34;&#34;&#34;
-        @brief Envoyer les trames de replay via le port série.
-        
-        @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+        Envoie les trames de replay via le port série.
+
+        Parameters
+        ----------
+        nombre_replays : int, optional
+            Nombre de fois que chaque trame sera envoyée. Par défaut 5.
         &#34;&#34;&#34;
         try:
             with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
@@ -293,10 +303,14 @@ el.replaceWith(d);
 
     def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
         &#34;&#34;&#34;
-        @brief Lancer l&#39;attaque de replay complète avec capture et envoi des trames.
-        
-        @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
-        @param capture_live: Si True, effectuer une capture live des trames ZigBee.
+        Lance l&#39;attaque de replay complète avec capture et envoi des trames.
+
+        Parameters
+        ----------
+        nombre_replays : int, optional
+            Nombre de fois que chaque trame sera envoyée. Par défaut 5.
+        capture_live : bool, optional
+            Si True, effectue une capture live des trames ZigBee. Par défaut False.
         &#34;&#34;&#34;
         try:
             if capture_live:
@@ -321,17 +335,28 @@ el.replaceWith(d);
         except Exception as e:
             logger.error(f&#34;Échec de l&#39;attaque de replay : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>@class ZigbeeReplayAttack
-@brief Classe pour effectuer une attaque de replay sur le réseau ZigBee.
-@details Cette classe permet de capturer des trames ZigBee, de les analyser, de les modifier (par exemple, en modifiant
-les numéros de séquence) et de les rejouer sur le réseau ZigBee. Elle gère également les mécanismes de
-protection contre les attaques de type replay et permet de personnaliser la configuration de l'attaque.</p>
-<p>@brief Constructeur de la classe ZigbeeReplayAttack.</p>
-<p>@param capture_file: Nom du fichier de capture pour stocker les trames ZigBee capturées.
-@param channel: Canal ZigBee sur lequel l'attaque de replay sera effectuée.
-@param pan_id: PAN ID du réseau ZigBee.
-@param serial_port: Port série utilisé pour envoyer les trames de replay.
-@param aes_key: Clé AES pour la sécurité des trames, si applicable.</p></div>
+<div class="desc"><p>Classe pour effectuer une attaque de replay sur le réseau ZigBee.</p>
+<p>Cette classe permet de capturer des trames ZigBee, de les analyser,
+de les modifier (par exemple, en modifiant les numéros de séquence)
+et de les rejouer sur le réseau ZigBee. Elle gère également les
+mécanismes de protection contre les attaques de type replay et permet
+de personnaliser la configuration de l'attaque.</p>
+<p>Initialise l'attaque de replay ZigBee.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>capture_file</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Nom du fichier de capture pour stocker les trames ZigBee capturées.
+Par défaut 'captures_zigbee.json'.</dd>
+<dt><strong><code>channel</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Canal ZigBee sur lequel l'attaque de replay sera effectuée.
+Par défaut 13.</dd>
+<dt><strong><code>pan_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>PAN ID du réseau ZigBee. Par défaut 0x1900.</dd>
+<dt><strong><code>serial_port</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Port série utilisé pour envoyer les trames de replay.</dd>
+<dt><strong><code>aes_key</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Clé AES pour la sécurité des trames, si applicable.</dd>
+</dl></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scripts.replay.ZigbeeReplayAttack.capturer_trames_live"><code class="name flex">
@@ -344,9 +369,12 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 </summary>
 <pre><code class="python">def capturer_trames_live(self, duree_capture: int = 10):
     &#34;&#34;&#34;
-    @brief Capture live des trames ZigBee pendant une durée spécifiée.
-    
-    @param duree_capture: Durée de la capture en secondes.
+    Capture live des trames ZigBee pendant une durée spécifiée.
+
+    Parameters
+    ----------
+    duree_capture : int, optional
+        Durée de la capture en secondes. Par défaut 10.
     &#34;&#34;&#34;
     logger.info(f&#34;Démarrage de la capture live pour {duree_capture} secondes&#34;)
     self.sniffer.demarrer_sniffer()
@@ -356,8 +384,12 @@ protection contre les attaques de type replay et permet de personnaliser la conf
     self.captures = self.sniffer.captures
     logger.info(f&#34;Capture terminée : {len(self.captures)} trames capturées&#34;)</code></pre>
 </details>
-<div class="desc"><p>@brief Capture live des trames ZigBee pendant une durée spécifiée.</p>
-<p>@param duree_capture: Durée de la capture en secondes.</p></div>
+<div class="desc"><p>Capture live des trames ZigBee pendant une durée spécifiée.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>duree_capture</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Durée de la capture en secondes. Par défaut 10.</dd>
+</dl></div>
 </dd>
 <dt id="scripts.replay.ZigbeeReplayAttack.charger_captures"><code class="name flex">
 <span>def <span class="ident">charger_captures</span></span>(<span>self)</span>
@@ -369,7 +401,10 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 </summary>
 <pre><code class="python">def charger_captures(self):
     &#34;&#34;&#34;
-    @brief Charger et analyser les captures ZigBee à partir d&#39;un fichier JSON.
+    Charge et analyse les captures ZigBee à partir d&#39;un fichier JSON.
+
+    Cette méthode lit le fichier de captures spécifié lors de l&#39;initialisation
+    et décode chaque trame pour préparer l&#39;attaque de replay.
     &#34;&#34;&#34;
     try:
         with open(self.capture_file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
@@ -394,7 +429,9 @@ protection contre les attaques de type replay et permet de personnaliser la conf
         logger.error(f&#34;Erreur lors du chargement des captures : {e}&#34;)
         self.captures = []</code></pre>
 </details>
-<div class="desc"><p>@brief Charger et analyser les captures ZigBee à partir d'un fichier JSON.</p></div>
+<div class="desc"><p>Charge et analyse les captures ZigBee à partir d'un fichier JSON.</p>
+<p>Cette méthode lit le fichier de captures spécifié lors de l'initialisation
+et décode chaque trame pour préparer l'attaque de replay.</p></div>
 </dd>
 <dt id="scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay"><code class="name flex">
 <span>def <span class="ident">envoyer_trames_replay</span></span>(<span>self, nombre_replays: int = 5)</span>
@@ -406,9 +443,12 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 </summary>
 <pre><code class="python">def envoyer_trames_replay(self, nombre_replays: int = 5):
     &#34;&#34;&#34;
-    @brief Envoyer les trames de replay via le port série.
-    
-    @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+    Envoie les trames de replay via le port série.
+
+    Parameters
+    ----------
+    nombre_replays : int, optional
+        Nombre de fois que chaque trame sera envoyée. Par défaut 5.
     &#34;&#34;&#34;
     try:
         with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
@@ -436,8 +476,12 @@ protection contre les attaques de type replay et permet de personnaliser la conf
     except Exception as e:
         logger.error(f&#34;Erreur durant le replay : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>@brief Envoyer les trames de replay via le port série.</p>
-<p>@param nombre_replays: Nombre de fois que chaque trame sera envoyée.</p></div>
+<div class="desc"><p>Envoie les trames de replay via le port série.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>nombre_replays</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Nombre de fois que chaque trame sera envoyée. Par défaut 5.</dd>
+</dl></div>
 </dd>
 <dt id="scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay"><code class="name flex">
 <span>def <span class="ident">lancer_attaque_replay</span></span>(<span>self, nombre_replays: int = 5, capture_live: bool = False)</span>
@@ -449,10 +493,14 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 </summary>
 <pre><code class="python">def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
     &#34;&#34;&#34;
-    @brief Lancer l&#39;attaque de replay complète avec capture et envoi des trames.
-    
-    @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
-    @param capture_live: Si True, effectuer une capture live des trames ZigBee.
+    Lance l&#39;attaque de replay complète avec capture et envoi des trames.
+
+    Parameters
+    ----------
+    nombre_replays : int, optional
+        Nombre de fois que chaque trame sera envoyée. Par défaut 5.
+    capture_live : bool, optional
+        Si True, effectue une capture live des trames ZigBee. Par défaut False.
     &#34;&#34;&#34;
     try:
         if capture_live:
@@ -477,9 +525,14 @@ protection contre les attaques de type replay et permet de personnaliser la conf
     except Exception as e:
         logger.error(f&#34;Échec de l&#39;attaque de replay : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>@brief Lancer l'attaque de replay complète avec capture et envoi des trames.</p>
-<p>@param nombre_replays: Nombre de fois que chaque trame sera envoyée.
-@param capture_live: Si True, effectuer une capture live des trames ZigBee.</p></div>
+<div class="desc"><p>Lance l'attaque de replay complète avec capture et envoi des trames.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>nombre_replays</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Nombre de fois que chaque trame sera envoyée. Par défaut 5.</dd>
+<dt><strong><code>capture_live</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Si True, effectue une capture live des trames ZigBee. Par défaut False.</dd>
+</dl></div>
 </dd>
 <dt id="scripts.replay.ZigbeeReplayAttack.preparer_trame_replay"><code class="name flex">
 <span>def <span class="ident">preparer_trame_replay</span></span>(<span>self, trame_originale: dict) ‑> bytes</span>
@@ -491,11 +544,17 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 </summary>
 <pre><code class="python">def preparer_trame_replay(self, trame_originale: dict) -&gt; bytes:
     &#34;&#34;&#34;
-    @brief Préparer une trame pour le replay en modifiant le numéro de séquence.
-    
-    @param trame_originale: Trame ZigBee originale à modifier.
-    
-    @return: Trame prête à être envoyée en replay sous forme de bytes.
+    Prépare une trame pour le replay en modifiant le numéro de séquence.
+
+    Parameters
+    ----------
+    trame_originale : dict
+        Trame ZigBee originale à modifier.
+
+    Returns
+    -------
+    bytes
+        Trame prête à être envoyée en replay.
     &#34;&#34;&#34;
     sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
     
@@ -509,9 +568,17 @@ protection contre les attaques de type replay et permet de personnaliser la conf
     # Encoder la trame modifiée
     return self.codeur.encoder_trame_zigbee(trame_originale)</code></pre>
 </details>
-<div class="desc"><p>@brief Préparer une trame pour le replay en modifiant le numéro de séquence.</p>
-<p>@param trame_originale: Trame ZigBee originale à modifier.</p>
-<p>@return: Trame prête à être envoyée en replay sous forme de bytes.</p></div>
+<div class="desc"><p>Prépare une trame pour le replay en modifiant le numéro de séquence.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>trame_originale</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Trame ZigBee originale à modifier.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bytes</code></dt>
+<dd>Trame prête à être envoyée en replay.</dd>
+</dl></div>
 </dd>
 <dt id="scripts.replay.ZigbeeReplayAttack.preparer_trames_replay"><code class="name flex">
 <span>def <span class="ident">preparer_trames_replay</span></span>(<span>self, nombre_trames: int = 20)</span>
@@ -523,9 +590,12 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 </summary>
 <pre><code class="python">def preparer_trames_replay(self, nombre_trames: int = 20):
     &#34;&#34;&#34;
-    @brief Préparer plusieurs trames pour le replay.
-    
-    @param nombre_trames: Nombre de trames à préparer pour le replay.
+    Prépare plusieurs trames pour le replay.
+
+    Parameters
+    ----------
+    nombre_trames : int, optional
+        Nombre de trames à préparer pour le replay. Par défaut 20.
     &#34;&#34;&#34;
     self.replay_queue = queue.Queue()
     
@@ -537,8 +607,12 @@ protection contre les attaques de type replay et permet de personnaliser la conf
         trame_modifiee = self.preparer_trame_replay(trame_originale)
         self.replay_queue.put(trame_modifiee)</code></pre>
 </details>
-<div class="desc"><p>@brief Préparer plusieurs trames pour le replay.</p>
-<p>@param nombre_trames: Nombre de trames à préparer pour le replay.</p></div>
+<div class="desc"><p>Prépare plusieurs trames pour le replay.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>nombre_trames</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Nombre de trames à préparer pour le replay. Par défaut 20.</dd>
+</dl></div>
 </dd>
 </dl>
 </dd>
@@ -553,11 +627,6 @@ protection contre les attaques de type replay et permet de personnaliser la conf
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="scripts" href="index.html">scripts</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="scripts.replay.main" href="#scripts.replay.main">main</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

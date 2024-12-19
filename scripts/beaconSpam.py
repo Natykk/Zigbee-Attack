@@ -1,5 +1,9 @@
 """
-Ce module implémente un spammer de beacons WiFi avec des informations sur la vitesse d'envoi des paquets. 
+Ce module implémente un spammer de paquets Beacon WiFi. Il permet de configurer une interface réseau pour envoyer des paquets Beacon sur un canal spécifique, surveiller le nombre de paquets envoyés, et gérer l'envoi en utilisant des threads.
+
+Classes
+-------
+WifiSpammer : Classe pour gérer l'envoi de paquets Beacon WiFi.
 """
 
 import threading
@@ -12,20 +16,40 @@ from typing import Optional
 
 class WifiSpammer:
     """
-    @class WifiSpammer
-    @brief Classe pour spammer le réseau WiFi avec des paquets Beacon.
-    @details Cette classe gère l'envoi de paquets Beacon WiFi de manière multithreadée. Elle permet de configurer
-             le canal, de créer les paquets Beacon, de les envoyer et de surveiller le progrès de l'envoi.
+    Classe pour spammer le réseau WiFi avec des paquets Beacon.
+
+    Attributes
+    ----------
+    interface : str
+        Interface réseau à utiliser pour l'envoi des paquets.
+    channel : int
+        Canal WiFi sur lequel envoyer les paquets Beacon.
+    ssid : str
+        SSID à diffuser dans les paquets Beacon.
+    packet_queue : queue.Queue
+        File d'attente des paquets à envoyer.
+    running : bool
+        Indicateur d'état de fonctionnement de l'envoi des paquets.
+    sent_count : int
+        Nombre de paquets envoyés.
+    start_time : float
+        Heure de début de l'envoi des paquets, utilisée pour calculer le taux d'envoi.
     """
 
     def __init__(self, interface: str, channel: int = 1, ssid: str = "TestSSID", max_queue_size: int = 1000):
         """
-        @brief Constructeur de la classe WifiSpammer.
-        
-        @param interface: Interface réseau à utiliser pour l'envoi des paquets.
-        @param channel: Canal WiFi sur lequel les paquets Beacon seront envoyés (par défaut : 1).
-        @param ssid: SSID à diffuser dans les paquets Beacon (par défaut : "TestSSID").
-        @param max_queue_size: Taille maximale de la file d'attente pour les paquets (par défaut : 1000).
+        Initialise un spammer WiFi.
+
+        Parameters
+        ----------
+        interface : str
+            Interface réseau à utiliser pour l'envoi des paquets.
+        channel : int, optional
+            Canal WiFi sur lequel les paquets Beacon seront envoyés (par défaut : 1).
+        ssid : str, optional
+            SSID à diffuser dans les paquets Beacon (par défaut : "TestSSID").
+        max_queue_size : int, optional
+            Taille maximale de la file d'attente pour les paquets (par défaut : 1000).
         """
         self.interface = interface
         self.channel = channel
@@ -37,9 +61,12 @@ class WifiSpammer:
 
     def set_channel(self):
         """
-        @brief Configure l'interface WiFi sur le canal spécifié.
-        
-        @exception Exception: Si une erreur survient lors de la configuration du canal.
+        Configure l'interface WiFi sur le canal spécifié.
+
+        Raises
+        ------
+        Exception
+            Si une erreur survient lors de la configuration du canal.
         """
         try:
             # os.system(f"iwconfig {self.interface} channel {self.channel}")
@@ -49,9 +76,12 @@ class WifiSpammer:
 
     def create_beacon_packet(self) -> RadioTap:
         """
-        @brief Crée un paquet Beacon WiFi.
-        
-        @return: Un paquet de type RadioTap, contenant un paquet Beacon WiFi configuré avec le SSID et le canal.
+        Crée un paquet Beacon WiFi.
+
+        Returns
+        -------
+        scapy.layers.dot11.RadioTap
+            Un paquet RadioTap contenant un Beacon WiFi configuré avec le SSID et le canal.
         """
         return (RadioTap()
                 / Dot11(type=0, subtype=8,
@@ -64,16 +94,16 @@ class WifiSpammer:
 
     def packet_sender(self):
         """
-        @brief Fonction dédiée à la gestion de l'envoi des paquets Beacon.
-        
-        @details Cette fonction est exécutée dans un thread pour envoyer en continu les paquets Beacon. Les paquets
-                 sont envoyés par lots de 10 pour optimiser les performances.
+        Gère l'envoi des paquets Beacon en continu.
+
+        Notes
+        -----
+        Cette méthode est exécutée dans un thread pour envoyer les paquets Beacon par lots de 10.
         """
         beacon_packet = self.create_beacon_packet()
 
         while self.running:
             try:
-                # Envoi par lots de paquets
                 sendp(beacon_packet, iface=self.interface, verbose=False, count=10)
                 with threading.Lock():
                     self.sent_count += 10
@@ -83,10 +113,9 @@ class WifiSpammer:
 
     def monitor_progress(self):
         """
-        @brief Surveille et rapporte la progression de l'envoi des paquets.
-        
-        @details Cette fonction est exécutée dans un thread pour afficher en temps réel le nombre de paquets envoyés
-                 ainsi que le taux d'envoi en paquets par seconde.
+        Surveille la progression de l'envoi des paquets Beacon.
+
+        Affiche en temps réel le nombre de paquets envoyés et le taux d'envoi en paquets par seconde.
         """
         while self.running:
             elapsed_time = time.time() - self.start_time
@@ -96,19 +125,23 @@ class WifiSpammer:
 
     def start_scan(self, num_sender_threads: int = 4):
         """
-        @brief Démarre le processus d'envoi des paquets Beacon avec plusieurs threads.
-        
-        @param num_sender_threads: Nombre de threads d'envoi (par défaut : 4). Chaque thread envoie des paquets Beacon.
-        
-        @details Cette méthode configure d'abord le canal WiFi, puis lance plusieurs threads pour envoyer les paquets
-                 Beacon. Un thread séparé est utilisé pour surveiller le progrès de l'envoi.
+        Démarre le processus d'envoi des paquets Beacon.
+
+        Parameters
+        ----------
+        num_sender_threads : int, optional
+            Nombre de threads utilisés pour envoyer les paquets (par défaut : 4).
+
+        Notes
+        -----
+        Configure le canal WiFi, lance plusieurs threads pour envoyer les paquets et démarre un thread pour surveiller
+        le progrès de l'envoi.
         """
         self.set_channel()
 
         self.running = True
         self.start_time = time.time()
 
-        # Lancement des threads d'envoi
         sender_threads = []
         for _ in range(num_sender_threads):
             thread = threading.Thread(target=self.packet_sender)
@@ -116,27 +149,24 @@ class WifiSpammer:
             thread.start()
             sender_threads.append(thread)
 
-        # Démarrage du thread de surveillance
         monitor_thread = threading.Thread(target=self.monitor_progress)
         monitor_thread.daemon = True
         monitor_thread.start()
 
         try:
-            # Maintient le thread principal actif
             while True:
                 time.sleep(0.1)
         except KeyboardInterrupt:
             print("\nArrêt du scan...")
             self.running = False
 
-            # Attend que tous les threads se terminent
             for thread in sender_threads:
                 thread.join()
             monitor_thread.join()
 
 if __name__ == "__main__":
     """
-    Exemple d'utilisation pour démarrer l'envoi de paquets Beacon sur le canal 1 avec 30 threads d'envoi.
+    Exemple d'utilisation de WifiSpammer pour envoyer des paquets Beacon sur le canal 1.
     """
     scanner = WifiSpammer(interface="wlp1s0", channel=1)
     # scanner.start_scan(num_sender_threads=30)
