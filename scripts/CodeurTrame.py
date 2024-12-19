@@ -1,11 +1,49 @@
+"""
+Ce module fournit une classe pour encoder des trames Zigbee à partir de champs spécifiques.
+"""
+
 import logging
 
 class CodeurTrameZigbee:
+    """
+    Classe pour encoder différentes trames ZigBee (ACK, Command, Data).
+    
+    Cette classe fournit des méthodes pour encoder les couches MAC, réseau,
+    et sécurité des trames ZigBee, ainsi que pour générer des trames complètes.
+    
+    Attributes:
+        logger (logging.Logger): Instance de logger pour le débogage.
+    """
+
     def __init__(self, logger=None):
+        """
+        Initialise une instance de CodeurTrameZigbee.
+        
+        Args:
+            logger (logging.Logger, optional): Logger pour les messages de débogage.
+                Si None, un logger par défaut est utilisé.
+        """
         self.logger = logger or logging.getLogger(__name__)
 
     def encoder_champ_controle_trame(self, champs):
-        """Encoder le champ de contrôle MAC avec une configuration plus complète."""
+        """
+        Encode le champ de contrôle MAC en fonction des champs fournis.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                le champ de contrôle MAC. Les clés possibles incluent:
+                - 'frame_type' (int)
+                - 'securite_activee' (int)
+                - 'trame_en_attente' (int)
+                - 'ack_requis' (int)
+                - 'compression_pan_id' (int)
+                - 'version_trame' (int)
+                - 'mode_adresse_dst' (int)
+                - 'mode_adresse_src' (int)
+
+        Returns:
+            bytes: Le champ de contrôle MAC encodé sous forme de deux octets.
+        """
         frame_type = champs.get('frame_type', 0x3) & 0x07  # Bits 0-2
         securite_activee = (champs.get('securite_activee', 0) & 0x01) << 3  # Bit 3
         trame_en_attente = (champs.get('trame_en_attente', 0) & 0x01) << 4  # Bit 4
@@ -27,9 +65,16 @@ class CodeurTrameZigbee:
         )
         return controle_trame.to_bytes(2, byteorder='little')
 
-
     def encoder_trame_ack(self, sequence_number):
-        """Encoder une trame ACK."""
+        """
+        Encode une trame ACK ZigBee.
+
+        Args:
+            sequence_number (int): Numéro de séquence de la trame ACK.
+
+        Returns:
+            bytes: Trame ACK encodée.
+        """
         controle_trame = self.encoder_champ_controle_trame({
             'frame_type': 0x2,  # ACK frame
             'securite_activee': 0,
@@ -43,16 +88,30 @@ class CodeurTrameZigbee:
         return controle_trame + sequence_number.to_bytes(1, 'little')
 
     def encoder_trame_command(self, champs):
-        """Encoder une trame de commande avec une configuration plus précise."""
+        """
+        Encode une trame de commande ZigBee.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                la trame de commande. Les clés doivent inclure:
+                - 'sequence_number' (int)
+                - 'pan_id' (str)
+                - 'destination' (str)
+                - 'source' (str)
+                - 'command_id' (int)
+
+        Returns:
+            bytes: Trame de commande encodée.
+        """
         controle_trame = self.encoder_champ_controle_trame({
             'frame_type': 0x3, # Command frame
             'securite_activee': 0,
             'trame_en_attente': 0,
-            'ack_requis': 1, # Demande d'accusé de réception
-            'compression_pan_id': 1, # Compression PAN ID
+            'ack_requis': 1,
+            'compression_pan_id': 1,
             'version_trame': 0,
-            'mode_adresse_dst': 2, # Mode adresse courte
-            'mode_adresse_src': 2 # Mode adresse courte
+            'mode_adresse_dst': 2,
+            'mode_adresse_src': 2
         })
         sequence_number = champs['sequence_number'].to_bytes(1, 'little')
         pan_id = bytes.fromhex(champs['pan_id'])
@@ -61,9 +120,18 @@ class CodeurTrameZigbee:
         command_id = champs['command_id'].to_bytes(1, 'little')
         return controle_trame + sequence_number + pan_id + destination + source + command_id
 
-
     def encoder_trame_data(self, champs):
-        """Encoder une trame Data."""
+        """
+        Encode une trame de données ZigBee.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                la trame de données. Doit inclure les clés pour `couche_mac`,
+                `couche_reseau`, `security_header`, et `payload`.
+
+        Returns:
+            bytes: Trame de données encodée.
+        """
         couche_mac = self.encoder_couche_mac(champs['couche_mac'])
         couche_reseau = self.encoder_couche_reseau(champs['couche_reseau'])
         security_header = self.encoder_security_header(champs['security_header'])
@@ -71,10 +139,21 @@ class CodeurTrameZigbee:
         return couche_mac + couche_reseau + security_header + payload
 
 
-
-
     def encoder_couche_mac(self, champs):
-        """Encoder la couche MAC."""
+        """Encoder la couche MAC ZigBee.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                la couche MAC. Les clés doivent inclure:
+                - 'controle_trame' (dict)
+                - 'numero_sequence' (int)
+                - 'pan_id_destination' (str)
+                - 'adresse_destination' (str)
+                - 'adresse_source' (str)
+
+        Returns:
+            bytes: La couche MAC encodée.
+        """
         controle_trame = self.encoder_champ_controle_trame(champs['controle_trame'])
         numero_sequence = champs['numero_sequence'].to_bytes(1, 'little')
         pan_id_destination = bytes.fromhex(champs['pan_id_destination'])
@@ -84,7 +163,24 @@ class CodeurTrameZigbee:
 
 
     def encoder_couche_reseau(self, champs):
-        """Encoder la couche réseau ZigBee."""
+        """Encoder la couche réseau ZigBee.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                la couche réseau. Les clés doivent inclure:
+                - 'champ_controle_reseau' (str)
+                - 'addr_dest' (str)
+                - 'addr_src' (str)
+                - 'radius' (int)
+                - 'sequence_number' (int)
+                - 'adresse_destination' (str)
+                - 'extended_source' (str)
+
+        Returns:
+
+            bytes: La couche réseau encodée.
+        
+        """
         champ_controle_reseau = bytes.fromhex(champs['champ_controle_reseau'])
         addr_dest = bytes.fromhex(champs['addr_dest'])
         addr_src = bytes.fromhex(champs['addr_src'])
@@ -95,7 +191,20 @@ class CodeurTrameZigbee:
         return champ_controle_reseau + addr_dest + addr_src + radius + sequence_number + adresse_destination + extended_source
 
     def encoder_security_header(self, champs):
-        """Encoder le ZigBee Security Header."""
+        """Encoder le ZigBee Security Header.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                le ZigBee Security Header. Les clés doivent inclure:
+                - 'extended_nonce' (str)
+                - 'frame_counter' (str)
+                - 'extended_source' (str)
+                - 'key_sequence_number' (int)
+
+        Returns:
+            bytes: Le ZigBee Security Header encodé.
+        
+        """
         extended_nonce = int(champs['extended_nonce'], 16).to_bytes(1, 'little')
         frame_counter = bytes.fromhex(champs['frame_counter'])
         extended_source = bytes.fromhex(champs['extended_source'])
@@ -103,7 +212,19 @@ class CodeurTrameZigbee:
         return extended_nonce + frame_counter + extended_source + key_sequence_number
 
     def encoder_trame_zigbee(self, champs):
-        """Encoder une trame ZigBee en fonction des champs donnés."""
+        """Encoder une trame ZigBee en fonction des champs donnés.
+
+        Args:
+            champs (dict): Dictionnaire contenant les champs nécessaires pour encoder
+                la trame ZigBee. Les clés doivent inclure:
+                - 'type_trame' (str) : 'Ack', 'Command', ou 'Data'
+                - Les champs spécifiques à chaque type de trame
+
+        Returns:
+            bytes: La trame ZigBee encodée.
+
+        
+        """
         type_trame = champs['type_trame']
         if type_trame == 'Ack':
             return self.encoder_trame_ack(champs['sequence_number'])

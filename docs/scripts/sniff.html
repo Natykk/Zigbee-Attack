@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>scripts.sniff API documentation</title>
+<meta name="description" content="Ce Module implémente un sniffeur de trames Zigbee.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>scripts.sniff</code></h1>
+</header>
+<section id="section-intro">
+<p>Ce Module implémente un sniffeur de trames Zigbee.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="scripts.sniff.calculer_entropie"><code class="name flex">
+<span>def <span class="ident">calculer_entropie</span></span>(<span>donnees)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculer_entropie(donnees):
+    &#34;&#34;&#34;
+    @brief Calcule l&#39;entropie d&#39;un jeu de données.
+    
+    @param donnees: Données pour lesquelles l&#39;entropie est calculée, sous forme de bytes.
+    @type donnees: bytes
+    
+    @return: Entropie des données.
+    @rtype: float
+    &#34;&#34;&#34;
+    if not donnees:
+        return 0.0
+    comptage = {octet: donnees.count(octet) for octet in set(donnees)}
+    total = len(donnees)
+    return -sum((c / total) * math.log2(c / total) for c in comptage.values())</code></pre>
+</details>
+<div class="desc"><p>@brief Calcule l'entropie d'un jeu de données.</p>
+<p>@param donnees: Données pour lesquelles l'entropie est calculée, sous forme de bytes.
+@type donnees: bytes</p>
+<p>@return: Entropie des données.
+@rtype: float</p></div>
+</dd>
+<dt id="scripts.sniff.decrypter_payload_zigbee"><code class="name flex">
+<span>def <span class="ident">decrypter_payload_zigbee</span></span>(<span>payload_hex, cle_hex)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decrypter_payload_zigbee(payload_hex, cle_hex):
+    &#34;&#34;&#34;
+    @brief Décrypte un payload Zigbee chiffré avec AES en mode CCM.
+    
+    @param payload_hex: Payload chiffré en hexadécimal.
+    @type payload_hex: str
+    @param cle_hex: Clé de chiffrement en hexadécimal.
+    @type cle_hex: str
+    
+    @return: Dictionnaire contenant le résultat du décryptage.
+    @rtype: dict
+    &#34;&#34;&#34;
+    try:
+        payload = bytes.fromhex(payload_hex)
+        cle = bytes.fromhex(cle_hex)
+
+        nonce = payload[:13]
+        tag = payload[-4:]
+        donnees_chiffrees = payload[13:-4]
+
+        cipher = AES.new(cle, AES.MODE_CCM, nonce=nonce, mac_len=4)
+        payload_dechiffre = cipher.decrypt_and_verify(donnees_chiffrees, tag)
+        return {
+            &#39;succes&#39;: True,
+            &#39;nonce&#39;: nonce.hex(),
+            &#39;tag&#39;: tag.hex(),
+            &#39;payload_dechiffre&#39;: payload_dechiffre.decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+        }
+    except ValueError as e:
+        return {&#39;succes&#39;: False, &#39;erreur&#39;: f&#34;Erreur de vérification du MAC : {str(e)}&#34;}
+    except Exception as e:
+        return {&#39;succes&#39;: False, &#39;erreur&#39;: f&#34;Erreur de déchiffrement : {str(e)}&#34;}</code></pre>
+</details>
+<div class="desc"><p>@brief Décrypte un payload Zigbee chiffré avec AES en mode CCM.</p>
+<p>@param payload_hex: Payload chiffré en hexadécimal.
+@type payload_hex: str
+@param cle_hex: Clé de chiffrement en hexadécimal.
+@type cle_hex: str</p>
+<p>@return: Dictionnaire contenant le résultat du décryptage.
+@rtype: dict</p></div>
+</dd>
+<dt id="scripts.sniff.trouver_peripheriques_serie"><code class="name flex">
+<span>def <span class="ident">trouver_peripheriques_serie</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def trouver_peripheriques_serie():
+    &#34;&#34;&#34;
+    @brief Recherche des périphériques série USB compatibles.
+    
+    @return: Liste des périphériques série trouvés.
+    @rtype: list
+    &#34;&#34;&#34;
+    return glob.glob(&#39;/dev/ttyACM*&#39;)</code></pre>
+</details>
+<div class="desc"><p>@brief Recherche des périphériques série USB compatibles.</p>
+<p>@return: Liste des périphériques série trouvés.
+@rtype: list</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="scripts.sniff.SniffeurZigbee"><code class="flex name class">
+<span>class <span class="ident">SniffeurZigbee</span></span>
+<span>(</span><span>canal=13, fichier_sortie='captures_zigbee.json', vitesse_bauds=115200)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SniffeurZigbee:
+    &#34;&#34;&#34;
+    @class SniffeurZigbee
+    @brief Classe pour capturer et analyser les trames ZigBee.
+    @details Cette classe gère la capture des trames ZigBee depuis un périphérique série, les décodent et les sauvegardent dans un fichier JSON.
+    Elle prend également en charge le décryptage des trames lorsque nécessaire.
+    &#34;&#34;&#34;
+
+    def __init__(self, canal=13, fichier_sortie=&#39;captures_zigbee.json&#39;, vitesse_bauds=115200):
+        &#34;&#34;&#34;
+        @brief Constructeur de la classe SniffeurZigbee.
+        
+        @param canal: Canal ZigBee sur lequel écouter. Valeur par défaut : 13.
+        @type canal: int
+        @param fichier_sortie: Nom du fichier de sortie pour les captures. Valeur par défaut : &#39;captures_zigbee.json&#39;.
+        @type fichier_sortie: str
+        @param vitesse_bauds: Vitesse de transmission série. Valeur par défaut : 115200.
+        @type vitesse_bauds: int
+        &#34;&#34;&#34;
+        self.canal = canal
+        self.fichier_sortie = fichier_sortie
+        self.vitesse_bauds = vitesse_bauds
+        self.file_paquets = queue.Queue(maxsize=1000)
+        self.est_en_cours = False
+        self.port_serie = None
+        self.interface = self._selectionner_interface()
+        self.captures = []
+        self.cle_dechiffrement = &#34;9b9494920170aeed67e90ce7d672face&#34;
+        self.metadonnees = []
+
+    def _selectionner_interface(self):
+        &#34;&#34;&#34;
+        @brief Sélectionne le périphérique série disponible pour le sniffer.
+        
+        @return: Nom du périphérique série sélectionné.
+        @rtype: str
+        
+        @raise RuntimeError: Si aucun périphérique série n&#39;est trouvé.
+        &#34;&#34;&#34;
+        peripheriques = trouver_peripheriques_erie()
+        if not peripheriques:
+            raise RuntimeError(&#34;Aucun périphérique série USB trouvé&#34;)
+        logger.info(f&#34;Périphériques disponibles : {peripheriques}&#34;)
+        return peripheriques[0]
+
+    def _configurer_sniffer(self):
+        &#34;&#34;&#34;
+        @brief Configure le sniffer pour capturer les trames ZigBee via un port série.
+        
+        @raise RuntimeError: Si la configuration échoue.
+        &#34;&#34;&#34;
+        try:
+            self.port_serie = serial.Serial(self.interface, baudrate=self.vitesse_bauds, timeout=1)
+            logger.info(f&#34;Configuration du sniffer sur {self.interface}&#34;)
+        except serial.SerialException as e:
+            logger.error(f&#34;Erreur de configuration du sniffer : {e}&#34;)
+            self._fermer_port_serie()
+            raise
+
+    def _fermer_port_serie(self):
+        &#34;&#34;&#34;
+        @brief Ferme le port série s&#39;il est ouvert.
+        &#34;&#34;&#34;
+        if self.port_serie and self.port_serie.is_open:
+            self.port_serie.close()
+
+    def _capturer_paquets(self):
+        &#34;&#34;&#34;
+        @brief Capture les paquets depuis le port série et les ajoute à la file d&#39;attente.
+        &#34;&#34;&#34;
+        try:
+            logger.info(f&#34;Début de capture sur {self.interface}, canal {self.canal}&#34;)
+            while self.est_en_cours:
+                if self.port_serie.in_waiting:
+                    donnees_brutes = self.port_serie.readline().decode(&#39;utf-8&#39;).strip()
+                    if donnees_brutes:
+                        try:
+                            self.file_paquets.put_nowait(donnees_brutes)
+                        except queue.Full:
+                            logger.warning(&#34;File de paquets pleine, paquet ignoré.&#34;)
+        except serial.SerialException as e:
+            logger.error(f&#34;Erreur de port série : {e}&#34;)
+        finally:
+            self._fermer_port_serie()
+
+    def _traiter_paquets(self, decoder=DecodeurTrameZigbee()):
+        &#34;&#34;&#34;
+        @brief Traite les paquets capturés, les décode et les ajoute à la liste des captures.
+        
+        @param decoder: Instance de la classe DecodeurTrameZigbee utilisée pour décoder les trames.
+        @type decoder: DecodeurTrameZigbee
+        &#34;&#34;&#34;
+        while self.est_en_cours:
+            try:
+                paquet = self.file_paquets.get(timeout=1)
+                try:
+                    logger.info(f&#34;Paquet brut reçu : {paquet}&#34;)
+                    paquet_received = paquet.split(&#34; &#34;)[1]  # Extraction des données reçues
+                    paquet_bytes = bytes.fromhex(paquet_received)  # Conversion hex-&gt;bytes
+
+                    # Extraction des métadonnées depuis la chaîne de paquet
+                    metadonnees = {
+                        &#39;power&#39;: paquet.split(&#34; &#34;)[3],  # Valeur de power
+                        &#39;lqi&#39;: paquet.split(&#34; &#34;)[5],    # Valeur de lqi
+                        &#39;timestamp&#39;: paquet.split(&#34; &#34;)[7]  # Valeur du timestamp
+                    }
+                    
+                    decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
+                    if decoded_frame:
+                        logger.info(f&#34;Trame Zigbee décodée : {decoded_frame}&#34;)
+                        decoded_frame[&#39;metadonnees&#39;] = metadonnees
+                        self.captures.append(decoded_frame)
+                        
+                    else:
+                        logger.warning(f&#34;Impossible de décoder la trame : {paquet_received}&#34;)
+                except Exception as e:
+                    logger.error(f&#34;Erreur lors du traitement du paquet : {e}&#34;)
+            except queue.Empty:
+                pass
+
+    def demarrer_sniffer(self):
+        &#34;&#34;&#34;
+        @brief Démarre le sniffer pour commencer à capturer les trames ZigBee.
+        
+        Cette méthode démarre deux threads : un pour capturer les paquets et un autre pour les traiter.
+        &#34;&#34;&#34;
+        try:
+            self.est_en_cours = True
+            self._configurer_sniffer()
+            threading.Thread(target=self._capturer_paquets, daemon=True).start()
+            threading.Thread(target=self._traiter_paquets, daemon=True).start()
+        except Exception as e:
+            logger.error(f&#34;Erreur lors du démarrage du sniffer : {e}&#34;)
+
+    def arreter_sniffer(self):
+        &#34;&#34;&#34;
+        @brief Arrête le sniffer.
+        &#34;&#34;&#34;
+        self.est_en_cours = False
+        logger.info(&#34;Arrêt du sniffer&#34;)
+
+    def sauvegarder_captures(self):
+        &#34;&#34;&#34;
+        @brief Sauvegarde les captures dans un fichier JSON.
+        
+        Cette méthode écrit les captures dans un fichier spécifié lors de l&#39;initialisation de la classe.
+        &#34;&#34;&#34;
+        try:
+            with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                json.dump(self.captures, f, indent=2, ensure_ascii=False)
+            logger.info(f&#34;Captures sauvegardées dans {self.fichier_sortie}&#34;)
+        except Exception as e:
+            logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>@class SniffeurZigbee
+@brief Classe pour capturer et analyser les trames ZigBee.
+@details Cette classe gère la capture des trames ZigBee depuis un périphérique série, les décodent et les sauvegardent dans un fichier JSON.
+Elle prend également en charge le décryptage des trames lorsque nécessaire.</p>
+<p>@brief Constructeur de la classe SniffeurZigbee.</p>
+<p>@param canal: Canal ZigBee sur lequel écouter. Valeur par défaut : 13.
+@type canal: int
+@param fichier_sortie: Nom du fichier de sortie pour les captures. Valeur par défaut : 'captures_zigbee.json'.
+@type fichier_sortie: str
+@param vitesse_bauds: Vitesse de transmission série. Valeur par défaut : 115200.
+@type vitesse_bauds: int</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="scripts.sniff.SniffeurZigbee.arreter_sniffer"><code class="name flex">
+<span>def <span class="ident">arreter_sniffer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def arreter_sniffer(self):
+    &#34;&#34;&#34;
+    @brief Arrête le sniffer.
+    &#34;&#34;&#34;
+    self.est_en_cours = False
+    logger.info(&#34;Arrêt du sniffer&#34;)</code></pre>
+</details>
+<div class="desc"><p>@brief Arrête le sniffer.</p></div>
+</dd>
+<dt id="scripts.sniff.SniffeurZigbee.demarrer_sniffer"><code class="name flex">
+<span>def <span class="ident">demarrer_sniffer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def demarrer_sniffer(self):
+    &#34;&#34;&#34;
+    @brief Démarre le sniffer pour commencer à capturer les trames ZigBee.
+    
+    Cette méthode démarre deux threads : un pour capturer les paquets et un autre pour les traiter.
+    &#34;&#34;&#34;
+    try:
+        self.est_en_cours = True
+        self._configurer_sniffer()
+        threading.Thread(target=self._capturer_paquets, daemon=True).start()
+        threading.Thread(target=self._traiter_paquets, daemon=True).start()
+    except Exception as e:
+        logger.error(f&#34;Erreur lors du démarrage du sniffer : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>@brief Démarre le sniffer pour commencer à capturer les trames ZigBee.</p>
+<p>Cette méthode démarre deux threads : un pour capturer les paquets et un autre pour les traiter.</p></div>
+</dd>
+<dt id="scripts.sniff.SniffeurZigbee.sauvegarder_captures"><code class="name flex">
+<span>def <span class="ident">sauvegarder_captures</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sauvegarder_captures(self):
+    &#34;&#34;&#34;
+    @brief Sauvegarde les captures dans un fichier JSON.
+    
+    Cette méthode écrit les captures dans un fichier spécifié lors de l&#39;initialisation de la classe.
+    &#34;&#34;&#34;
+    try:
+        with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+            json.dump(self.captures, f, indent=2, ensure_ascii=False)
+        logger.info(f&#34;Captures sauvegardées dans {self.fichier_sortie}&#34;)
+    except Exception as e:
+        logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>@brief Sauvegarde les captures dans un fichier JSON.</p>
+<p>Cette méthode écrit les captures dans un fichier spécifié lors de l'initialisation de la classe.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="scripts" href="index.html">scripts</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="scripts.sniff.calculer_entropie" href="#scripts.sniff.calculer_entropie">calculer_entropie</a></code></li>
+<li><code><a title="scripts.sniff.decrypter_payload_zigbee" href="#scripts.sniff.decrypter_payload_zigbee">decrypter_payload_zigbee</a></code></li>
+<li><code><a title="scripts.sniff.trouver_peripheriques_serie" href="#scripts.sniff.trouver_peripheriques_serie">trouver_peripheriques_serie</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="scripts.sniff.SniffeurZigbee" href="#scripts.sniff.SniffeurZigbee">SniffeurZigbee</a></code></h4>
+<ul class="">
+<li><code><a title="scripts.sniff.SniffeurZigbee.arreter_sniffer" href="#scripts.sniff.SniffeurZigbee.arreter_sniffer">arreter_sniffer</a></code></li>
+<li><code><a title="scripts.sniff.SniffeurZigbee.demarrer_sniffer" href="#scripts.sniff.SniffeurZigbee.demarrer_sniffer">demarrer_sniffer</a></code></li>
+<li><code><a title="scripts.sniff.SniffeurZigbee.sauvegarder_captures" href="#scripts.sniff.SniffeurZigbee.sauvegarder_captures">sauvegarder_captures</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>

