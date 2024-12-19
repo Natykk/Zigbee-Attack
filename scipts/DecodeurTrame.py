@@ -189,12 +189,12 @@ class DecodeurTrameZigbee:
 
 #trame_command = bytes.fromhex("63884a00190000146e04")
 
-trame_data = bytes.fromhex("6188300019146e0000481a146e00001e222f3c60feffbd4d749e2860feffbd4d7428247002009e2860feffbd4d74005ca080848585055c298eab1c1c9f41")
-decoder = DecodeurTrameZigbee()
+#trame_data = bytes.fromhex("6188300019146e0000481a146e00001e222f3c60feffbd4d749e2860feffbd4d7428247002009e2860feffbd4d74005ca080848585055c298eab1c1c9f41")
+#decoder = DecodeurTrameZigbee()
 #print(json.dumps(decoder.decoder_trame_zigbee(trame_ack), indent=2))
 #print(json.dumps(decoder.decoder_trame_zigbee(trame_command), indent=2))
 #print(json.dumps(decoder.decoder_trame_zigbee(trame_data), indent=2))
 
 #Ecriture dans un fichier
-with open('captures_zigbee.json', 'w') as f:
-    json.dump(decoder.decoder_trame_zigbee(trame_data), f, indent=2)
+#with open('captures_zigbee.json', 'w') as f:
+#    json.dump(decoder.decoder_trame_zigbee(trame_data), f, indent=2)

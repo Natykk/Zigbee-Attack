@@ -158,6 +158,8 @@ class SniffeurZigbee:
         except Exception as e:
             logger.error(f"Erreur lors de la sauvegarde des captures : {e}")
 
+
+'''
 # Exemple d'utilisation
 if __name__ == "__main__":
     sniffer = SniffeurZigbee()
@@ -165,3 +167,4 @@ if __name__ == "__main__":
     time.sleep(10)  # Capture pendant 10 secondes
     sniffer.arreter_sniffer()
     sniffer.sauvegarder_captures()
+'''
