@@ -129,6 +129,116 @@ class DecodeurTrameZigbee:
             'source': source,
             'command_id': command_id
         }
+    
+    def decoder_couche_aps(self, octets_trame, offset):
+
+        frame_control_field = octets_trame[offset:offset+1]
+        
+
+        val = bin(int.from_bytes(frame_control_field, byteorder='little'))[2:].zfill(8)
+        val = val[::-1]
+ 
+        
+        frame_type = int(val[0:2],2)
+
+        delivery_mode = int(val[2:4],2)
+
+        security = int(val[5],2)
+
+        ack_request = int(val[6],2)
+
+        extended_header = int(val[7],2)
+
+        offset += 1
+
+        destination_endpoint = int.from_bytes(octets_trame[offset:offset+1])
+
+        offset += 1
+
+        cluster_id = octets_trame[offset:offset+2].hex()
+
+
+        offset += 2
+
+        profile_id = octets_trame[offset:offset+2].hex()
+
+        offset += 2
+
+        source_endpoint = int.from_bytes(octets_trame[offset:offset+1])
+
+        offset += 1
+
+        counter = int.from_bytes(octets_trame[offset:offset+1])
+
+        offset += 1
+
+        return {
+
+            'frame_control_field': {
+                'frame_type': frame_type,
+                'delivery_mode': delivery_mode,
+                'security': security,
+                'ack_request': ack_request,
+                'extended_header': extended_header
+            },
+            'destination_endpoint': destination_endpoint,
+            'cluster_id': cluster_id,
+            'profile_id': profile_id,
+            'source_endpoint': source_endpoint,
+            'counter': counter,
+            'offset': offset
+        }
+    
+
+    def decoder_couche_zcl(self, octets_trame, offset):
+        frame_control_field = octets_trame[offset:offset+1]
+        val = bin(int.from_bytes(frame_control_field, byteorder='little'))[2:].zfill(8)
+
+        val = val[::-1]
+
+        frame_type = val[0:2]
+        frame_type = frame_type[::-1]
+        frame_type = int(frame_type,2)
+   
+
+        manufacturer_specific = int(val[2],2)
+   
+
+        direction = int(val[3],2)
+        if direction == 0:
+            direction = "Client to Server"
+        else:
+            direction = "Server to Client"
+   
+
+        disable_default_response = int(val[4],2)
+
+        offset += 1
+
+        Sequence_number = int.from_bytes(octets_trame[offset:offset+1])
+
+        offset += 1
+
+        command_id = octets_trame[offset:offset+1].hex()
+
+        offset += 1
+
+        return {
+            'frame_control_field': {
+                'frame_type': frame_type,
+                'manufacturer_specific': manufacturer_specific,
+                'direction': direction,
+                'disable_default_response': disable_default_response
+            },
+            'Sequence_number': Sequence_number,
+            'command_id': command_id,
+            'offset': offset
+        }
+    
+    
+
+
+        
 
     def decoder_trame_data(self, octets_trame):
         """
@@ -154,19 +264,24 @@ class DecodeurTrameZigbee:
 
         couche_reseau = self.decoder_couche_reseau(octets_trame, offset)
         offset = couche_reseau['offset']
-
-        security_header = self.decoder_security_header(octets_trame, offset)
-        offset = security_header['offset']
-
-        payload = octets_trame[offset:].hex()
-
-        return {
-            'type_trame': 'Data',
-            'couche_mac': couche_mac,
-            'couche_reseau': couche_reseau,
-            'security_header': security_header,
-            'payload': payload
-        }
+ 
+        if couche_reseau['champ_controle_reseau']['security']:
+            #TODO: Déchiffrer le payload
+            pass   
+        else:
+            decoder_couche_aps = self.decoder_couche_aps(octets_trame, offset)
+            offset = decoder_couche_aps['offset']
+            decoder_couche_zcl = self.decoder_couche_zcl(octets_trame, offset)
+            offset = decoder_couche_zcl['offset']
+            payload = octets_trame[offset:].hex()
+            return {
+                'type_trame': 'Data',
+                'couche_mac': couche_mac,
+                'couche_reseau': couche_reseau,
+                'couche_aps': decoder_couche_aps,
+                'couche_zcl': decoder_couche_zcl,
+                'payload': payload
+            }
 
     def decoder_trame_zigbee(self, octets_trame):
         """
@@ -270,7 +385,38 @@ class DecodeurTrameZigbee:
             - addr_dest : Adresse de destination
             - addr_src : Adresse source
         """
-        champ_controle_reseau = octets_trame[offset:offset + 2].hex()
+        champ_controle_reseau = octets_trame[offset:offset + 2]
+        # Je prends les 2 premiers bits pour le champ de contrôle réseau
+        val = bin(int.from_bytes(champ_controle_reseau, byteorder='little'))[2:].zfill(16)
+        val = val[::-1]
+        
+        # Extraction des champs selon les positions de l'image
+        frame_type = int(val[0:1],2)          # Bits 0-2
+ 
+        protocol_version = val[2:6]  # Bits 3-6
+        protocol_version = protocol_version[::-1]
+        protocol_version = int(protocol_version,2)
+        
+
+        discover_route = int(val[5:7],2)      # Bits 5-6
+     
+        # Flags individuels
+        multicast = int(val[7],2)            # Bit 7
+     
+        security = int(val[9],2)             # Bit 8
+     
+
+        source_route = int(val[10],2)         # Bit 9
+     
+        
+        destination = int(val[-5],2)         # Bit 10 (valeur différente de l'image)
+   
+        
+        extended_source = int(val[-4],2)     # Bit 11
+     
+        
+        end_device = int(val[-3],2)
+        
         offset += 2
 
         addr_dest = octets_trame[offset:offset + 2].hex()
@@ -289,9 +435,19 @@ class DecodeurTrameZigbee:
         offset += 8
         extended_source = octets_trame[offset:offset + 8].hex()
         offset += 8
-
+        
         return {
-            'champ_controle_reseau': champ_controle_reseau,
+            'champ_controle_reseau': {
+                'frame_type': frame_type,
+                'protocol_version': protocol_version,
+                'discover_route': bool(discover_route),
+                'multicast': bool(multicast),
+                'security': bool(security),
+                'source_route': bool(source_route),
+                'destination': bool(destination),
+                'extended_source': bool(extended_source),
+                'end_device': bool(end_device)
+            },
             'radius': radius,
             'sequence_number': sequence_number,
             'adresse_destination': adresse_destination,
@@ -322,36 +478,55 @@ class DecodeurTrameZigbee:
             - key_sequence_number : Numéro de séquence de la clé
             - offset : Décalage après l'en-tête de sécurité
         """
-        extended_nonce = hex(octets_trame[offset])
+        print(octets_trame[offset:offset+1].hex())
+
+        Security_control_field = octets_trame[offset:offset+1]
+
+        val = bin(int.from_bytes(Security_control_field, byteorder='little'))[2:].zfill(8)
+        val = val[::-1]
+
+        Security_level = val[0:3]
+     
+        Key_id_mode = val[3:5]
+        Key_id_mode = Key_id_mode[::-1]
+        extended_nonce = val[5]
+        
         offset += 1
 
         frame_counter = octets_trame[offset:offset + 4].hex()
+        #Convertir en big endian
+        frame_counter = frame_counter[6:8] + frame_counter[4:6] + frame_counter[2:4] + frame_counter[0:2]
+        frame_counter = int(frame_counter, 16)
+        
         offset += 4
 
         extended_source = octets_trame[offset:offset + 8].hex()
+
         offset += 8
 
-        key_sequence_number = octets_trame[offset]
+        key_sequence_number = octets_trame[offset:offset + 1].hex()
+    
         offset += 1
+        Data = octets_trame[offset:-4].hex()
+        
+
+        mic = octets_trame[-4:].hex()
+
+
+        mic_length = len(mic) // 2
 
         return {
-            'extended_nonce': extended_nonce,
+            'Security_control_field': {
+                'Security_level': Security_level,
+                'Key_id_mode': Key_id_mode,
+                'extended_nonce': extended_nonce
+            },
             'frame_counter': frame_counter,
             'extended_source': extended_source,
             'key_sequence_number': key_sequence_number,
-            'offset': offset
+            'offset': offset,
+            'mic': mic,
+            'Data': Data,
+            'mic_length': mic_length
         }
 
-
-# Tests
-#trame_ack = bytes.fromhex("02002c")
-#trame_command = bytes.fromhex("63884a00190000146e04")
-#trame_data = bytes.fromhex("6188300019146e0000481a146e00001e222f3c60feffbd4d749e2860feffbd4d7428247002009e2860feffbd4d74005ca080848585055c298eab1c1c9f41")
-#decoder = DecodeurTrameZigbee()
-#print(json.dumps(decoder.decoder_trame_zigbee(trame_ack), indent=2))
-#print(json.dumps(decoder.decoder_trame_zigbee(trame_command), indent=2))
-#print(json.dumps(decoder.decoder_trame_zigbee(trame_data), indent=2))
-
-#Ecriture dans un fichier
-#with open('captures_zigbee.json', 'w') as f:
-#    json.dump(decoder.decoder_trame_zigbee(trame_data), f, indent=2)
