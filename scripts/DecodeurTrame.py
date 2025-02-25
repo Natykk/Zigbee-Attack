@@ -267,7 +267,12 @@ class DecodeurTrameZigbee:
  
         if couche_reseau['champ_controle_reseau']['security']:
             #TODO: Déchiffrer le payload
-            pass   
+            return {
+                'type_trame': 'Data',
+                'couche_mac': couche_mac,
+                'couche_reseau': couche_reseau,
+                'security_header': self.decoder_security_header(octets_trame, offset),
+            }
         else:
             decoder_couche_aps = self.decoder_couche_aps(octets_trame, offset)
             offset = decoder_couche_aps['offset']
@@ -440,13 +445,13 @@ class DecodeurTrameZigbee:
             'champ_controle_reseau': {
                 'frame_type': frame_type,
                 'protocol_version': protocol_version,
-                'discover_route': bool(discover_route),
-                'multicast': bool(multicast),
-                'security': bool(security),
-                'source_route': bool(source_route),
-                'destination': bool(destination),
-                'extended_source': bool(extended_source),
-                'end_device': bool(end_device)
+                'discover_route': discover_route,
+                'multicast': multicast,
+                'security': security,
+                'source_route': source_route,
+                'destination': destination,
+                'extended_source': extended_source,
+                'end_device': end_device
             },
             'radius': radius,
             'sequence_number': sequence_number,

@@ -12,9 +12,10 @@ import time
 import json
 import glob
 from datetime import datetime
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 import math
 from DecodeurTrame import DecodeurTrameZigbee
+#from Cryptodome.Util.Padding import pad,Counter
 
 # Configuration de la journalisation
 logging.basicConfig(
@@ -37,73 +38,6 @@ def trouver_peripheriques_serie():
         Liste des périphériques série trouvés.
     """
     return glob.glob('/dev/ttyACM*')
-
-def calculer_entropie(donnees):
-    """
-    Calcule l'entropie d'un jeu de données.
-
-    Paramètres
-    ----------
-    donnees : bytes
-        Données pour lesquelles l'entropie est calculée.
-
-    Retours
-    -------
-    float
-        Entropie des données.
-    """
-    if not donnees:
-        return 0.0
-    comptage = {octet: donnees.count(octet) for octet in set(donnees)}
-    total = len(donnees)
-    return -sum((c / total) * math.log2(c / total) for c in comptage.values())
-
-def decrypter_payload_zigbee(payload_hex, cle_hex):
-    """
-    Décrypte un payload Zigbee chiffré avec AES en mode CCM.
-
-    Paramètres
-    ----------
-    payload_hex : str
-        Payload chiffré en format hexadécimal.
-    cle_hex : str
-        Clé de chiffrement en format hexadécimal.
-
-    Retours
-    -------
-    dict
-        Dictionnaire contenant les résultats du déchiffrement avec les clés suivantes :
-        - succes : bool
-            Indique si le déchiffrement a réussi
-        - nonce : str, optionnel
-            Nonce utilisé pour le déchiffrement (uniquement si succès)
-        - tag : str, optionnel
-            Tag d'authentification (uniquement si succès)
-        - payload_dechiffre : str, optionnel
-            Payload déchiffré (uniquement si succès)
-        - erreur : str, optionnel
-            Message d'erreur (uniquement en cas d'échec)
-    """
-    try:
-        payload = bytes.fromhex(payload_hex)
-        cle = bytes.fromhex(cle_hex)
-
-        nonce = payload[:13]
-        tag = payload[-4:]
-        donnees_chiffrees = payload[13:-4]
-
-        cipher = AES.new(cle, AES.MODE_CCM, nonce=nonce, mac_len=4)
-        payload_dechiffre = cipher.decrypt_and_verify(donnees_chiffrees, tag)
-        return {
-            'succes': True,
-            'nonce': nonce.hex(),
-            'tag': tag.hex(),
-            'payload_dechiffre': payload_dechiffre.decode('utf-8', errors='ignore')
-        }
-    except ValueError as e:
-        return {'succes': False, 'erreur': f"Erreur de vérification du MAC : {str(e)}"}
-    except Exception as e:
-        return {'succes': False, 'erreur': f"Erreur de déchiffrement : {str(e)}"}
 
 class SniffeurZigbee:
     """
@@ -155,8 +89,19 @@ class SniffeurZigbee:
         self.port_serie = None
         self.interface = self._selectionner_interface()
         self.captures = []
-        self.cle_dechiffrement = "9b9494920170aeed67e90ce7d672face"
+        self.cle_dechiffrement = ""
         self.metadonnees = []
+
+
+    def reinitialiser(self):
+        """Réinitialise complètement l'état du sniffer"""
+        self.captures.clear()
+        self.file_paquets.queue.clear()
+        self.metadonnees.clear()
+        
+        if self.port_serie and self.port_serie.is_open:
+            self.port_serie.reset_input_buffer()  
+            self.port_serie.reset_output_buffer()
 
     def _selectionner_interface(self):
         """
@@ -172,11 +117,11 @@ class SniffeurZigbee:
         RuntimeError
             Si aucun périphérique série n'est trouvé.
         """
-        peripheriques = trouver_peripheriques_erie()
+        peripheriques = trouver_peripheriques_serie()
         if not peripheriques:
             raise RuntimeError("Aucun périphérique série USB trouvé")
         logger.info(f"Périphériques disponibles : {peripheriques}")
-        return peripheriques[0]
+        return '/dev/ttyACM0' #peripheriques[0]
 
     def _configurer_sniffer(self):
         """
@@ -189,6 +134,7 @@ class SniffeurZigbee:
         """
         try:
             self.port_serie = serial.Serial(self.interface, baudrate=self.vitesse_bauds, timeout=1)
+            self.port_serie.reset_input_buffer()
             logger.info(f"Configuration du sniffer sur {self.interface}")
         except serial.SerialException as e:
             logger.error(f"Erreur de configuration du sniffer : {e}")
@@ -209,6 +155,7 @@ class SniffeurZigbee:
         Cette méthode s'exécute dans un thread séparé et lit en continu depuis le
         port série, ajoutant les paquets reçus à la file d'attente.
         """
+
         try:
             logger.info(f"Début de capture sur {self.interface}, canal {self.canal}")
             while self.est_en_cours:
@@ -237,21 +184,24 @@ class SniffeurZigbee:
             try:
                 paquet = self.file_paquets.get(timeout=1)
                 try:
-                    logger.info(f"Paquet brut reçu : {paquet}")
+                    #logger.info(f"Paquet brut reçu : {paquet}")
                     paquet_received = paquet.split(" ")[1]
                     paquet_bytes = bytes.fromhex(paquet_received)
-
+                    
                     metadonnees = {
                         'power': paquet.split(" ")[3],
                         'lqi': paquet.split(" ")[5],
-                        'timestamp': paquet.split(" ")[7]
+                        'timestamp': paquet.split(" ")[7],
+                        'trame_brute': paquet_received
                     }
                     
                     decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
                     if decoded_frame:
-                        logger.info(f"Trame Zigbee décodée : {decoded_frame}")
+                        #logger.info(f"Trame Zigbee décodée : {decoded_frame}")
+                        
                         decoded_frame['metadonnees'] = metadonnees
                         self.captures.append(decoded_frame)
+                        
                     else:
                         logger.warning(f"Impossible de décoder la trame : {paquet_received}")
                 except Exception as e:
