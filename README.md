@@ -13,12 +13,8 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 
 ### Matériel et Frameworks Utilisés :
 - **Matériel** :
-  - Dongle USB TI CC2531
   - Dongle nRF52840
   - ESP32-H2
-- **Frameworks** :
-  - Killerbee
-  - WHAD
 
 ## 🛠️ Liste des Tâches
 
@@ -32,22 +28,21 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 
 ### Étape 2 : Préparation Banc de Test Zigbee
 - [x] **2.1 Configuration Matériel et Logiciel** 
-- [ ] **2.2 Mise en place d'outils**
+- [x] **2.2 Mise en place d'outils**
   - [x] Test d'attaques par brouillage et interception 
-  - [ ] Test d'attaques par rejeu et usurpation 
+  - [x] Test d'attaques par rejeu 
 
 ### Étape 3 : Reproduction des Scénarios d'attaques Zigbee
-- [ ] **3.1 Reproduction d'attaques simples**
+- [x] **3.1 Reproduction d'attaques simples**
   - [x] Attaque de brouillage 
   - [x] Attaque d'interception 
-- [ ] **3.2 Reproduction d'attaques complexes**
-  - [ ] Attaque par rejeu 
-  - [ ] Attaque par usurpation d'identité 
+- [x] **3.2 Reproduction d'attaques complexes**
+  - [x] Attaque par rejeu 
 
 ### Étape 4 : Documentation et Code
-- [ ] **4.1 Documentation du Banc de Test et des Attaques**
-  - [ ] Attaques par brouillage et interception 
-  - [ ] Attaques par rejeu et usurpation 
+- [x] **4.1 Documentation du Banc de Test et des Attaques**
+  - [x] Attaques par brouillage et interception 
+  - [x] Attaques par rejeu 
 - [ ] **4.2 Finalisation du Code et Documentation** 
 
 
