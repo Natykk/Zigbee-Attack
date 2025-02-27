@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
 <title>scripts.sniff API documentation</title>
-<meta name="description" content="Module implémentant un sniffeur de trames Zigbee …">
+<meta name="description" content="Module : sniffeur_zigbee
+…">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,9 +37,10 @@ el.replaceWith(d);
 <h1 class="title">Module <code>scripts.sniff</code></h1>
 </header>
 <section id="section-intro">
-<p>Module implémentant un sniffeur de trames Zigbee.</p>
-<p>Ce module fournit les fonctionnalités pour capturer et analyser les trames Zigbee
-depuis une interface série.</p>
+<h1 id="module-sniffeur_zigbee">Module : sniffeur_zigbee</h1>
+<p>Ce module implémente un sniffeur de trames Zigbee.</p>
+<p>Il fournit les fonctionnalités pour capturer, décoder et analyser les trames Zigbee
+depuis une interface série, ainsi que pour sauvegarder les captures dans un fichier JSON.</p>
 </section>
 <section>
 </section>
@@ -47,117 +49,6 @@ depuis une interface série.</p>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="scripts.sniff.calculer_entropie"><code class="name flex">
-<span>def <span class="ident">calculer_entropie</span></span>(<span>donnees)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calculer_entropie(donnees):
-    &#34;&#34;&#34;
-    Calcule l&#39;entropie d&#39;un jeu de données.
-
-    Paramètres
-    ----------
-    donnees : bytes
-        Données pour lesquelles l&#39;entropie est calculée.
-
-    Retours
-    -------
-    float
-        Entropie des données.
-    &#34;&#34;&#34;
-    if not donnees:
-        return 0.0
-    comptage = {octet: donnees.count(octet) for octet in set(donnees)}
-    total = len(donnees)
-    return -sum((c / total) * math.log2(c / total) for c in comptage.values())</code></pre>
-</details>
-<div class="desc"><p>Calcule l'entropie d'un jeu de données.</p>
-<h2 id="parametres">Paramètres</h2>
-<p>donnees : bytes
-Données pour lesquelles l'entropie est calculée.</p>
-<h2 id="retours">Retours</h2>
-<p>float
-Entropie des données.</p></div>
-</dd>
-<dt id="scripts.sniff.decrypter_payload_zigbee"><code class="name flex">
-<span>def <span class="ident">decrypter_payload_zigbee</span></span>(<span>payload_hex, cle_hex)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def decrypter_payload_zigbee(payload_hex, cle_hex):
-    &#34;&#34;&#34;
-    Décrypte un payload Zigbee chiffré avec AES en mode CCM.
-
-    Paramètres
-    ----------
-    payload_hex : str
-        Payload chiffré en format hexadécimal.
-    cle_hex : str
-        Clé de chiffrement en format hexadécimal.
-
-    Retours
-    -------
-    dict
-        Dictionnaire contenant les résultats du déchiffrement avec les clés suivantes :
-        - succes : bool
-            Indique si le déchiffrement a réussi
-        - nonce : str, optionnel
-            Nonce utilisé pour le déchiffrement (uniquement si succès)
-        - tag : str, optionnel
-            Tag d&#39;authentification (uniquement si succès)
-        - payload_dechiffre : str, optionnel
-            Payload déchiffré (uniquement si succès)
-        - erreur : str, optionnel
-            Message d&#39;erreur (uniquement en cas d&#39;échec)
-    &#34;&#34;&#34;
-    try:
-        payload = bytes.fromhex(payload_hex)
-        cle = bytes.fromhex(cle_hex)
-
-        nonce = payload[:13]
-        tag = payload[-4:]
-        donnees_chiffrees = payload[13:-4]
-
-        cipher = AES.new(cle, AES.MODE_CCM, nonce=nonce, mac_len=4)
-        payload_dechiffre = cipher.decrypt_and_verify(donnees_chiffrees, tag)
-        return {
-            &#39;succes&#39;: True,
-            &#39;nonce&#39;: nonce.hex(),
-            &#39;tag&#39;: tag.hex(),
-            &#39;payload_dechiffre&#39;: payload_dechiffre.decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
-        }
-    except ValueError as e:
-        return {&#39;succes&#39;: False, &#39;erreur&#39;: f&#34;Erreur de vérification du MAC : {str(e)}&#34;}
-    except Exception as e:
-        return {&#39;succes&#39;: False, &#39;erreur&#39;: f&#34;Erreur de déchiffrement : {str(e)}&#34;}</code></pre>
-</details>
-<div class="desc"><p>Décrypte un payload Zigbee chiffré avec AES en mode CCM.</p>
-<h2 id="parametres">Paramètres</h2>
-<p>payload_hex : str
-Payload chiffré en format hexadécimal.
-cle_hex : str
-Clé de chiffrement en format hexadécimal.</p>
-<h2 id="retours">Retours</h2>
-<p>dict
-Dictionnaire contenant les résultats du déchiffrement avec les clés suivantes :
-- succes : bool
-Indique si le déchiffrement a réussi
-- nonce : str, optionnel
-Nonce utilisé pour le déchiffrement (uniquement si succès)
-- tag : str, optionnel
-Tag d'authentification (uniquement si succès)
-- payload_dechiffre : str, optionnel
-Payload déchiffré (uniquement si succès)
-- erreur : str, optionnel
-Message d'erreur (uniquement en cas d'échec)</p></div>
-</dd>
 <dt id="scripts.sniff.trouver_peripheriques_serie"><code class="name flex">
 <span>def <span class="ident">trouver_peripheriques_serie</span></span>(<span>)</span>
 </code></dt>
@@ -170,17 +61,24 @@ Message d'erreur (uniquement en cas d'échec)</p></div>
     &#34;&#34;&#34;
     Recherche les périphériques série USB compatibles.
 
+    Cette fonction explore le système pour trouver tous les périphériques dont
+    le nom correspond au motif &#39;/dev/tty*&#39;, ce qui est généralement le cas sur
+    les systèmes Unix/Linux pour les interfaces série.
+
     Retours
     -------
     list
-        Liste des périphériques série trouvés.
+        Liste des chemins d&#39;accès aux périphériques série trouvés.
     &#34;&#34;&#34;
-    return glob.glob(&#39;/dev/ttyACM*&#39;)</code></pre>
+    return glob.glob(&#39;/dev/tty*&#39;)</code></pre>
 </details>
 <div class="desc"><p>Recherche les périphériques série USB compatibles.</p>
+<p>Cette fonction explore le système pour trouver tous les périphériques dont
+le nom correspond au motif '/dev/tty*', ce qui est généralement le cas sur
+les systèmes Unix/Linux pour les interfaces série.</p>
 <h2 id="retours">Retours</h2>
 <p>list
-Liste des périphériques série trouvés.</p></div>
+Liste des chemins d'accès aux périphériques série trouvés.</p></div>
 </dd>
 </dl>
 </section>
@@ -200,41 +98,42 @@ Liste des périphériques série trouvés.</p></div>
     &#34;&#34;&#34;
     Classe pour capturer et analyser les trames ZigBee.
 
-    Cette classe gère la capture des trames ZigBee depuis un périphérique série,
-    leur décodage et leur sauvegarde dans un fichier JSON. Elle prend également
-    en charge le déchiffrement des trames lorsque nécessaire.
+    Cette classe gère la capture des trames ZigBee via un port série, leur décodage 
+    grâce à un décodeur spécialisé, ainsi que leur sauvegarde dans un fichier JSON.
+    Elle peut également être étendue pour prendre en charge le déchiffrement des trames.
 
     Paramètres
     ----------
     canal : int, optionnel
-        Canal ZigBee sur lequel écouter (par défaut 13)
+        Canal ZigBee sur lequel écouter (par défaut 13).
     fichier_sortie : str, optionnel
-        Nom du fichier de sortie pour les captures (par défaut &#39;captures_zigbee.json&#39;)
+        Chemin du fichier de sortie pour sauvegarder les captures 
+        (par défaut &#39;captures_zigbee.json&#39;).
     vitesse_bauds : int, optionnel
-        Vitesse de transmission série (par défaut 115200)
+        Vitesse de transmission du port série (par défaut 115200).
 
     Attributs
     ----------
     canal : int
-        Canal ZigBee sélectionné
+        Canal ZigBee sélectionné.
     fichier_sortie : str
-        Chemin vers le fichier de sortie
+        Chemin vers le fichier de sortie.
     vitesse_bauds : int
-        Vitesse de transmission en bauds
+        Vitesse de transmission en bauds.
     file_paquets : Queue
-        File d&#39;attente pour stocker les paquets capturés
+        File d&#39;attente utilisée pour stocker les paquets bruts capturés.
     est_en_cours : bool
-        Drapeau indiquant si la capture est active
+        Indique si le sniffer est en cours d&#39;exécution.
     port_serie : serial.Serial
-        Objet port série
+        Instance du port série configuré pour la capture.
     interface : str
-        Interface série sélectionnée
+        Nom du périphérique série sélectionné.
     captures : list
-        Liste des trames capturées
+        Liste des trames ZigBee décodées et leurs métadonnées associées.
     cle_dechiffrement : str
-        Clé de déchiffrement
+        Clé utilisée pour le déchiffrement des trames, si nécessaire.
     metadonnees : list
-        Liste des métadonnées de capture
+        Liste des métadonnées associées aux captures.
     &#34;&#34;&#34;
 
     def __init__(self, canal=13, fichier_sortie=&#39;captures_zigbee.json&#39;, vitesse_bauds=115200):
@@ -246,12 +145,38 @@ Liste des périphériques série trouvés.</p></div>
         self.port_serie = None
         self.interface = self._selectionner_interface()
         self.captures = []
-        self.cle_dechiffrement = &#34;9b9494920170aeed67e90ce7d672face&#34;
+        self.cle_dechiffrement = &#34;&#34;
         self.metadonnees = []
+
+    def reinitialiser(self):
+        &#34;&#34;&#34;
+        Réinitialise complètement l&#39;état du sniffer.
+
+        Cette méthode vide la liste des captures, la file d&#39;attente des paquets
+        ainsi que les métadonnées accumulées. Si le port série est ouvert, elle 
+        réinitialise également ses buffers d&#39;entrée et de sortie.
+        &#34;&#34;&#34;
+        self.captures.clear()
+        self.file_paquets.queue.clear()
+        self.metadonnees.clear()
+        
+        try:
+            if self.port_serie and self.port_serie.is_open:
+                self.port_serie.reset_input_buffer()  
+                self.port_serie.reset_output_buffer()
+                with self.file_paquets.mutex:
+                    self.file_paquets.queue.clear()
+                self.captures.clear()
+        except Exception as e:
+            logger.error(f&#34;Erreur lors de la réinitialisation du sniffer : {e}&#34;)
 
     def _selectionner_interface(self):
         &#34;&#34;&#34;
         Sélectionne le périphérique série disponible pour le sniffer.
+
+        Cette méthode recherche tous les périphériques série disponibles et
+        retourne celui par défaut. Ici, le périphérique &#39;/dev/ttyACM0&#39; est utilisé,
+        mais cette méthode peut être adaptée pour sélectionner dynamiquement.
 
         Retours
         -------
@@ -263,23 +188,27 @@ Liste des périphériques série trouvés.</p></div>
         RuntimeError
             Si aucun périphérique série n&#39;est trouvé.
         &#34;&#34;&#34;
-        peripheriques = trouver_peripheriques_erie()
+        peripheriques = trouver_peripheriques_serie()
         if not peripheriques:
             raise RuntimeError(&#34;Aucun périphérique série USB trouvé&#34;)
         logger.info(f&#34;Périphériques disponibles : {peripheriques}&#34;)
-        return peripheriques[0]
+        return &#39;/dev/ttyACM0&#39;  # Ou peripheriques[0] pour utiliser le premier trouvé
 
     def _configurer_sniffer(self):
         &#34;&#34;&#34;
-        Configure le sniffer pour capturer les trames ZigBee via le port série.
+        Configure le sniffer pour la capture des trames ZigBee via le port série.
+
+        Cette méthode initialise l&#39;objet serial.Serial avec les paramètres 
+        appropriés et réinitialise les buffers d&#39;entrée et de sortie.
 
         Lève
         ----
         RuntimeError
-            Si la configuration échoue.
+            En cas d&#39;échec de la configuration du port série.
         &#34;&#34;&#34;
         try:
             self.port_serie = serial.Serial(self.interface, baudrate=self.vitesse_bauds, timeout=1)
+            self.port_serie.reset_input_buffer()
             logger.info(f&#34;Configuration du sniffer sur {self.interface}&#34;)
         except serial.SerialException as e:
             logger.error(f&#34;Erreur de configuration du sniffer : {e}&#34;)
@@ -289,6 +218,8 @@ Liste des périphériques série trouvés.</p></div>
     def _fermer_port_serie(self):
         &#34;&#34;&#34;
         Ferme le port série s&#39;il est ouvert.
+
+        Cette méthode vérifie si le port série est actif et le ferme proprement.
         &#34;&#34;&#34;
         if self.port_serie and self.port_serie.is_open:
             self.port_serie.close()
@@ -298,10 +229,16 @@ Liste des périphériques série trouvés.</p></div>
         Capture les paquets depuis le port série et les ajoute à la file d&#39;attente.
 
         Cette méthode s&#39;exécute dans un thread séparé et lit en continu depuis le
-        port série, ajoutant les paquets reçus à la file d&#39;attente.
+        port série. Chaque ligne reçue est décodée en UTF-8, épurée des espaces inutiles,
+        et placée dans la file d&#39;attente pour traitement ultérieur.
+
+        En cas d&#39;erreur de port série, un message d&#39;erreur est logué.
         &#34;&#34;&#34;
         try:
             logger.info(f&#34;Début de capture sur {self.interface}, canal {self.canal}&#34;)
+            # Vider les buffers avant de démarrer
+            self.port_serie.reset_input_buffer()
+            self.port_serie.reset_output_buffer()
             while self.est_en_cours:
                 if self.port_serie.in_waiting:
                     donnees_brutes = self.port_serie.readline().decode(&#39;utf-8&#39;).strip()
@@ -317,30 +254,37 @@ Liste des périphériques série trouvés.</p></div>
 
     def _traiter_paquets(self, decoder=DecodeurTrameZigbee()):
         &#34;&#34;&#34;
-        Traite les paquets capturés, les décode et les ajoute à la liste des captures.
+        Traite les paquets capturés en les décodant et en les stockant dans la liste des captures.
+
+        Pour chaque paquet récupéré dans la file d&#39;attente, cette méthode :
+            - Extrait la partie correspondant à la trame en hexadécimal.
+            - Convertit la chaîne hexadécimale en bytes.
+            - Utilise l&#39;instance de DecodeurTrameZigbee pour décoder la trame.
+            - Ajoute des métadonnées (puissance, LQI, timestamp) extraites du paquet.
+            - Stocke la trame décodée avec ses métadonnées dans la liste des captures.
 
         Paramètres
         ----------
         decoder : DecodeurTrameZigbee, optionnel
-            Instance de la classe de décodage des trames ZigBee (par défaut DecodeurTrameZigbee())
+            Instance du décodeur de trames ZigBee à utiliser (par défaut une instance de DecodeurTrameZigbee).
         &#34;&#34;&#34;
         while self.est_en_cours:
             try:
                 paquet = self.file_paquets.get(timeout=1)
                 try:
-                    logger.info(f&#34;Paquet brut reçu : {paquet}&#34;)
+                    # On suppose que le paquet est constitué de plusieurs champs séparés par des espaces.
                     paquet_received = paquet.split(&#34; &#34;)[1]
                     paquet_bytes = bytes.fromhex(paquet_received)
-
+                    
                     metadonnees = {
                         &#39;power&#39;: paquet.split(&#34; &#34;)[3],
                         &#39;lqi&#39;: paquet.split(&#34; &#34;)[5],
-                        &#39;timestamp&#39;: paquet.split(&#34; &#34;)[7]
+                        &#39;timestamp&#39;: paquet.split(&#34; &#34;)[7],
+                        &#39;trame_brute&#39;: paquet_received
                     }
                     
                     decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
                     if decoded_frame:
-                        logger.info(f&#34;Trame Zigbee décodée : {decoded_frame}&#34;)
                         decoded_frame[&#39;metadonnees&#39;] = metadonnees
                         self.captures.append(decoded_frame)
                     else:
@@ -352,10 +296,13 @@ Liste des périphériques série trouvés.</p></div>
 
     def demarrer_sniffer(self):
         &#34;&#34;&#34;
-        Démarre le sniffer pour commencer à capturer les trames ZigBee.
+        Démarre le sniffer pour capturer les trames ZigBee.
 
-        Cette méthode démarre deux threads : un pour la capture des paquets
-        et un autre pour leur traitement.
+        Cette méthode configure le port série puis lance deux threads en mode daemon :
+            - Un thread pour la capture des paquets (_capturer_paquets).
+            - Un thread pour le traitement et le décodage des paquets (_traiter_paquets).
+
+        En cas d&#39;erreur lors du démarrage, un message d&#39;erreur est logué.
         &#34;&#34;&#34;
         try:
             self.est_en_cours = True
@@ -369,23 +316,23 @@ Liste des périphériques série trouvés.</p></div>
         &#34;&#34;&#34;
         Arrête le sniffer.
 
-        Cette méthode met le drapeau d&#39;exécution à False, ce qui provoquera
-        l&#39;arrêt des threads de capture et de traitement.
+        Cette méthode modifie le drapeau d&#39;exécution afin d&#39;arrêter les threads de capture 
+        et de traitement. Un message d&#39;information est logué pour indiquer l&#39;arrêt.
         &#34;&#34;&#34;
         self.est_en_cours = False
         logger.info(&#34;Arrêt du sniffer&#34;)
 
     def sauvegarder_captures(self):
         &#34;&#34;&#34;
-        Sauvegarde les captures dans un fichier JSON.
+        Sauvegarde les trames capturées dans un fichier JSON.
 
-        Cette méthode écrit les captures dans le fichier spécifié lors de
-        l&#39;initialisation de la classe.
+        Les captures présentes dans la liste self.captures sont écrites dans le fichier
+        spécifié par l&#39;attribut fichier_sortie avec une indentation pour une lecture facilitée.
 
         Lève
         ----
         Exception
-            Si une erreur survient lors de la sauvegarde des captures.
+            Si une erreur survient lors de l&#39;écriture dans le fichier.
         &#34;&#34;&#34;
         try:
             with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
@@ -395,37 +342,38 @@ Liste des périphériques série trouvés.</p></div>
             logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)</code></pre>
 </details>
 <div class="desc"><p>Classe pour capturer et analyser les trames ZigBee.</p>
-<p>Cette classe gère la capture des trames ZigBee depuis un périphérique série,
-leur décodage et leur sauvegarde dans un fichier JSON. Elle prend également
-en charge le déchiffrement des trames lorsque nécessaire.</p>
+<p>Cette classe gère la capture des trames ZigBee via un port série, leur décodage
+grâce à un décodeur spécialisé, ainsi que leur sauvegarde dans un fichier JSON.
+Elle peut également être étendue pour prendre en charge le déchiffrement des trames.</p>
 <h2 id="parametres">Paramètres</h2>
 <p>canal : int, optionnel
-Canal ZigBee sur lequel écouter (par défaut 13)
+Canal ZigBee sur lequel écouter (par défaut 13).
 fichier_sortie : str, optionnel
-Nom du fichier de sortie pour les captures (par défaut 'captures_zigbee.json')
+Chemin du fichier de sortie pour sauvegarder les captures
+(par défaut 'captures_zigbee.json').
 vitesse_bauds : int, optionnel
-Vitesse de transmission série (par défaut 115200)</p>
+Vitesse de transmission du port série (par défaut 115200).</p>
 <h2 id="attributs">Attributs</h2>
 <p>canal : int
-Canal ZigBee sélectionné
+Canal ZigBee sélectionné.
 fichier_sortie : str
-Chemin vers le fichier de sortie
+Chemin vers le fichier de sortie.
 vitesse_bauds : int
-Vitesse de transmission en bauds
+Vitesse de transmission en bauds.
 file_paquets : Queue
-File d'attente pour stocker les paquets capturés
+File d'attente utilisée pour stocker les paquets bruts capturés.
 est_en_cours : bool
-Drapeau indiquant si la capture est active
+Indique si le sniffer est en cours d'exécution.
 port_serie : serial.Serial
-Objet port série
+Instance du port série configuré pour la capture.
 interface : str
-Interface série sélectionnée
+Nom du périphérique série sélectionné.
 captures : list
-Liste des trames capturées
+Liste des trames ZigBee décodées et leurs métadonnées associées.
 cle_dechiffrement : str
-Clé de déchiffrement
+Clé utilisée pour le déchiffrement des trames, si nécessaire.
 metadonnees : list
-Liste des métadonnées de capture</p></div>
+Liste des métadonnées associées aux captures.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scripts.sniff.SniffeurZigbee.arreter_sniffer"><code class="name flex">
@@ -440,15 +388,15 @@ Liste des métadonnées de capture</p></div>
     &#34;&#34;&#34;
     Arrête le sniffer.
 
-    Cette méthode met le drapeau d&#39;exécution à False, ce qui provoquera
-    l&#39;arrêt des threads de capture et de traitement.
+    Cette méthode modifie le drapeau d&#39;exécution afin d&#39;arrêter les threads de capture 
+    et de traitement. Un message d&#39;information est logué pour indiquer l&#39;arrêt.
     &#34;&#34;&#34;
     self.est_en_cours = False
     logger.info(&#34;Arrêt du sniffer&#34;)</code></pre>
 </details>
 <div class="desc"><p>Arrête le sniffer.</p>
-<p>Cette méthode met le drapeau d'exécution à False, ce qui provoquera
-l'arrêt des threads de capture et de traitement.</p></div>
+<p>Cette méthode modifie le drapeau d'exécution afin d'arrêter les threads de capture
+et de traitement. Un message d'information est logué pour indiquer l'arrêt.</p></div>
 </dd>
 <dt id="scripts.sniff.SniffeurZigbee.demarrer_sniffer"><code class="name flex">
 <span>def <span class="ident">demarrer_sniffer</span></span>(<span>self)</span>
@@ -460,10 +408,13 @@ l'arrêt des threads de capture et de traitement.</p></div>
 </summary>
 <pre><code class="python">def demarrer_sniffer(self):
     &#34;&#34;&#34;
-    Démarre le sniffer pour commencer à capturer les trames ZigBee.
+    Démarre le sniffer pour capturer les trames ZigBee.
 
-    Cette méthode démarre deux threads : un pour la capture des paquets
-    et un autre pour leur traitement.
+    Cette méthode configure le port série puis lance deux threads en mode daemon :
+        - Un thread pour la capture des paquets (_capturer_paquets).
+        - Un thread pour le traitement et le décodage des paquets (_traiter_paquets).
+
+    En cas d&#39;erreur lors du démarrage, un message d&#39;erreur est logué.
     &#34;&#34;&#34;
     try:
         self.est_en_cours = True
@@ -473,9 +424,46 @@ l'arrêt des threads de capture et de traitement.</p></div>
     except Exception as e:
         logger.error(f&#34;Erreur lors du démarrage du sniffer : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Démarre le sniffer pour commencer à capturer les trames ZigBee.</p>
-<p>Cette méthode démarre deux threads : un pour la capture des paquets
-et un autre pour leur traitement.</p></div>
+<div class="desc"><p>Démarre le sniffer pour capturer les trames ZigBee.</p>
+<p>Cette méthode configure le port série puis lance deux threads en mode daemon :
+- Un thread pour la capture des paquets (_capturer_paquets).
+- Un thread pour le traitement et le décodage des paquets (_traiter_paquets).</p>
+<p>En cas d'erreur lors du démarrage, un message d'erreur est logué.</p></div>
+</dd>
+<dt id="scripts.sniff.SniffeurZigbee.reinitialiser"><code class="name flex">
+<span>def <span class="ident">reinitialiser</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reinitialiser(self):
+    &#34;&#34;&#34;
+    Réinitialise complètement l&#39;état du sniffer.
+
+    Cette méthode vide la liste des captures, la file d&#39;attente des paquets
+    ainsi que les métadonnées accumulées. Si le port série est ouvert, elle 
+    réinitialise également ses buffers d&#39;entrée et de sortie.
+    &#34;&#34;&#34;
+    self.captures.clear()
+    self.file_paquets.queue.clear()
+    self.metadonnees.clear()
+    
+    try:
+        if self.port_serie and self.port_serie.is_open:
+            self.port_serie.reset_input_buffer()  
+            self.port_serie.reset_output_buffer()
+            with self.file_paquets.mutex:
+                self.file_paquets.queue.clear()
+            self.captures.clear()
+    except Exception as e:
+        logger.error(f&#34;Erreur lors de la réinitialisation du sniffer : {e}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Réinitialise complètement l'état du sniffer.</p>
+<p>Cette méthode vide la liste des captures, la file d'attente des paquets
+ainsi que les métadonnées accumulées. Si le port série est ouvert, elle
+réinitialise également ses buffers d'entrée et de sortie.</p></div>
 </dd>
 <dt id="scripts.sniff.SniffeurZigbee.sauvegarder_captures"><code class="name flex">
 <span>def <span class="ident">sauvegarder_captures</span></span>(<span>self)</span>
@@ -487,15 +475,15 @@ et un autre pour leur traitement.</p></div>
 </summary>
 <pre><code class="python">def sauvegarder_captures(self):
     &#34;&#34;&#34;
-    Sauvegarde les captures dans un fichier JSON.
+    Sauvegarde les trames capturées dans un fichier JSON.
 
-    Cette méthode écrit les captures dans le fichier spécifié lors de
-    l&#39;initialisation de la classe.
+    Les captures présentes dans la liste self.captures sont écrites dans le fichier
+    spécifié par l&#39;attribut fichier_sortie avec une indentation pour une lecture facilitée.
 
     Lève
     ----
     Exception
-        Si une erreur survient lors de la sauvegarde des captures.
+        Si une erreur survient lors de l&#39;écriture dans le fichier.
     &#34;&#34;&#34;
     try:
         with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
@@ -504,12 +492,12 @@ et un autre pour leur traitement.</p></div>
     except Exception as e:
         logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Sauvegarde les captures dans un fichier JSON.</p>
-<p>Cette méthode écrit les captures dans le fichier spécifié lors de
-l'initialisation de la classe.</p>
+<div class="desc"><p>Sauvegarde les trames capturées dans un fichier JSON.</p>
+<p>Les captures présentes dans la liste self.captures sont écrites dans le fichier
+spécifié par l'attribut fichier_sortie avec une indentation pour une lecture facilitée.</p>
 <h2 id="leve">Lève</h2>
 <p>Exception
-Si une erreur survient lors de la sauvegarde des captures.</p></div>
+Si une erreur survient lors de l'écriture dans le fichier.</p></div>
 </dd>
 </dl>
 </dd>
@@ -518,7 +506,9 @@ Si une erreur survient lors de la sauvegarde des captures.</p></div>
 </article>
 <nav id="sidebar">
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#module-sniffeur_zigbee">Module : sniffeur_zigbee</a></li>
+</ul>
 </div>
 <ul id="index">
 <li><h3>Super-module</h3>
@@ -528,8 +518,6 @@ Si une erreur survient lors de la sauvegarde des captures.</p></div>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="scripts.sniff.calculer_entropie" href="#scripts.sniff.calculer_entropie">calculer_entropie</a></code></li>
-<li><code><a title="scripts.sniff.decrypter_payload_zigbee" href="#scripts.sniff.decrypter_payload_zigbee">decrypter_payload_zigbee</a></code></li>
 <li><code><a title="scripts.sniff.trouver_peripheriques_serie" href="#scripts.sniff.trouver_peripheriques_serie">trouver_peripheriques_serie</a></code></li>
 </ul>
 </li>
@@ -540,6 +528,7 @@ Si une erreur survient lors de la sauvegarde des captures.</p></div>
 <ul class="">
 <li><code><a title="scripts.sniff.SniffeurZigbee.arreter_sniffer" href="#scripts.sniff.SniffeurZigbee.arreter_sniffer">arreter_sniffer</a></code></li>
 <li><code><a title="scripts.sniff.SniffeurZigbee.demarrer_sniffer" href="#scripts.sniff.SniffeurZigbee.demarrer_sniffer">demarrer_sniffer</a></code></li>
+<li><code><a title="scripts.sniff.SniffeurZigbee.reinitialiser" href="#scripts.sniff.SniffeurZigbee.reinitialiser">reinitialiser</a></code></li>
 <li><code><a title="scripts.sniff.SniffeurZigbee.sauvegarder_captures" href="#scripts.sniff.SniffeurZigbee.sauvegarder_captures">sauvegarder_captures</a></code></li>
 </ul>
 </li>

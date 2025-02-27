@@ -50,12 +50,8 @@ el.replaceWith(d);
 <h3 id="materiel-et-frameworks-utilises">Matériel et Frameworks Utilisés :</h3>
 <ul>
 <li><strong>Matériel</strong> :</li>
-<li>Dongle USB TI CC2531</li>
 <li>Dongle nRF52840</li>
 <li>ESP32-H2</li>
-<li><strong>Frameworks</strong> :</li>
-<li>Killerbee</li>
-<li>WHAD</li>
 </ul>
 <h2 id="liste-des-taches">🛠️ Liste des Tâches</h2>
 <h3 id="etape-1-etude-des-attaques-et-du-protocole-zigbee">Étape 1 : Étude des attaques et du protocole Zigbee</h3>
@@ -70,24 +66,23 @@ el.replaceWith(d);
 <h3 id="etape-2-preparation-banc-de-test-zigbee">Étape 2 : Préparation Banc de Test Zigbee</h3>
 <ul>
 <li>[x] <strong>2.1 Configuration Matériel et Logiciel</strong> </li>
-<li>[ ] <strong>2.2 Mise en place d'outils</strong></li>
+<li>[x] <strong>2.2 Mise en place d'outils</strong></li>
 <li>[x] Test d'attaques par brouillage et interception </li>
-<li>[ ] Test d'attaques par rejeu et usurpation </li>
+<li>[x] Test d'attaques par rejeu </li>
 </ul>
 <h3 id="etape-3-reproduction-des-scenarios-dattaques-zigbee">Étape 3 : Reproduction des Scénarios d'attaques Zigbee</h3>
 <ul>
-<li>[ ] <strong>3.1 Reproduction d'attaques simples</strong></li>
+<li>[x] <strong>3.1 Reproduction d'attaques simples</strong></li>
 <li>[x] Attaque de brouillage </li>
 <li>[x] Attaque d'interception </li>
-<li>[ ] <strong>3.2 Reproduction d'attaques complexes</strong></li>
-<li>[ ] Attaque par rejeu </li>
-<li>[ ] Attaque par usurpation d'identité </li>
+<li>[x] <strong>3.2 Reproduction d'attaques complexes</strong></li>
+<li>[x] Attaque par rejeu </li>
 </ul>
 <h3 id="etape-4-documentation-et-code">Étape 4 : Documentation et Code</h3>
 <ul>
-<li>[ ] <strong>4.1 Documentation du Banc de Test et des Attaques</strong></li>
-<li>[ ] Attaques par brouillage et interception </li>
-<li>[ ] Attaques par rejeu et usurpation </li>
+<li>[x] <strong>4.1 Documentation du Banc de Test et des Attaques</strong></li>
+<li>[x] Attaques par brouillage et interception </li>
+<li>[x] Attaques par rejeu </li>
 <li>[ ] <strong>4.2 Finalisation du Code et Documentation</strong> </li>
 </ul>
 <h2 id="structure-du-depot">📂 Structure du Dépôt</h2>
@@ -106,7 +101,7 @@ el.replaceWith(d);
 <dl>
 <dt><code class="name"><a title="scripts.CodeurTrame" href="CodeurTrame.html">scripts.CodeurTrame</a></code></dt>
 <dd>
-<div class="desc"><p>Ce module fournit une classe pour encoder des trames ZigBee à partir de champs spécifiques …</p></div>
+<div class="desc"></div>
 </dd>
 <dt><code class="name"><a title="scripts.DecodeurTrame" href="DecodeurTrame.html">scripts.DecodeurTrame</a></code></dt>
 <dd>
@@ -118,17 +113,42 @@ de trames ZigBee.</p></div>
 <dd>
 <div class="desc"><p>Ce module implémente un spammer de paquets Beacon WiFi. Il permet de configurer une interface réseau pour envoyer des paquets Beacon sur un canal …</p></div>
 </dd>
+<dt><code class="name"><a title="scripts.chiffrement" href="chiffrement.html">scripts.chiffrement</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="scripts.coordinator" href="coordinator.html">scripts.coordinator</a></code></dt>
 <dd>
-<div class="desc"><p>Ce module implémente un coordinateur Zigbee avec WHAD …</p></div>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="scripts.esp" href="esp.html">scripts.esp</a></code></dt>
+<dd>
+<div class="desc"><p>Décodeur de trames ZigBee.
+Ce module implémente un décodeur pour analyser et interpréter différents types
+de trames ZigBee, et intègre le …</p></div>
+</dd>
+<dt><code class="name"><a title="scripts.frame_counter" href="frame_counter.html">scripts.frame_counter</a></code></dt>
+<dd>
+<div class="desc"><p>Module pour la gestion du frame counter et du numéro de séquence dans les trames Zigbee.
+Ce module fournit des méthodes permettant d'incrémenter le …</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.replay" href="replay.html">scripts.replay</a></code></dt>
 <dd>
-<div class="desc"><p>Attaque de replay sur le réseau ZigBee …</p></div>
+<div class="desc"><p>Module : zigbee_replay_attack
+…</p></div>
 </dd>
 <dt><code class="name"><a title="scripts.sniff" href="sniff.html">scripts.sniff</a></code></dt>
 <dd>
-<div class="desc"><p>Module implémentant un sniffeur de trames Zigbee …</p></div>
+<div class="desc"><p>Module : sniffeur_zigbee
+…</p></div>
+</dd>
+<dt><code class="name"><a title="scripts.testUART" href="testUART.html">scripts.testUART</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="scripts.zigbee_encrypt" href="zigbee_encrypt.html">scripts.zigbee_encrypt</a></code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 </dl>
 </section>
@@ -150,11 +170,11 @@ de trames ZigBee.</p></div>
     attaque = ZigbeeReplayAttack(
         capture_file=&#39;captures_zigbee.json&#39;,
         channel=13,
-        pan_id=0x1900,
-        serial_port=&#39;/dev/ttyACM0&#39;,
-        aes_key=&#34;9b9494920170aeed67e90ce7d672face&#34;
+        pan_id=0xf4ef,
+        serial_port=&#39;/dev/ttyUSB0&#39;,
+        aes_key=None
     )
-    attaque.lancer_attaque_replay(nombre_replays=3, capture_live=True)</code></pre>
+    attaque.lancer_attaque_replay(capture_live=True)</code></pre>
 </details>
 <div class="desc"></div>
 </dd>
@@ -191,9 +211,14 @@ de trames ZigBee.</p></div>
 <li><code><a title="scripts.CodeurTrame" href="CodeurTrame.html">scripts.CodeurTrame</a></code></li>
 <li><code><a title="scripts.DecodeurTrame" href="DecodeurTrame.html">scripts.DecodeurTrame</a></code></li>
 <li><code><a title="scripts.beaconSpam" href="beaconSpam.html">scripts.beaconSpam</a></code></li>
+<li><code><a title="scripts.chiffrement" href="chiffrement.html">scripts.chiffrement</a></code></li>
 <li><code><a title="scripts.coordinator" href="coordinator.html">scripts.coordinator</a></code></li>
+<li><code><a title="scripts.esp" href="esp.html">scripts.esp</a></code></li>
+<li><code><a title="scripts.frame_counter" href="frame_counter.html">scripts.frame_counter</a></code></li>
 <li><code><a title="scripts.replay" href="replay.html">scripts.replay</a></code></li>
 <li><code><a title="scripts.sniff" href="sniff.html">scripts.sniff</a></code></li>
+<li><code><a title="scripts.testUART" href="testUART.html">scripts.testUART</a></code></li>
+<li><code><a title="scripts.zigbee_encrypt" href="zigbee_encrypt.html">scripts.zigbee_encrypt</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>

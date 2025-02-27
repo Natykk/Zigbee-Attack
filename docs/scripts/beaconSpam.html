@@ -51,7 +51,7 @@ el.replaceWith(d);
 <dl>
 <dt id="scripts.beaconSpam.WifiSpammer"><code class="flex name class">
 <span>class <span class="ident">WifiSpammer</span></span>
-<span>(</span><span>interface: str,<br>channel: int = 1,<br>ssid: str = 'TestSSID',<br>max_queue_size: int = 1000)</span>
+<span>(</span><span>interface: str,<br>channel: int = 1,<br>ssid: str = 'JamESP',<br>max_queue_size: int = 1000)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -80,7 +80,7 @@ el.replaceWith(d);
         Heure de début de l&#39;envoi des paquets, utilisée pour calculer le taux d&#39;envoi.
     &#34;&#34;&#34;
 
-    def __init__(self, interface: str, channel: int = 1, ssid: str = &#34;TestSSID&#34;, max_queue_size: int = 1000):
+    def __init__(self, interface: str, channel: int = 1, ssid: str = &#34;JamESP&#34;, max_queue_size: int = 1000):
         &#34;&#34;&#34;
         Initialise un spammer WiFi.
 
@@ -91,17 +91,18 @@ el.replaceWith(d);
         channel : int, optional
             Canal WiFi sur lequel les paquets Beacon seront envoyés (par défaut : 1).
         ssid : str, optional
-            SSID à diffuser dans les paquets Beacon (par défaut : &#34;TestSSID&#34;).
+            SSID à diffuser dans les paquets Beacon (par défaut : &#34;JamESP&#34;).
         max_queue_size : int, optional
             Taille maximale de la file d&#39;attente pour les paquets (par défaut : 1000).
         &#34;&#34;&#34;
         self.interface = interface
-        self.channel = channel
+        self.channel = 1
         self.ssid = ssid
         self.packet_queue = Queue(maxsize=max_queue_size)
         self.running = False
         self.sent_count = 0
         self.start_time = 0
+        
 
     def set_channel(self):
         &#34;&#34;&#34;
@@ -113,7 +114,10 @@ el.replaceWith(d);
             Si une erreur survient lors de la configuration du canal.
         &#34;&#34;&#34;
         try:
-            # os.system(f&#34;iwconfig {self.interface} channel {self.channel}&#34;)
+            os.system(f&#34;ifconfig {self.interface} down&#34;)
+            os.system(f&#34;iwconfig {self.interface} mode monitor&#34;)
+            os.system(f&#34;iwconfig {self.interface} channel {self.channel}&#34;)
+            os.system(f&#34;ifconfig {self.interface} up&#34;)
             print(f&#34;Canal configuré sur {self.channel}&#34;)
         except Exception as e:
             print(f&#34;Erreur lors de la configuration du canal : {e}&#34;)
@@ -202,11 +206,15 @@ el.replaceWith(d);
                 time.sleep(0.1)
         except KeyboardInterrupt:
             print(&#34;\nArrêt du scan...&#34;)
+            
             self.running = False
 
             for thread in sender_threads:
                 thread.join()
-            monitor_thread.join()</code></pre>
+            monitor_thread.join()
+            os.system(f&#34;ifconfig {self.interface} down&#34;)
+            os.system(f&#34;iwconfig {self.interface} mode managed&#34;)
+            os.system(f&#34;ifconfig {self.interface} up&#34;)</code></pre>
 </details>
 <div class="desc"><p>Classe pour spammer le réseau WiFi avec des paquets Beacon.</p>
 <h2 id="attributes">Attributes</h2>
@@ -234,7 +242,7 @@ el.replaceWith(d);
 <dt><strong><code>channel</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Canal WiFi sur lequel les paquets Beacon seront envoyés (par défaut : 1).</dd>
 <dt><strong><code>ssid</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>SSID à diffuser dans les paquets Beacon (par défaut : "TestSSID").</dd>
+<dd>SSID à diffuser dans les paquets Beacon (par défaut : "JamESP").</dd>
 <dt><strong><code>max_queue_size</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Taille maximale de la file d'attente pour les paquets (par défaut : 1000).</dd>
 </dl></div>
@@ -345,7 +353,10 @@ el.replaceWith(d);
         Si une erreur survient lors de la configuration du canal.
     &#34;&#34;&#34;
     try:
-        # os.system(f&#34;iwconfig {self.interface} channel {self.channel}&#34;)
+        os.system(f&#34;ifconfig {self.interface} down&#34;)
+        os.system(f&#34;iwconfig {self.interface} mode monitor&#34;)
+        os.system(f&#34;iwconfig {self.interface} channel {self.channel}&#34;)
+        os.system(f&#34;ifconfig {self.interface} up&#34;)
         print(f&#34;Canal configuré sur {self.channel}&#34;)
     except Exception as e:
         print(f&#34;Erreur lors de la configuration du canal : {e}&#34;)</code></pre>
@@ -400,11 +411,15 @@ el.replaceWith(d);
             time.sleep(0.1)
     except KeyboardInterrupt:
         print(&#34;\nArrêt du scan...&#34;)
+        
         self.running = False
 
         for thread in sender_threads:
             thread.join()
-        monitor_thread.join()</code></pre>
+        monitor_thread.join()
+        os.system(f&#34;ifconfig {self.interface} down&#34;)
+        os.system(f&#34;iwconfig {self.interface} mode managed&#34;)
+        os.system(f&#34;ifconfig {self.interface} up&#34;)</code></pre>
 </details>
 <div class="desc"><p>Démarre le processus d'envoi des paquets Beacon.</p>
 <h2 id="parameters">Parameters</h2>

