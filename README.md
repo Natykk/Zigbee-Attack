@@ -47,7 +47,7 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 
 
 ## 📂 Structure du Dépôt
-- `/docs` : Tous les rapports et guides.
+- `/docs` : Tous les rapports et guides aussi disponible sur le site https://natykk.github.io/Zigbee-Attack/scripts/
 - `/scripts` : Scripts et configurations pour le banc de test.
 - `/report` : Résultats et logs des scénarios d'attaques.
 
