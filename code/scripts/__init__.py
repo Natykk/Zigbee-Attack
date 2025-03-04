@@ -8,7 +8,6 @@ Fichier d'initialisation qui permet d'importer les classes et les fonctions pour
 from beaconSpam  import *
 from CodeurTrame import *
 from DecodeurTrame import *
-from coordinator import *
 from replay import *
 from sniff import *
 
@@ -126,7 +125,8 @@ def main():
         channel=13,
         pan_id=0xf4ef,
         serial_port='/dev/ttyUSB0',
-        aes_key=None
+        aes_key=None,
+        materiel='esp32h2'
     )
     attaque.lancer_attaque_replay(capture_live=True)
 

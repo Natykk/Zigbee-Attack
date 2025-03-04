@@ -36,7 +36,7 @@ class WifiSpammer:
         Heure de début de l'envoi des paquets, utilisée pour calculer le taux d'envoi.
     """
 
-    def __init__(self, interface: str, channel: int = 1, ssid: str = "TestSSID", max_queue_size: int = 1000):
+    def __init__(self, interface: str, channel: int = 1, ssid: str = "JamESP", max_queue_size: int = 1000):
         """
         Initialise un spammer WiFi.
 
@@ -47,17 +47,18 @@ class WifiSpammer:
         channel : int, optional
             Canal WiFi sur lequel les paquets Beacon seront envoyés (par défaut : 1).
         ssid : str, optional
-            SSID à diffuser dans les paquets Beacon (par défaut : "TestSSID").
+            SSID à diffuser dans les paquets Beacon (par défaut : "JamESP").
         max_queue_size : int, optional
             Taille maximale de la file d'attente pour les paquets (par défaut : 1000).
         """
         self.interface = interface
-        self.channel = channel
+        self.channel = 1
         self.ssid = ssid
         self.packet_queue = Queue(maxsize=max_queue_size)
         self.running = False
         self.sent_count = 0
         self.start_time = 0
+        
 
     def set_channel(self):
         """
@@ -69,7 +70,10 @@ class WifiSpammer:
             Si une erreur survient lors de la configuration du canal.
         """
         try:
-            # os.system(f"iwconfig {self.interface} channel {self.channel}")
+            os.system(f"ifconfig {self.interface} down")
+            os.system(f"iwconfig {self.interface} mode monitor")
+            os.system(f"iwconfig {self.interface} channel {self.channel}")
+            os.system(f"ifconfig {self.interface} up")
             print(f"Canal configuré sur {self.channel}")
         except Exception as e:
             print(f"Erreur lors de la configuration du canal : {e}")
@@ -158,15 +162,13 @@ class WifiSpammer:
                 time.sleep(0.1)
         except KeyboardInterrupt:
             print("\nArrêt du scan...")
+            
             self.running = False
 
             for thread in sender_threads:
                 thread.join()
             monitor_thread.join()
+            os.system(f"ifconfig {self.interface} down")
+            os.system(f"iwconfig {self.interface} mode managed")
+            os.system(f"ifconfig {self.interface} up")
 
-if __name__ == "__main__":
-    """
-    Exemple d'utilisation de WifiSpammer pour envoyer des paquets Beacon sur le canal 1.
-    """
-    scanner = WifiSpammer(interface="wlp1s0", channel=1)
-    # scanner.start_scan(num_sender_threads=30)
