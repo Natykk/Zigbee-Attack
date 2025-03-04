@@ -103,7 +103,7 @@ class SniffeurZigbee:
         Liste des métadonnées associées aux captures.
     """
 
-    def __init__(self, canal=13, fichier_sortie='captures_zigbee.json', vitesse_bauds=115200, format_sortie='json'):
+    def __init__(self, canal=13, fichier_sortie='captures_zigbee.json', vitesse_bauds=115200, format_sortie='json',materiel='nrf52'):
         self.canal = canal
         self.fichier_sortie = fichier_sortie
         self.vitesse_bauds = vitesse_bauds
@@ -116,6 +116,24 @@ class SniffeurZigbee:
         self.cle_dechiffrement = ""
         self.metadonnees = []
         self.pcap_writer = None
+        self.materiel = materiel
+
+    def definir_materiel(self, materiel):
+        """
+        Définit le format d'entrée des trames capturées.
+        
+        Paramètres
+        ----------
+        materiel : str
+            Format d'entrée ('nrf52' pour le nRF52840 ou 'esp32h2' pour ESP32H2).
+        """
+        if materiel.lower() not in ['nrf52', 'esp32h2']:
+            logger.warning(f"Format d'entrée non pris en charge: {materiel}. Utilisation de 'nrf52'.")
+            self.materiel = 'nrf52'
+        else:
+            self.materiel = materiel.lower()
+            
+        logger.info(f"Format d'entrée défini sur {self.materiel}")
 
     def reinitialiser(self):
         """
@@ -161,7 +179,7 @@ class SniffeurZigbee:
         if not peripheriques:
             raise RuntimeError("Aucun périphérique série USB trouvé")
         logger.info(f"Périphériques disponibles : {peripheriques}")
-        return '/dev/ttyACM0'  # Ou peripheriques[0] pour utiliser le premier trouvé
+        return '/dev/ttyUSB0'  # Ou peripheriques[0] pour utiliser le premier trouvé
 
     def _configurer_sniffer(self):
         """
@@ -182,6 +200,10 @@ class SniffeurZigbee:
             
             # Configurer le canal de capture
             self._configurer_canal()
+            if self.materiel == 'esp32h2':
+                #Envoie sur le port serie la commande pour activer le mode sniffer
+                self.port_serie.write(bytes("#CMD#MODE_SNIFF",'utf-8'))
+                print("Mode sniffer activé")
             
         except serial.SerialException as e:
             logger.error(f"Erreur de configuration du sniffer : {e}")
@@ -252,15 +274,9 @@ class SniffeurZigbee:
     def _capturer_paquets(self):
         """
         Capture les paquets depuis le port série et les ajoute à la file d'attente.
-
-        Cette méthode s'exécute dans un thread séparé et lit en continu depuis le
-        port série. Chaque ligne reçue est décodée en UTF-8, épurée des espaces inutiles,
-        et placée dans la file d'attente pour traitement ultérieur.
-
-        En cas d'erreur de port série, un message d'erreur est logué.
         """
         try:
-            logger.info(f"Début de capture sur {self.interface}, canal {self.canal}")
+            logger.info(f"Début de capture sur {self.interface}, canal {self.canal}, format d'entrée: {self.materiel}")
             # Vider les buffers avant de démarrer
             self.port_serie.reset_input_buffer()
             self.port_serie.reset_output_buffer()
@@ -270,14 +286,18 @@ class SniffeurZigbee:
                         donnees_brutes = self.port_serie.readline().decode('utf-8', errors='replace').strip()
                         
                         # Vérifier si les données sont au format attendu avant de les mettre en file
-                        if donnees_brutes and "received:" in donnees_brutes:
+                        if self.materiel == 'nrf52' and donnees_brutes and "received:" in donnees_brutes:
+                            try:
+                                self.file_paquets.put_nowait(donnees_brutes)
+                            except queue.Full:
+                                logger.warning("File de paquets pleine, paquet ignoré.")
+                        elif self.materiel == 'esp32h2' and donnees_brutes and "]" in donnees_brutes and len(donnees_brutes) > 10:
                             try:
                                 self.file_paquets.put_nowait(donnees_brutes)
                             except queue.Full:
                                 logger.warning("File de paquets pleine, paquet ignoré.")
                     except UnicodeDecodeError as e:
                         logger.warning(f"Erreur de décodage des données série: {e}")
-                        # Continuer à lire même en cas d'erreur de décodage
                         self.port_serie.reset_input_buffer()
         except serial.SerialException as e:
             logger.error(f"Erreur de port série : {e}")
@@ -287,61 +307,104 @@ class SniffeurZigbee:
     def _traiter_paquets(self, decoder=DecodeurTrameZigbee()):
         """
         Traite les paquets capturés en les décodant et en les stockant dans la liste des captures.
-
-        Pour chaque paquet récupéré dans la file d'attente, cette méthode :
-            - Extrait la partie correspondant à la trame en hexadécimal.
-            - Convertit la chaîne hexadécimale en bytes.
-            - Utilise l'instance de DecodeurTrameZigbee pour décoder la trame.
-            - Ajoute des métadonnées (puissance, LQI, timestamp) extraites du paquet.
-            - Stocke la trame décodée avec ses métadonnées dans la liste des captures.
-
-        Paramètres
-        ----------
-        decoder : DecodeurTrameZigbee, optionnel
-            Instance du décodeur de trames ZigBee à utiliser (par défaut une instance de DecodeurTrameZigbee).
         """
         while self.est_en_cours:
             try:
                 paquet = self.file_paquets.get(timeout=1)
                 try:
-                    # Utiliser des expressions régulières pour extraire les informations
-                    import re
-                    
-                    # Motif pour extraire les informations
-                    pattern = r"received: ([0-9a-fA-F]+) power: ([-\d]+) lqi: (\d+) time: (\d+)"
-                    match = re.search(pattern, paquet)
-                    
-                    if match:
-                        paquet_received = match.group(1)
-                        power = match.group(2)
-                        lqi = match.group(3)
-                        timestamp = match.group(4)
-                        
-                        paquet_bytes = bytes.fromhex(paquet_received)
-                        
-                        metadonnees = {
-                            'power': power,
-                            'lqi': lqi,
-                            'timestamp': timestamp,
-                            'trame_brute': paquet_received,
-                            'canal': self.canal
-                        }
-                        # Si PCAP est activé, ajouter la trame au fichier PCAP
-                        if self.format_sortie == 'pcap' and self.pcap_writer:
-                            self._ajouter_trame_pcap(paquet_bytes, metadonnees)
-                        
-                        decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
-                        if decoded_frame:
-                            decoded_frame['metadonnees'] = metadonnees
-                            self.captures.append(decoded_frame)
-                        else:
-                            logger.warning(f"Impossible de décoder la trame : {paquet_received}")
+                    # Traitement selon le format d'entrée
+                    if self.materiel == 'nrf52':
+                        self._traiter_paquet_nrf52(paquet, decoder)
+                    elif self.materiel == 'esp32h2':
+                        self._traiter_paquet_esp32h2(paquet, decoder)
                     else:
-                        logger.warning(f"Format de paquet non reconnu: {paquet}")
+                        logger.warning(f"materiel non reconnu: {self.materiel}")
                 except Exception as e:
                     logger.error(f"Erreur lors du traitement du paquet : {e}", exc_info=True)
             except queue.Empty:
                 pass
+    def _traiter_paquet_nrf(self, paquet, decoder):
+        """
+        Traite un paquet au format nrf52840 sniffer.
+        """
+        import re
+        pattern = r"received: ([0-9a-fA-F]+) power: ([-\d]+) lqi: (\d+) time: (\d+)"
+        match = re.search(pattern, paquet)
+        
+        if match:
+            paquet_received = match.group(1)
+            power = match.group(2)
+            lqi = match.group(3)
+            timestamp = match.group(4)
+            
+            paquet_bytes = bytes.fromhex(paquet_received)
+            
+            metadonnees = {
+                'power': power,
+                'lqi': lqi,
+                'timestamp': timestamp,
+                'trame_brute': paquet_received,
+                'canal': self.canal
+            }
+            
+            # Si PCAP est activé, ajouter la trame au fichier PCAP
+            if self.format_sortie == 'pcap' and self.pcap_writer:
+                self._ajouter_trame_pcap(paquet_bytes, metadonnees)
+            
+            decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
+            if decoded_frame:
+                decoded_frame['metadonnees'] = metadonnees
+                self.captures.append(decoded_frame)
+            else:
+                logger.warning(f"Impossible de décoder la trame : {paquet_received}")
+        else:
+            logger.warning(f"Format de paquet KillerBee non reconnu: {paquet}")
+
+    def _traiter_paquet_esp32h2(self, paquet, decoder):
+        """
+        Traite un paquet au format ESP32H2.
+        
+        Format attendu: [ sequence|RSSI: valeurDB| tailleB] trameHEX
+        Exemple: [ 22959|RSSI: -54dB| 10B] 0308A1FFFFFFFF07C009
+        """
+        import re
+        # Pattern pour extraire les informations du format ESP32H2
+        pattern = r"\[\s*(\d+)\|RSSI:\s*([-\d]+)dB\|\s*(\d+)B\]\s*([0-9a-fA-F]+)"
+        match = re.search(pattern, paquet)
+        
+        if match:
+            sequence = match.group(1)
+            rssi = match.group(2)
+            taille = match.group(3)
+            trame_hex = match.group(4)
+            
+            paquet_bytes = bytes.fromhex(trame_hex)
+            
+            # Utiliser le temps actuel comme timestamp si non disponible
+            timestamp = int(time.time() * 1000)
+            
+            metadonnees = {
+                'power': rssi,  # Utiliser RSSI comme power
+                'lqi': '0',     # LQI non disponible, utiliser 0 comme valeur par défaut
+                'timestamp': str(timestamp),
+                'trame_brute': trame_hex,
+                'canal': self.canal,
+                'sequence': sequence,
+                'taille': taille
+            }
+            
+            # Si PCAP est activé, ajouter la trame au fichier PCAP
+            if self.format_sortie == 'pcap' and self.pcap_writer:
+                self._ajouter_trame_pcap(paquet_bytes, metadonnees)
+                
+            decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
+            if decoded_frame:
+                decoded_frame['metadonnees'] = metadonnees
+                self.captures.append(decoded_frame)
+            else:
+                logger.warning(f"Impossible de décoder la trame ESP32H2 : {trame_hex}")
+        else:
+            logger.warning(f"Format de paquet ESP32H2 non reconnu: {paquet}")
 
     def _initialiser_pcap(self):
         """
@@ -375,7 +438,7 @@ class SniffeurZigbee:
         """
         try:
             # Créer un paquet Scapy à partir des données
-            dot15d4_pkt = Dot15d4FCS(trame_bytes)  # Supprimer les 2 derniers octets (ancien FCS)
+            dot15d4_pkt = Dot15d4FCS(trame_bytes) 
             dot15d4_pkt.fcs = None  # Forcer Scapy à recalculer le FCS
             
             
@@ -410,6 +473,7 @@ class SniffeurZigbee:
             # Initialiser le fichier PCAP si nécessaire
             if self.format_sortie == 'pcap':
                 self._initialiser_pcap()
+            
                 
             threading.Thread(target=self._capturer_paquets, daemon=True).start()
             threading.Thread(target=self._traiter_paquets, daemon=True).start()
@@ -494,9 +558,3 @@ class SniffeurZigbee:
         
         logger.info(f"Format de sortie défini sur {self.format_sortie}, fichier de sortie: {self.fichier_sortie}")
 
-
-sniff = SniffeurZigbee(canal=13, fichier_sortie='captures_zigbee.pcap', format_sortie='pcap')
-sniff.demarrer_sniffer()
-time.sleep(10)
-sniff.arreter_sniffer()
-sniff.sauvegarder_captures()
