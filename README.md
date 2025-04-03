@@ -13,8 +13,7 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 
 ### Matériel et Frameworks Utilisés :
 - **Matériel** :
-  - Dongle nRF52840
-  - ESP32-H2
+  - 2x ESP32-H2 (1x [HA_on_off_light](https://github.com/espressif/esp-idf/tree/master/examples/zigbee/light_sample/HA_on_off_light) , 1x [HA_on_off_switch](https://github.com/espressif/esp-idf/tree/master/examples/zigbee/light_sample/HA_on_off_switch) )
 
 ## 🛠️ Liste des Tâches
 
@@ -53,6 +52,9 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 
 ## 📖 Références
 Pour plus d’informations sur le protocole Zigbee et les attaques étudiées, consultez la documentation associée dans `/docs`.
+
+## Exemples
+Des exemples d'utilisation des différentes modules sont disponible dans le init.py 
 
 ---
 
