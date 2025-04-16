@@ -14,6 +14,7 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 ### Matériel et Frameworks Utilisés :
 - **Matériel** :
   - 2x ESP32-H2 (1x [HA_on_off_light](https://github.com/espressif/esp-idf/tree/master/examples/zigbee/light_sample/HA_on_off_light) , 1x [HA_on_off_switch](https://github.com/espressif/esp-idf/tree/master/examples/zigbee/light_sample/HA_on_off_switch) )
+  - 1x ESP32-H2 utilisant [https://forgens.univ-ubs.fr/gitlab/e2003623/projet-zigbee/-/blob/main/code/firmware/esp_sniff_envoie.c?ref_type=heads](esp_sniff_envoie.c)
 
 ## 🛠️ Liste des Tâches
 
@@ -42,7 +43,7 @@ Dans ce projet, nous explorerons les mécanismes de sécurité du protocole Zigb
 - [x] **4.1 Documentation du Banc de Test et des Attaques**
   - [x] Attaques par brouillage et interception 
   - [x] Attaques par rejeu 
-- [ ] **4.2 Finalisation du Code et Documentation** 
+- [x] **4.2 Finalisation du Code et Documentation** 
 
 
 ## 📂 Structure du Dépôt
@@ -56,6 +57,3 @@ Pour plus d’informations sur le protocole Zigbee et les attaques étudiées, c
 ## Exemples
 Des exemples d'utilisation des différentes modules sont disponible dans le init.py 
 
----
-
-Vous pouvez utiliser les cases à cocher pour suivre l'avancement directement dans GitHub.
