@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>scripts.sniff API documentation</title>
+<title>sniff API documentation</title>
 <meta name="description" content="Module : sniffeur_zigbee
 …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,13 +34,14 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>scripts.sniff</code></h1>
+<h1 class="title">Module <code>sniff</code></h1>
 </header>
 <section id="section-intro">
 <h1 id="module-sniffeur_zigbee">Module : sniffeur_zigbee</h1>
 <p>Ce module implémente un sniffeur de trames Zigbee.</p>
 <p>Il fournit les fonctionnalités pour capturer, décoder et analyser les trames Zigbee
-depuis une interface série, ainsi que pour sauvegarder les captures dans un fichier JSON.</p>
+depuis une interface série, ainsi que pour sauvegarder les captures dans un fichier JSON
+ou PCAP.</p>
 </section>
 <section>
 </section>
@@ -49,7 +50,7 @@ depuis une interface série, ainsi que pour sauvegarder les captures dans un fic
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="scripts.sniff.trouver_peripheriques_serie"><code class="name flex">
+<dt id="sniff.trouver_peripheriques_serie"><code class="name flex">
 <span>def <span class="ident">trouver_peripheriques_serie</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -85,9 +86,9 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="scripts.sniff.SniffeurZigbee"><code class="flex name class">
+<dt id="sniff.SniffeurZigbee"><code class="flex name class">
 <span>class <span class="ident">SniffeurZigbee</span></span>
-<span>(</span><span>canal=13, fichier_sortie='captures_zigbee.json', vitesse_bauds=115200)</span>
+<span>(</span><span>canal=13,<br>fichier_sortie='captures_zigbee.json',<br>vitesse_bauds=115200,<br>format_sortie='json',<br>materiel='nrf52')</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -99,7 +100,7 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
     Classe pour capturer et analyser les trames ZigBee.
 
     Cette classe gère la capture des trames ZigBee via un port série, leur décodage 
-    grâce à un décodeur spécialisé, ainsi que leur sauvegarde dans un fichier JSON.
+    grâce à un décodeur spécialisé, ainsi que leur sauvegarde dans un fichier JSON ou PCAP.
     Elle peut également être étendue pour prendre en charge le déchiffrement des trames.
 
     Paramètres
@@ -111,6 +112,8 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
         (par défaut &#39;captures_zigbee.json&#39;).
     vitesse_bauds : int, optionnel
         Vitesse de transmission du port série (par défaut 115200).
+    format_sortie : str, optionnel
+        Format du fichier de sortie (&#39;json&#39; ou &#39;pcap&#39;, par défaut &#39;json&#39;).
 
     Attributs
     ----------
@@ -120,6 +123,8 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
         Chemin vers le fichier de sortie.
     vitesse_bauds : int
         Vitesse de transmission en bauds.
+    format_sortie : str
+        Format du fichier de sortie choisi (&#39;json&#39; ou &#39;pcap&#39;).
     file_paquets : Queue
         File d&#39;attente utilisée pour stocker les paquets bruts capturés.
     est_en_cours : bool
@@ -136,10 +141,11 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
         Liste des métadonnées associées aux captures.
     &#34;&#34;&#34;
 
-    def __init__(self, canal=13, fichier_sortie=&#39;captures_zigbee.json&#39;, vitesse_bauds=115200):
+    def __init__(self, canal=13, fichier_sortie=&#39;captures_zigbee.json&#39;, vitesse_bauds=115200, format_sortie=&#39;json&#39;,materiel=&#39;nrf52&#39;):
         self.canal = canal
         self.fichier_sortie = fichier_sortie
         self.vitesse_bauds = vitesse_bauds
+        self.format_sortie = format_sortie
         self.file_paquets = queue.Queue(maxsize=1000)
         self.est_en_cours = False
         self.port_serie = None
@@ -147,6 +153,42 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
         self.captures = []
         self.cle_dechiffrement = &#34;&#34;
         self.metadonnees = []
+        self.pcap_writer = None
+        self.materiel = materiel
+
+    def definir_materiel(self, materiel):
+        &#34;&#34;&#34;
+    Définit le materiel utilisé pour les trames capturées à partir du port série.
+    
+    Cette méthode permet de spécifier le format dans lequel les trames sont envoyées
+    par le périphérique de capture (firmware). L&#39;implémentation supporte deux formats :
+    &#39;nrf52&#39; pour les trames provenant du nRF52840 et &#39;esp32h2&#39; pour les trames
+    provenant de l&#39;ESP32H2.
+    
+    Paramètres
+    ----------
+    format_entree : str
+        Format d&#39;entrée à utiliser. Valeurs acceptées:
+        - &#39;nrf52&#39;: Format de trame du nRF52840 avec la syntaxe &#34;received: [trame_hex] power: [rssi] lqi: [lqi] time: [timestamp]&#34;
+        - &#39;esp32h2&#39;: Format de trame de l&#39;ESP32H2 avec la syntaxe &#34;[ sequence|RSSI: valeurDB| tailleB] trameHEX&#34;
+    
+    Notes
+    -----
+    Si un format non supporté est fourni, la méthode utilise &#39;nrf52&#39; par défaut
+    et enregistre un avertissement dans les logs.
+    
+    Exemple
+    -------
+    &gt;&gt;&gt; sniffer = SniffeurZigbee()
+    &gt;&gt;&gt; sniffer.definir_format_entree(&#39;esp32h2&#39;)  # Configure le sniffeur pour les trames ESP32H2
+    &#34;&#34;&#34;
+        if materiel.lower() not in [&#39;nrf52&#39;, &#39;esp32h2&#39;]:
+            logger.warning(f&#34;Format d&#39;entrée non pris en charge: {materiel}. Utilisation de &#39;nrf52&#39;.&#34;)
+            self.materiel = &#39;nrf52&#39;
+        else:
+            self.materiel = materiel.lower()
+            
+        logger.info(f&#34;Format d&#39;entrée défini sur {self.materiel}&#34;)
 
     def reinitialiser(self):
         &#34;&#34;&#34;
@@ -192,7 +234,7 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
         if not peripheriques:
             raise RuntimeError(&#34;Aucun périphérique série USB trouvé&#34;)
         logger.info(f&#34;Périphériques disponibles : {peripheriques}&#34;)
-        return &#39;/dev/ttyACM0&#39;  # Ou peripheriques[0] pour utiliser le premier trouvé
+        return &#39;/dev/ttyUSB0&#39;  # Ou peripheriques[0] pour utiliser le premier trouvé
 
     def _configurer_sniffer(self):
         &#34;&#34;&#34;
@@ -210,10 +252,70 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
             self.port_serie = serial.Serial(self.interface, baudrate=self.vitesse_bauds, timeout=1)
             self.port_serie.reset_input_buffer()
             logger.info(f&#34;Configuration du sniffer sur {self.interface}&#34;)
+            
+            # Configurer le canal de capture
+            self._configurer_canal()
+            if self.materiel == &#39;esp32h2&#39;:
+                #Envoie sur le port serie la commande pour activer le mode sniffer
+                self.port_serie.write(bytes(&#34;#CMD#MODE_SNIFF&#34;,&#39;utf-8&#39;))
+                print(&#34;Mode sniffer activé&#34;)
+            
         except serial.SerialException as e:
             logger.error(f&#34;Erreur de configuration du sniffer : {e}&#34;)
             self._fermer_port_serie()
             raise
+
+    def _configurer_canal(self):
+        &#34;&#34;&#34;
+        Configure le canal de capture ZigBee sur le périphérique.
+        
+        Cette méthode envoie une commande au périphérique pour définir
+        le canal ZigBee à utiliser pour la capture.
+        &#34;&#34;&#34;
+        try:
+            # Vérifier que le canal est valide (11-26 pour ZigBee)
+            if not (11 &lt;= self.canal &lt;= 26):
+                logger.warning(f&#34;Canal {self.canal} hors plage, utilisation du canal 13 par défaut&#34;)
+                self.canal = 13
+            
+            # Envoyer la commande au périphérique pour configurer le canal
+            # Format de commande dépend du firmware du périphérique
+            commande = f&#34;CHANNEL {self.canal}\r\n&#34;.encode(&#39;utf-8&#39;)
+            self.port_serie.write(commande)
+            time.sleep(0.5)  # Laisser le temps au périphérique de traiter la commande
+            
+            reponse = self.port_serie.readline().decode(&#39;utf-8&#39;).strip()
+            logger.info(f&#34;Configuration du canal {self.canal}: {reponse}&#34;)
+            
+        except Exception as e:
+            logger.error(f&#34;Erreur lors de la configuration du canal: {e}&#34;)
+
+    def definir_canal(self, nouveau_canal):
+        &#34;&#34;&#34;
+        Définit un nouveau canal pour la capture.
+        
+        Si le sniffer est en cours d&#39;exécution, il est arrêté puis redémarré
+        avec le nouveau canal.
+        
+        Paramètres
+        ----------
+        nouveau_canal : int
+            Le nouveau canal ZigBee à utiliser (11-26).
+        &#34;&#34;&#34;
+        if not (11 &lt;= nouveau_canal &lt;= 26):
+            logger.warning(f&#34;Canal {nouveau_canal} invalide. Utilisation de la plage 11-26 uniquement.&#34;)
+            return
+            
+        etait_en_cours = self.est_en_cours
+        if etait_en_cours:
+            self.arreter_sniffer()
+            time.sleep(1)  # Attendre l&#39;arrêt complet
+            
+        self.canal = nouveau_canal
+        logger.info(f&#34;Canal modifié: {self.canal}&#34;)
+        
+        if etait_en_cours:
+            self.demarrer_sniffer()
 
     def _fermer_port_serie(self):
         &#34;&#34;&#34;
@@ -226,27 +328,57 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
 
     def _capturer_paquets(self):
         &#34;&#34;&#34;
-        Capture les paquets depuis le port série et les ajoute à la file d&#39;attente.
-
-        Cette méthode s&#39;exécute dans un thread séparé et lit en continu depuis le
-        port série. Chaque ligne reçue est décodée en UTF-8, épurée des espaces inutiles,
-        et placée dans la file d&#39;attente pour traitement ultérieur.
-
-        En cas d&#39;erreur de port série, un message d&#39;erreur est logué.
-        &#34;&#34;&#34;
+    Capture les paquets depuis le port série et les ajoute à la file d&#39;attente.
+    
+    Cette méthode est conçue pour être exécutée dans un thread dédié. Elle lit en continu
+    les données du port série configuré et les met dans une file d&#39;attente pour traitement ultérieur.
+    Le format des paquets dépend du format d&#39;entrée configuré (&#39;nrf52&#39; ou &#39;esp32h2&#39;).
+    
+    La méthode s&#39;exécute en boucle tant que l&#39;attribut &#39;est_en_cours&#39; est True.
+    Pour chaque ligne lue depuis le port série, elle vérifie si le format correspond
+    au format d&#39;entrée configuré avant de l&#39;ajouter à la file.
+    
+    Mécanismes de vérification appliqués:
+    - Pour le format &#39;nrf52&#39;: vérifie que la chaîne contient &#34;received:&#34;
+    - Pour le format &#39;esp32h2&#39;: vérifie que la chaîne contient &#34;]&#34; et a une longueur &gt; 10
+    
+    Gestion d&#39;erreurs:
+    - Les erreurs de décodage Unicode sont traitées avec l&#39;option &#39;errors=replace&#39; et journalisées
+    - Les exceptions de port série entraînent l&#39;arrêt de la capture
+    - Si la file de paquets est pleine, les paquets sont ignorés et un avertissement est journalisé
+    
+    Notes
+    -----
+    Cette méthode nettoie les buffers d&#39;entrée/sortie au démarrage pour éviter de
+    traiter des données partielles ou obsolètes.
+    
+    Le port série est toujours fermé proprement dans le bloc &#39;finally&#39;, quelle que soit
+    la raison de l&#39;arrêt de la méthode.
+    &#34;&#34;&#34;
         try:
-            logger.info(f&#34;Début de capture sur {self.interface}, canal {self.canal}&#34;)
+            logger.info(f&#34;Début de capture sur {self.interface}, canal {self.canal}, format d&#39;entrée: {self.materiel}&#34;)
             # Vider les buffers avant de démarrer
             self.port_serie.reset_input_buffer()
             self.port_serie.reset_output_buffer()
             while self.est_en_cours:
                 if self.port_serie.in_waiting:
-                    donnees_brutes = self.port_serie.readline().decode(&#39;utf-8&#39;).strip()
-                    if donnees_brutes:
-                        try:
-                            self.file_paquets.put_nowait(donnees_brutes)
-                        except queue.Full:
-                            logger.warning(&#34;File de paquets pleine, paquet ignoré.&#34;)
+                    try:
+                        donnees_brutes = self.port_serie.readline().decode(&#39;utf-8&#39;, errors=&#39;replace&#39;).strip()
+                        
+                        # Vérifier si les données sont au format attendu avant de les mettre en file
+                        if self.materiel == &#39;nrf52&#39; and donnees_brutes and &#34;received:&#34; in donnees_brutes:
+                            try:
+                                self.file_paquets.put_nowait(donnees_brutes)
+                            except queue.Full:
+                                logger.warning(&#34;File de paquets pleine, paquet ignoré.&#34;)
+                        elif self.materiel == &#39;esp32h2&#39; and donnees_brutes and &#34;]&#34; in donnees_brutes and len(donnees_brutes) &gt; 10:
+                            try:
+                                self.file_paquets.put_nowait(donnees_brutes)
+                            except queue.Full:
+                                logger.warning(&#34;File de paquets pleine, paquet ignoré.&#34;)
+                    except UnicodeDecodeError as e:
+                        logger.warning(f&#34;Erreur de décodage des données série: {e}&#34;)
+                        self.port_serie.reset_input_buffer()
         except serial.SerialException as e:
             logger.error(f&#34;Erreur de port série : {e}&#34;)
         finally:
@@ -254,45 +386,260 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
 
     def _traiter_paquets(self, decoder=DecodeurTrameZigbee()):
         &#34;&#34;&#34;
-        Traite les paquets capturés en les décodant et en les stockant dans la liste des captures.
-
-        Pour chaque paquet récupéré dans la file d&#39;attente, cette méthode :
-            - Extrait la partie correspondant à la trame en hexadécimal.
-            - Convertit la chaîne hexadécimale en bytes.
-            - Utilise l&#39;instance de DecodeurTrameZigbee pour décoder la trame.
-            - Ajoute des métadonnées (puissance, LQI, timestamp) extraites du paquet.
-            - Stocke la trame décodée avec ses métadonnées dans la liste des captures.
-
-        Paramètres
-        ----------
-        decoder : DecodeurTrameZigbee, optionnel
-            Instance du décodeur de trames ZigBee à utiliser (par défaut une instance de DecodeurTrameZigbee).
-        &#34;&#34;&#34;
+    Traite les paquets capturés en les décodant et en les stockant dans la liste des captures.
+    
+    Cette méthode est conçue pour être exécutée dans un thread dédié, parallèlement à celui
+    qui capture les paquets. Elle récupère les paquets depuis la file d&#39;attente, les décode
+    en utilisant le décodeur fourni et stocke les résultats dans la liste des captures.
+    
+    Le traitement dépend du format d&#39;entrée configuré (&#39;nrf52&#39; ou &#39;esp32h2&#39;) et utilise
+    les méthodes spécifiques _traiter_paquet_nrf52 ou _traiter_paquet_esp32h2.
+    
+    Paramètres
+    ----------
+    decoder : DecodeurTrameZigbee, optionnel
+        Instance de décodeur à utiliser pour interpréter les trames. Par défaut,
+        une nouvelle instance de DecodeurTrameZigbee est créée.
+    
+    Notes
+    -----
+    - La méthode s&#39;exécute en boucle tant que l&#39;attribut &#39;est_en_cours&#39; est True
+    - Un timeout est utilisé lors de la récupération des paquets pour permettre une
+      vérification régulière de la condition d&#39;arrêt (est_en_cours)
+    - Les erreurs de traitement d&#39;un paquet spécifique sont attrapées et journalisées,
+      sans interrompre le traitement des autres paquets
+    - Les exceptions de type queue.Empty sont ignorées (timeout de récupération de paquet)
+    &#34;&#34;&#34;
         while self.est_en_cours:
             try:
                 paquet = self.file_paquets.get(timeout=1)
                 try:
-                    # On suppose que le paquet est constitué de plusieurs champs séparés par des espaces.
-                    paquet_received = paquet.split(&#34; &#34;)[1]
-                    paquet_bytes = bytes.fromhex(paquet_received)
-                    
-                    metadonnees = {
-                        &#39;power&#39;: paquet.split(&#34; &#34;)[3],
-                        &#39;lqi&#39;: paquet.split(&#34; &#34;)[5],
-                        &#39;timestamp&#39;: paquet.split(&#34; &#34;)[7],
-                        &#39;trame_brute&#39;: paquet_received
-                    }
-                    
-                    decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
-                    if decoded_frame:
-                        decoded_frame[&#39;metadonnees&#39;] = metadonnees
-                        self.captures.append(decoded_frame)
+                    # Traitement selon le format d&#39;entrée
+                    if self.materiel == &#39;nrf52&#39;:
+                        self._traiter_paquet_nrf52(paquet, decoder)
+                    elif self.materiel == &#39;esp32h2&#39;:
+                        self._traiter_paquet_esp32h2(paquet, decoder)
                     else:
-                        logger.warning(f&#34;Impossible de décoder la trame : {paquet_received}&#34;)
+                        logger.warning(f&#34;materiel non reconnu: {self.materiel}&#34;)
                 except Exception as e:
-                    logger.error(f&#34;Erreur lors du traitement du paquet : {e}&#34;)
+                    logger.error(f&#34;Erreur lors du traitement du paquet : {e}&#34;, exc_info=True)
             except queue.Empty:
                 pass
+    def _traiter_paquet_nrf(self, paquet, decoder):
+        &#34;&#34;&#34;
+    Traite un paquet au format nRF52840.
+    
+    Cette méthode analyse les paquets capturés depuis un adaptateur basé sur le nRF52840.
+    Le format attendu est: &#34;received: [trame_hex] power: [rssi] lqi: [lqi] time: [timestamp]&#34;.
+    La méthode extrait les données et métadonnées, puis utilise le décodeur pour interpréter
+    la trame ZigBee.
+    
+    Paramètres
+    ----------
+    paquet : str
+        Chaîne de caractères représentant le paquet à traiter au format nRF52840.
+    decoder : DecodeurTrameZigbee
+        Instance de décodeur à utiliser pour interpréter la trame.
+    
+    Notes
+    -----
+    Les métadonnées extraites incluent:
+    - power (RSSI): puissance du signal reçu en dBm
+    - lqi: indicateur de qualité de la liaison
+    - timestamp: horodatage de la capture
+    - trame_brute: données brutes de la trame en hexadécimal
+    - canal: canal ZigBee utilisé
+    
+    Si le format de sortie est &#39;pcap&#39;, la trame est également ajoutée au fichier PCAP.
+    
+    La méthode journalise un avertissement si la trame ne peut pas être décodée ou
+    si le format du paquet ne correspond pas au format attendu.
+    &#34;&#34;&#34;
+        import re
+        pattern = r&#34;received: ([0-9a-fA-F]+) power: ([-\d]+) lqi: (\d+) time: (\d+)&#34;
+        match = re.search(pattern, paquet)
+        
+        if match:
+            paquet_received = match.group(1)
+            power = match.group(2)
+            lqi = match.group(3)
+            timestamp = match.group(4)
+            
+            paquet_bytes = bytes.fromhex(paquet_received)
+            
+            metadonnees = {
+                &#39;power&#39;: power,
+                &#39;lqi&#39;: lqi,
+                &#39;timestamp&#39;: timestamp,
+                &#39;trame_brute&#39;: paquet_received,
+                &#39;canal&#39;: self.canal
+            }
+            
+            # Si PCAP est activé, ajouter la trame au fichier PCAP
+            if self.format_sortie == &#39;pcap&#39; and self.pcap_writer:
+                self._ajouter_trame_pcap(paquet_bytes, metadonnees)
+            
+            decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
+            if decoded_frame:
+                decoded_frame[&#39;metadonnees&#39;] = metadonnees
+                self.captures.append(decoded_frame)
+            else:
+                logger.warning(f&#34;Impossible de décoder la trame : {paquet_received}&#34;)
+        else:
+            logger.warning(f&#34;Format de paquet KillerBee non reconnu: {paquet}&#34;)
+
+    def _traiter_paquet_esp32h2(self, paquet, decoder):
+        &#34;&#34;&#34;
+    Traite un paquet au format ESP32H2.
+    
+    Cette méthode analyse les paquets capturés depuis un adaptateur basé sur l&#39;ESP32H2.
+    Le format attendu est: &#34;[ sequence|RSSI: valeurDB| tailleB] trameHEX&#34;.
+    Exemple: &#34;[ 22959|RSSI: -54dB| 10B] 0308A1FFFFFFFF07C009&#34;
+    
+    La méthode extrait les données et métadonnées, puis utilise le décodeur pour interpréter
+    la trame ZigBee.
+    
+    Paramètres
+    ----------
+    paquet : str
+        Chaîne de caractères représentant le paquet à traiter au format ESP32H2.
+    decoder : DecodeurTrameZigbee
+        Instance de décodeur à utiliser pour interpréter la trame.
+    
+    Notes
+    -----
+    Les métadonnées extraites incluent:
+    - power (RSSI): puissance du signal reçu en dBm
+    - lqi: toujours défini à &#39;0&#39; car non fourni par l&#39;ESP32H2
+    - timestamp: horodatage de la capture (généré par l&#39;heure système actuelle)
+    - trame_brute: données brutes de la trame en hexadécimal
+    - canal: canal ZigBee utilisé
+    - sequence: numéro de séquence fourni par l&#39;ESP32H2
+    - taille: taille de la trame en octets
+    
+    Si le format de sortie est &#39;pcap&#39;, la trame est également ajoutée au fichier PCAP.
+    
+    La méthode journalise un avertissement si la trame ne peut pas être décodée ou
+    si le format du paquet ne correspond pas au format attendu.
+    &#34;&#34;&#34;
+        import re
+        # Pattern pour extraire les informations du format ESP32H2
+        pattern = r&#34;\[\s*(\d+)\|RSSI:\s*([-\d]+)dB\|\s*(\d+)B\]\s*([0-9a-fA-F]+)&#34;
+        match = re.search(pattern, paquet)
+        
+        if match:
+            sequence = match.group(1)
+            rssi = match.group(2)
+            taille = match.group(3)
+            trame_hex = match.group(4)
+            
+            paquet_bytes = bytes.fromhex(trame_hex)
+            
+            # Utiliser le temps actuel comme timestamp si non disponible
+            timestamp = int(time.time() * 1000)
+            
+            metadonnees = {
+                &#39;power&#39;: rssi,  # Utiliser RSSI comme power
+                &#39;lqi&#39;: &#39;0&#39;,     # LQI non disponible, utiliser 0 comme valeur par défaut
+                &#39;timestamp&#39;: str(timestamp),
+                &#39;trame_brute&#39;: trame_hex,
+                &#39;canal&#39;: self.canal,
+                &#39;sequence&#39;: sequence,
+                &#39;taille&#39;: taille
+            }
+            
+            # Si PCAP est activé, ajouter la trame au fichier PCAP
+            if self.format_sortie == &#39;pcap&#39; and self.pcap_writer:
+                self._ajouter_trame_pcap(paquet_bytes, metadonnees)
+                
+            decoded_frame = decoder.decoder_trame_zigbee(paquet_bytes)
+            if decoded_frame:
+                decoded_frame[&#39;metadonnees&#39;] = metadonnees
+                self.captures.append(decoded_frame)
+            else:
+                logger.warning(f&#34;Impossible de décoder la trame ESP32H2 : {trame_hex}&#34;)
+        else:
+            logger.warning(f&#34;Format de paquet ESP32H2 non reconnu: {paquet}&#34;)
+
+    def _initialiser_pcap(self):
+        &#34;&#34;&#34;
+    Initialise le fichier PCAP pour sauvegarder les trames.
+    
+    Cette méthode crée un fichier PCAP pour stocker les trames capturées lorsque
+    le format de sortie est configuré sur &#39;pcap&#39;. Elle s&#39;assure que le fichier
+    a l&#39;extension .pcap et configure le PcapWriter de Scapy avec les paramètres
+    appropriés pour les trames IEEE 802.15.4 (ZigBee).
+    
+    Effets de bord:
+    - Modifie l&#39;extension du fichier de sortie si nécessaire
+    - Initialise l&#39;attribut self.pcap_writer
+    
+    Notes
+    -----
+    - Utilise le linktype 195 qui correspond au format IEEE 802.15.4
+    - En cas d&#39;erreur lors de l&#39;initialisation du fichier PCAP,
+      le format de sortie est automatiquement basculé vers &#39;json&#39;
+    - La synchronisation forcée (sync=True) garantit que les données sont écrites
+      immédiatement sur le disque, ce qui est utile en cas d&#39;arrêt inattendu
+    &#34;&#34;&#34;
+        if self.format_sortie == &#39;pcap&#39;:
+            try:
+                # S&#39;assurer que l&#39;extension est .pcap
+                if not self.fichier_sortie.endswith(&#39;.pcap&#39;):
+                    self.fichier_sortie = os.path.splitext(self.fichier_sortie)[0] + &#39;.pcap&#39;
+                
+                # Créer le PcapWriter avec les bons paramètres
+                # linktype=195 pour IEEE 802.15.4 (Zigbee utilise cette couche physique)
+                self.pcap_writer = scapy.PcapWriter(self.fichier_sortie, linktype=195, append=False, sync=True)
+                logger.info(f&#34;Fichier PCAP initialisé: {self.fichier_sortie}&#34;)
+            except Exception as e:
+                logger.error(f&#34;Erreur lors de l&#39;initialisation du fichier PCAP: {e}&#34;)
+                self.format_sortie = &#39;json&#39;
+                logger.info(f&#34;Format de sortie basculé sur JSON en raison de l&#39;erreur&#34;)
+
+    def _ajouter_trame_pcap(self, trame_bytes, metadonnees):
+        &#34;&#34;&#34;
+    Ajoute une trame au fichier PCAP.
+    
+    Cette méthode convertit les données brutes d&#39;une trame en un paquet Scapy
+    Dot15d4FCS, y associe les métadonnées pertinentes (LQI, RSSI, timestamp),
+    puis l&#39;écrit dans le fichier PCAP.
+    
+    Paramètres
+    ----------
+    trame_bytes : bytes
+        Les données brutes de la trame en format binaire.
+    metadonnees : dict
+        Dictionnaire contenant les métadonnées associées à la trame.
+        Doit contenir au minimum les clés &#39;lqi&#39;, &#39;power&#39; et &#39;timestamp&#39;.
+    
+    Notes
+    -----
+    - La méthode initialise un objet Dot15d4FCS de Scapy avec les données brutes
+    - Le FCS (Frame Check Sequence) est effacé pour que Scapy le recalcule automatiquement
+    - Les valeurs LQI, RSSI et timestamp sont extraites des métadonnées et
+      associées au paquet Scapy
+    - Le timestamp est converti de millisecondes à secondes (format PCAP)
+    - Les erreurs lors de l&#39;ajout sont capturées et journalisées sans interrompre
+      le processus de capture
+    &#34;&#34;&#34;
+        try:
+            # Créer un paquet Scapy à partir des données
+            dot15d4_pkt = Dot15d4FCS(trame_bytes) 
+            dot15d4_pkt.fcs = None  # Forcer Scapy à recalculer le FCS
+            
+            
+            dot15d4_pkt.lqi = int(metadonnees[&#39;lqi&#39;])
+            dot15d4_pkt.rssi = int(metadonnees[&#39;power&#39;])
+            
+            
+            timestamp = float(metadonnees[&#39;timestamp&#39;]) / 1000.0
+            dot15d4_pkt.time = timestamp
+
+            self.pcap_writer.write(dot15d4_pkt)
+            
+        except Exception as e:
+            logger.error(f&#34;Erreur lors de l&#39;ajout de la trame au fichier PCAP: {e}&#34;)
 
     def demarrer_sniffer(self):
         &#34;&#34;&#34;
@@ -302,15 +649,26 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
             - Un thread pour la capture des paquets (_capturer_paquets).
             - Un thread pour le traitement et le décodage des paquets (_traiter_paquets).
 
+        Si le format de sortie est PCAP, initialise également le fichier PCAP.
+
         En cas d&#39;erreur lors du démarrage, un message d&#39;erreur est logué.
         &#34;&#34;&#34;
         try:
             self.est_en_cours = True
             self._configurer_sniffer()
+            
+            # Initialiser le fichier PCAP si nécessaire
+            if self.format_sortie == &#39;pcap&#39;:
+                self._initialiser_pcap()
+            
+                
             threading.Thread(target=self._capturer_paquets, daemon=True).start()
             threading.Thread(target=self._traiter_paquets, daemon=True).start()
+            
+            logger.info(f&#34;Sniffer démarré sur le canal {self.canal} (format de sortie: {self.format_sortie})&#34;)
         except Exception as e:
             logger.error(f&#34;Erreur lors du démarrage du sniffer : {e}&#34;)
+            self.est_en_cours = False
 
     def arreter_sniffer(self):
         &#34;&#34;&#34;
@@ -318,16 +676,24 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
 
         Cette méthode modifie le drapeau d&#39;exécution afin d&#39;arrêter les threads de capture 
         et de traitement. Un message d&#39;information est logué pour indiquer l&#39;arrêt.
+        
+        Si le format de sortie est PCAP, ferme également le fichier PCAP.
         &#34;&#34;&#34;
         self.est_en_cours = False
+        
+        # Fermer le fichier PCAP si nécessaire
+        if self.format_sortie == &#39;pcap&#39; and self.pcap_writer:
+            self.pcap_writer.close()
+            self.pcap_writer = None
+            
         logger.info(&#34;Arrêt du sniffer&#34;)
 
     def sauvegarder_captures(self):
         &#34;&#34;&#34;
-        Sauvegarde les trames capturées dans un fichier JSON.
+        Sauvegarde les trames capturées dans un fichier JSON ou PCAP.
 
-        Les captures présentes dans la liste self.captures sont écrites dans le fichier
-        spécifié par l&#39;attribut fichier_sortie avec une indentation pour une lecture facilitée.
+        Selon le format de sortie sélectionné, cette méthode sauvegarde les captures
+        soit au format JSON soit au format PCAP.
 
         Lève
         ----
@@ -335,15 +701,76 @@ Liste des chemins d'accès aux périphériques série trouvés.</p></div>
             Si une erreur survient lors de l&#39;écriture dans le fichier.
         &#34;&#34;&#34;
         try:
-            with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
-                json.dump(self.captures, f, indent=2, ensure_ascii=False)
-            logger.info(f&#34;Captures sauvegardées dans {self.fichier_sortie}&#34;)
+            if self.format_sortie == &#39;json&#39;:
+                # S&#39;assurer que l&#39;extension est .json
+                if not self.fichier_sortie.endswith(&#39;.json&#39;):
+                    self.fichier_sortie = os.path.splitext(self.fichier_sortie)[0] + &#39;.json&#39;
+                
+                with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(self.captures, f, indent=2, ensure_ascii=False)
+                logger.info(f&#34;Captures sauvegardées au format JSON dans {self.fichier_sortie}&#34;)
+            
+            elif self.format_sortie == &#39;pcap&#39;:
+                # Le fichier PCAP est écrit en continu pendant la capture
+                # On s&#39;assure simplement qu&#39;il est bien fermé
+                if self.pcap_writer:
+                    self.pcap_writer.close()
+                    self.pcap_writer = None
+                logger.info(f&#34;Captures sauvegardées au format PCAP dans {self.fichier_sortie}&#34;)
+            
+            else:
+                logger.warning(f&#34;Format de sortie non reconnu: {self.format_sortie}&#34;)
+        
         except Exception as e:
-            logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)</code></pre>
+            logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)
+
+    def definir_format_sortie(self, format_sortie):
+        &#34;&#34;&#34;
+    Définit le format de sortie pour les captures.
+    
+    Cette méthode configure le format dans lequel les trames capturées seront
+    sauvegardées. Deux formats sont supportés : JSON et PCAP. La méthode
+    ajuste également l&#39;extension du fichier de sortie pour correspondre au format choisi.
+    
+    Paramètres
+    ----------
+    format_sortie : str
+        Format de sortie à utiliser. Valeurs acceptées:
+        - &#39;json&#39;: sauvegarde les données sous forme de structure JSON
+        - &#39;pcap&#39;: sauvegarde les trames dans un fichier PCAP lisible par Wireshark
+    
+    Effets de bord:
+    - Modifie l&#39;attribut self.format_sortie
+    - Ajuste l&#39;extension du fichier de sortie (self.fichier_sortie)
+    
+    Notes
+    -----
+    - Si un format non supporté est fourni, la méthode utilise &#39;json&#39; par défaut
+      et enregistre un avertissement dans les logs
+    - L&#39;extension du fichier de sortie est automatiquement mise à jour pour
+      refléter le format choisi (.json ou .pcap)
+    - Un message d&#39;information est journalisé pour confirmer la configuration
+    
+    Exemple
+    -------
+    &gt;&gt;&gt; sniffer = SniffeurZigbee(fichier_sortie=&#39;captures&#39;)
+    &gt;&gt;&gt; sniffer.definir_format_sortie(&#39;pcap&#39;)  # Fichier de sortie devient &#39;captures.pcap&#39;
+    &#34;&#34;&#34;
+        if format_sortie.lower() not in [&#39;json&#39;, &#39;pcap&#39;]:
+            logger.warning(f&#34;Format de sortie non pris en charge: {format_sortie}. Utilisation de &#39;json&#39;.&#34;)
+            self.format_sortie = &#39;json&#39;
+        else:
+            self.format_sortie = format_sortie.lower()
+            
+        # Adapter l&#39;extension du fichier de sortie
+        nom_base, _ = os.path.splitext(self.fichier_sortie)
+        self.fichier_sortie = nom_base + (&#39;.&#39; + self.format_sortie)
+        
+        logger.info(f&#34;Format de sortie défini sur {self.format_sortie}, fichier de sortie: {self.fichier_sortie}&#34;)</code></pre>
 </details>
 <div class="desc"><p>Classe pour capturer et analyser les trames ZigBee.</p>
 <p>Cette classe gère la capture des trames ZigBee via un port série, leur décodage
-grâce à un décodeur spécialisé, ainsi que leur sauvegarde dans un fichier JSON.
+grâce à un décodeur spécialisé, ainsi que leur sauvegarde dans un fichier JSON ou PCAP.
 Elle peut également être étendue pour prendre en charge le déchiffrement des trames.</p>
 <h2 id="parametres">Paramètres</h2>
 <p>canal : int, optionnel
@@ -352,7 +779,9 @@ fichier_sortie : str, optionnel
 Chemin du fichier de sortie pour sauvegarder les captures
 (par défaut 'captures_zigbee.json').
 vitesse_bauds : int, optionnel
-Vitesse de transmission du port série (par défaut 115200).</p>
+Vitesse de transmission du port série (par défaut 115200).
+format_sortie : str, optionnel
+Format du fichier de sortie ('json' ou 'pcap', par défaut 'json').</p>
 <h2 id="attributs">Attributs</h2>
 <p>canal : int
 Canal ZigBee sélectionné.
@@ -360,6 +789,8 @@ fichier_sortie : str
 Chemin vers le fichier de sortie.
 vitesse_bauds : int
 Vitesse de transmission en bauds.
+format_sortie : str
+Format du fichier de sortie choisi ('json' ou 'pcap').
 file_paquets : Queue
 File d'attente utilisée pour stocker les paquets bruts capturés.
 est_en_cours : bool
@@ -376,7 +807,7 @@ metadonnees : list
 Liste des métadonnées associées aux captures.</p></div>
 <h3>Methods</h3>
 <dl>
-<dt id="scripts.sniff.SniffeurZigbee.arreter_sniffer"><code class="name flex">
+<dt id="sniff.SniffeurZigbee.arreter_sniffer"><code class="name flex">
 <span>def <span class="ident">arreter_sniffer</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -390,15 +821,203 @@ Liste des métadonnées associées aux captures.</p></div>
 
     Cette méthode modifie le drapeau d&#39;exécution afin d&#39;arrêter les threads de capture 
     et de traitement. Un message d&#39;information est logué pour indiquer l&#39;arrêt.
+    
+    Si le format de sortie est PCAP, ferme également le fichier PCAP.
     &#34;&#34;&#34;
     self.est_en_cours = False
+    
+    # Fermer le fichier PCAP si nécessaire
+    if self.format_sortie == &#39;pcap&#39; and self.pcap_writer:
+        self.pcap_writer.close()
+        self.pcap_writer = None
+        
     logger.info(&#34;Arrêt du sniffer&#34;)</code></pre>
 </details>
 <div class="desc"><p>Arrête le sniffer.</p>
 <p>Cette méthode modifie le drapeau d'exécution afin d'arrêter les threads de capture
-et de traitement. Un message d'information est logué pour indiquer l'arrêt.</p></div>
+et de traitement. Un message d'information est logué pour indiquer l'arrêt.</p>
+<p>Si le format de sortie est PCAP, ferme également le fichier PCAP.</p></div>
 </dd>
-<dt id="scripts.sniff.SniffeurZigbee.demarrer_sniffer"><code class="name flex">
+<dt id="sniff.SniffeurZigbee.definir_canal"><code class="name flex">
+<span>def <span class="ident">definir_canal</span></span>(<span>self, nouveau_canal)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def definir_canal(self, nouveau_canal):
+    &#34;&#34;&#34;
+    Définit un nouveau canal pour la capture.
+    
+    Si le sniffer est en cours d&#39;exécution, il est arrêté puis redémarré
+    avec le nouveau canal.
+    
+    Paramètres
+    ----------
+    nouveau_canal : int
+        Le nouveau canal ZigBee à utiliser (11-26).
+    &#34;&#34;&#34;
+    if not (11 &lt;= nouveau_canal &lt;= 26):
+        logger.warning(f&#34;Canal {nouveau_canal} invalide. Utilisation de la plage 11-26 uniquement.&#34;)
+        return
+        
+    etait_en_cours = self.est_en_cours
+    if etait_en_cours:
+        self.arreter_sniffer()
+        time.sleep(1)  # Attendre l&#39;arrêt complet
+        
+    self.canal = nouveau_canal
+    logger.info(f&#34;Canal modifié: {self.canal}&#34;)
+    
+    if etait_en_cours:
+        self.demarrer_sniffer()</code></pre>
+</details>
+<div class="desc"><p>Définit un nouveau canal pour la capture.</p>
+<p>Si le sniffer est en cours d'exécution, il est arrêté puis redémarré
+avec le nouveau canal.</p>
+<h2 id="parametres">Paramètres</h2>
+<p>nouveau_canal : int
+Le nouveau canal ZigBee à utiliser (11-26).</p></div>
+</dd>
+<dt id="sniff.SniffeurZigbee.definir_format_sortie"><code class="name flex">
+<span>def <span class="ident">definir_format_sortie</span></span>(<span>self, format_sortie)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def definir_format_sortie(self, format_sortie):
+    &#34;&#34;&#34;
+Définit le format de sortie pour les captures.
+
+Cette méthode configure le format dans lequel les trames capturées seront
+sauvegardées. Deux formats sont supportés : JSON et PCAP. La méthode
+ajuste également l&#39;extension du fichier de sortie pour correspondre au format choisi.
+
+Paramètres
+----------
+format_sortie : str
+    Format de sortie à utiliser. Valeurs acceptées:
+    - &#39;json&#39;: sauvegarde les données sous forme de structure JSON
+    - &#39;pcap&#39;: sauvegarde les trames dans un fichier PCAP lisible par Wireshark
+
+Effets de bord:
+- Modifie l&#39;attribut self.format_sortie
+- Ajuste l&#39;extension du fichier de sortie (self.fichier_sortie)
+
+Notes
+-----
+- Si un format non supporté est fourni, la méthode utilise &#39;json&#39; par défaut
+  et enregistre un avertissement dans les logs
+- L&#39;extension du fichier de sortie est automatiquement mise à jour pour
+  refléter le format choisi (.json ou .pcap)
+- Un message d&#39;information est journalisé pour confirmer la configuration
+
+Exemple
+-------
+&gt;&gt;&gt; sniffer = SniffeurZigbee(fichier_sortie=&#39;captures&#39;)
+&gt;&gt;&gt; sniffer.definir_format_sortie(&#39;pcap&#39;)  # Fichier de sortie devient &#39;captures.pcap&#39;
+&#34;&#34;&#34;
+    if format_sortie.lower() not in [&#39;json&#39;, &#39;pcap&#39;]:
+        logger.warning(f&#34;Format de sortie non pris en charge: {format_sortie}. Utilisation de &#39;json&#39;.&#34;)
+        self.format_sortie = &#39;json&#39;
+    else:
+        self.format_sortie = format_sortie.lower()
+        
+    # Adapter l&#39;extension du fichier de sortie
+    nom_base, _ = os.path.splitext(self.fichier_sortie)
+    self.fichier_sortie = nom_base + (&#39;.&#39; + self.format_sortie)
+    
+    logger.info(f&#34;Format de sortie défini sur {self.format_sortie}, fichier de sortie: {self.fichier_sortie}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Définit le format de sortie pour les captures.</p>
+<p>Cette méthode configure le format dans lequel les trames capturées seront
+sauvegardées. Deux formats sont supportés : JSON et PCAP. La méthode
+ajuste également l'extension du fichier de sortie pour correspondre au format choisi.</p>
+<h2 id="parametres">Paramètres</h2>
+<p>format_sortie : str
+Format de sortie à utiliser. Valeurs acceptées:
+- 'json': sauvegarde les données sous forme de structure JSON
+- 'pcap': sauvegarde les trames dans un fichier PCAP lisible par Wireshark</p>
+<p>Effets de bord:
+- Modifie l'attribut self.format_sortie
+- Ajuste l'extension du fichier de sortie (self.fichier_sortie)</p>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Si un format non supporté est fourni, la méthode utilise 'json' par défaut
+et enregistre un avertissement dans les logs</li>
+<li>L'extension du fichier de sortie est automatiquement mise à jour pour
+refléter le format choisi (.json ou .pcap)</li>
+<li>Un message d'information est journalisé pour confirmer la configuration</li>
+</ul>
+<h2 id="exemple">Exemple</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; sniffer = SniffeurZigbee(fichier_sortie='captures')
+&gt;&gt;&gt; sniffer.definir_format_sortie('pcap')  # Fichier de sortie devient 'captures.pcap'
+</code></pre></div>
+</dd>
+<dt id="sniff.SniffeurZigbee.definir_materiel"><code class="name flex">
+<span>def <span class="ident">definir_materiel</span></span>(<span>self, materiel)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def definir_materiel(self, materiel):
+    &#34;&#34;&#34;
+Définit le materiel utilisé pour les trames capturées à partir du port série.
+
+Cette méthode permet de spécifier le format dans lequel les trames sont envoyées
+par le périphérique de capture (firmware). L&#39;implémentation supporte deux formats :
+&#39;nrf52&#39; pour les trames provenant du nRF52840 et &#39;esp32h2&#39; pour les trames
+provenant de l&#39;ESP32H2.
+
+Paramètres
+----------
+format_entree : str
+    Format d&#39;entrée à utiliser. Valeurs acceptées:
+    - &#39;nrf52&#39;: Format de trame du nRF52840 avec la syntaxe &#34;received: [trame_hex] power: [rssi] lqi: [lqi] time: [timestamp]&#34;
+    - &#39;esp32h2&#39;: Format de trame de l&#39;ESP32H2 avec la syntaxe &#34;[ sequence|RSSI: valeurDB| tailleB] trameHEX&#34;
+
+Notes
+-----
+Si un format non supporté est fourni, la méthode utilise &#39;nrf52&#39; par défaut
+et enregistre un avertissement dans les logs.
+
+Exemple
+-------
+&gt;&gt;&gt; sniffer = SniffeurZigbee()
+&gt;&gt;&gt; sniffer.definir_format_entree(&#39;esp32h2&#39;)  # Configure le sniffeur pour les trames ESP32H2
+&#34;&#34;&#34;
+    if materiel.lower() not in [&#39;nrf52&#39;, &#39;esp32h2&#39;]:
+        logger.warning(f&#34;Format d&#39;entrée non pris en charge: {materiel}. Utilisation de &#39;nrf52&#39;.&#34;)
+        self.materiel = &#39;nrf52&#39;
+    else:
+        self.materiel = materiel.lower()
+        
+    logger.info(f&#34;Format d&#39;entrée défini sur {self.materiel}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Définit le materiel utilisé pour les trames capturées à partir du port série.</p>
+<p>Cette méthode permet de spécifier le format dans lequel les trames sont envoyées
+par le périphérique de capture (firmware). L'implémentation supporte deux formats :
+'nrf52' pour les trames provenant du nRF52840 et 'esp32h2' pour les trames
+provenant de l'ESP32H2.</p>
+<h2 id="parametres">Paramètres</h2>
+<p>format_entree : str
+Format d'entrée à utiliser. Valeurs acceptées:
+- 'nrf52': Format de trame du nRF52840 avec la syntaxe "received: [trame_hex] power: [rssi] lqi: [lqi] time: [timestamp]"
+- 'esp32h2': Format de trame de l'ESP32H2 avec la syntaxe "[ sequence|RSSI: valeurDB| tailleB] trameHEX"</p>
+<h2 id="notes">Notes</h2>
+<p>Si un format non supporté est fourni, la méthode utilise 'nrf52' par défaut
+et enregistre un avertissement dans les logs.</p>
+<h2 id="exemple">Exemple</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; sniffer = SniffeurZigbee()
+&gt;&gt;&gt; sniffer.definir_format_entree('esp32h2')  # Configure le sniffeur pour les trames ESP32H2
+</code></pre></div>
+</dd>
+<dt id="sniff.SniffeurZigbee.demarrer_sniffer"><code class="name flex">
 <span>def <span class="ident">demarrer_sniffer</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -414,23 +1033,35 @@ et de traitement. Un message d'information est logué pour indiquer l'arrêt.</p
         - Un thread pour la capture des paquets (_capturer_paquets).
         - Un thread pour le traitement et le décodage des paquets (_traiter_paquets).
 
+    Si le format de sortie est PCAP, initialise également le fichier PCAP.
+
     En cas d&#39;erreur lors du démarrage, un message d&#39;erreur est logué.
     &#34;&#34;&#34;
     try:
         self.est_en_cours = True
         self._configurer_sniffer()
+        
+        # Initialiser le fichier PCAP si nécessaire
+        if self.format_sortie == &#39;pcap&#39;:
+            self._initialiser_pcap()
+        
+            
         threading.Thread(target=self._capturer_paquets, daemon=True).start()
         threading.Thread(target=self._traiter_paquets, daemon=True).start()
+        
+        logger.info(f&#34;Sniffer démarré sur le canal {self.canal} (format de sortie: {self.format_sortie})&#34;)
     except Exception as e:
-        logger.error(f&#34;Erreur lors du démarrage du sniffer : {e}&#34;)</code></pre>
+        logger.error(f&#34;Erreur lors du démarrage du sniffer : {e}&#34;)
+        self.est_en_cours = False</code></pre>
 </details>
 <div class="desc"><p>Démarre le sniffer pour capturer les trames ZigBee.</p>
 <p>Cette méthode configure le port série puis lance deux threads en mode daemon :
 - Un thread pour la capture des paquets (_capturer_paquets).
 - Un thread pour le traitement et le décodage des paquets (_traiter_paquets).</p>
+<p>Si le format de sortie est PCAP, initialise également le fichier PCAP.</p>
 <p>En cas d'erreur lors du démarrage, un message d'erreur est logué.</p></div>
 </dd>
-<dt id="scripts.sniff.SniffeurZigbee.reinitialiser"><code class="name flex">
+<dt id="sniff.SniffeurZigbee.reinitialiser"><code class="name flex">
 <span>def <span class="ident">reinitialiser</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -465,7 +1096,7 @@ et de traitement. Un message d'information est logué pour indiquer l'arrêt.</p
 ainsi que les métadonnées accumulées. Si le port série est ouvert, elle
 réinitialise également ses buffers d'entrée et de sortie.</p></div>
 </dd>
-<dt id="scripts.sniff.SniffeurZigbee.sauvegarder_captures"><code class="name flex">
+<dt id="sniff.SniffeurZigbee.sauvegarder_captures"><code class="name flex">
 <span>def <span class="ident">sauvegarder_captures</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -475,10 +1106,10 @@ réinitialise également ses buffers d'entrée et de sortie.</p></div>
 </summary>
 <pre><code class="python">def sauvegarder_captures(self):
     &#34;&#34;&#34;
-    Sauvegarde les trames capturées dans un fichier JSON.
+    Sauvegarde les trames capturées dans un fichier JSON ou PCAP.
 
-    Les captures présentes dans la liste self.captures sont écrites dans le fichier
-    spécifié par l&#39;attribut fichier_sortie avec une indentation pour une lecture facilitée.
+    Selon le format de sortie sélectionné, cette méthode sauvegarde les captures
+    soit au format JSON soit au format PCAP.
 
     Lève
     ----
@@ -486,15 +1117,32 @@ réinitialise également ses buffers d'entrée et de sortie.</p></div>
         Si une erreur survient lors de l&#39;écriture dans le fichier.
     &#34;&#34;&#34;
     try:
-        with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
-            json.dump(self.captures, f, indent=2, ensure_ascii=False)
-        logger.info(f&#34;Captures sauvegardées dans {self.fichier_sortie}&#34;)
+        if self.format_sortie == &#39;json&#39;:
+            # S&#39;assurer que l&#39;extension est .json
+            if not self.fichier_sortie.endswith(&#39;.json&#39;):
+                self.fichier_sortie = os.path.splitext(self.fichier_sortie)[0] + &#39;.json&#39;
+            
+            with open(self.fichier_sortie, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                json.dump(self.captures, f, indent=2, ensure_ascii=False)
+            logger.info(f&#34;Captures sauvegardées au format JSON dans {self.fichier_sortie}&#34;)
+        
+        elif self.format_sortie == &#39;pcap&#39;:
+            # Le fichier PCAP est écrit en continu pendant la capture
+            # On s&#39;assure simplement qu&#39;il est bien fermé
+            if self.pcap_writer:
+                self.pcap_writer.close()
+                self.pcap_writer = None
+            logger.info(f&#34;Captures sauvegardées au format PCAP dans {self.fichier_sortie}&#34;)
+        
+        else:
+            logger.warning(f&#34;Format de sortie non reconnu: {self.format_sortie}&#34;)
+    
     except Exception as e:
         logger.error(f&#34;Erreur lors de la sauvegarde des captures : {e}&#34;)</code></pre>
 </details>
-<div class="desc"><p>Sauvegarde les trames capturées dans un fichier JSON.</p>
-<p>Les captures présentes dans la liste self.captures sont écrites dans le fichier
-spécifié par l'attribut fichier_sortie avec une indentation pour une lecture facilitée.</p>
+<div class="desc"><p>Sauvegarde les trames capturées dans un fichier JSON ou PCAP.</p>
+<p>Selon le format de sortie sélectionné, cette méthode sauvegarde les captures
+soit au format JSON soit au format PCAP.</p>
 <h2 id="leve">Lève</h2>
 <p>Exception
 Si une erreur survient lors de l'écriture dans le fichier.</p></div>
@@ -511,25 +1159,23 @@ Si une erreur survient lors de l'écriture dans le fichier.</p></div>
 </ul>
 </div>
 <ul id="index">
-<li><h3>Super-module</h3>
-<ul>
-<li><code><a title="scripts" href="index.html">scripts</a></code></li>
-</ul>
-</li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="scripts.sniff.trouver_peripheriques_serie" href="#scripts.sniff.trouver_peripheriques_serie">trouver_peripheriques_serie</a></code></li>
+<li><code><a title="sniff.trouver_peripheriques_serie" href="#sniff.trouver_peripheriques_serie">trouver_peripheriques_serie</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="scripts.sniff.SniffeurZigbee" href="#scripts.sniff.SniffeurZigbee">SniffeurZigbee</a></code></h4>
+<h4><code><a title="sniff.SniffeurZigbee" href="#sniff.SniffeurZigbee">SniffeurZigbee</a></code></h4>
 <ul class="">
-<li><code><a title="scripts.sniff.SniffeurZigbee.arreter_sniffer" href="#scripts.sniff.SniffeurZigbee.arreter_sniffer">arreter_sniffer</a></code></li>
-<li><code><a title="scripts.sniff.SniffeurZigbee.demarrer_sniffer" href="#scripts.sniff.SniffeurZigbee.demarrer_sniffer">demarrer_sniffer</a></code></li>
-<li><code><a title="scripts.sniff.SniffeurZigbee.reinitialiser" href="#scripts.sniff.SniffeurZigbee.reinitialiser">reinitialiser</a></code></li>
-<li><code><a title="scripts.sniff.SniffeurZigbee.sauvegarder_captures" href="#scripts.sniff.SniffeurZigbee.sauvegarder_captures">sauvegarder_captures</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.arreter_sniffer" href="#sniff.SniffeurZigbee.arreter_sniffer">arreter_sniffer</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.definir_canal" href="#sniff.SniffeurZigbee.definir_canal">definir_canal</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.definir_format_sortie" href="#sniff.SniffeurZigbee.definir_format_sortie">definir_format_sortie</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.definir_materiel" href="#sniff.SniffeurZigbee.definir_materiel">definir_materiel</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.demarrer_sniffer" href="#sniff.SniffeurZigbee.demarrer_sniffer">demarrer_sniffer</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.reinitialiser" href="#sniff.SniffeurZigbee.reinitialiser">reinitialiser</a></code></li>
+<li><code><a title="sniff.SniffeurZigbee.sauvegarder_captures" href="#sniff.SniffeurZigbee.sauvegarder_captures">sauvegarder_captures</a></code></li>
 </ul>
 </li>
 </ul>

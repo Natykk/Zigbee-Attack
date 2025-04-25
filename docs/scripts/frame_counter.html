@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>scripts.frame_counter API documentation</title>
+<title>frame_counter API documentation</title>
 <meta name="description" content="Module pour la gestion du frame counter et du numéro de séquence dans les trames Zigbee.
 Ce module fournit des méthodes permettant d&#39;incrémenter le …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,7 +34,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>scripts.frame_counter</code></h1>
+<h1 class="title">Module <code>frame_counter</code></h1>
 </header>
 <section id="section-intro">
 <p>Module pour la gestion du frame counter et du numéro de séquence dans les trames Zigbee.
@@ -50,7 +50,7 @@ dans une trame Zigbee, tout en garantissant que la longueur de la trame reste co
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="scripts.frame_counter.ZigbeeFrameFinder"><code class="flex name class">
+<dt id="frame_counter.ZigbeeFrameFinder"><code class="flex name class">
 <span>class <span class="ident">ZigbeeFrameFinder</span></span>
 </code></dt>
 <dd>
@@ -129,7 +129,7 @@ dans une trame Zigbee, tout en garantissant que la longueur de la trame reste co
 <div class="desc"></div>
 <h3>Methods</h3>
 <dl>
-<dt id="scripts.frame_counter.ZigbeeFrameFinder.increment_frame_counter"><code class="name flex">
+<dt id="frame_counter.ZigbeeFrameFinder.increment_frame_counter"><code class="name flex">
 <span>def <span class="ident">increment_frame_counter</span></span>(<span>self, trame_hex: str, increment: int = 10) ‑> str</span>
 </code></dt>
 <dd>
@@ -195,7 +195,7 @@ et réintégré dans la trame à la même position, garantissant ainsi que la lo
 ce qui indiquerait une erreur dans le format de la trame.</dd>
 </dl></div>
 </dd>
-<dt id="scripts.frame_counter.ZigbeeFrameFinder.increment_sequence_number"><code class="name flex">
+<dt id="frame_counter.ZigbeeFrameFinder.increment_sequence_number"><code class="name flex">
 <span>def <span class="ident">increment_sequence_number</span></span>(<span>self, trame_hex: str, increment: int = 1) ‑> str</span>
 </code></dt>
 <dd>
@@ -267,18 +267,13 @@ et reconstruit la trame en alternant la valeur du dernier octet selon une règle
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3>Super-module</h3>
-<ul>
-<li><code><a title="scripts" href="index.html">scripts</a></code></li>
-</ul>
-</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="scripts.frame_counter.ZigbeeFrameFinder" href="#scripts.frame_counter.ZigbeeFrameFinder">ZigbeeFrameFinder</a></code></h4>
+<h4><code><a title="frame_counter.ZigbeeFrameFinder" href="#frame_counter.ZigbeeFrameFinder">ZigbeeFrameFinder</a></code></h4>
 <ul class="">
-<li><code><a title="scripts.frame_counter.ZigbeeFrameFinder.increment_frame_counter" href="#scripts.frame_counter.ZigbeeFrameFinder.increment_frame_counter">increment_frame_counter</a></code></li>
-<li><code><a title="scripts.frame_counter.ZigbeeFrameFinder.increment_sequence_number" href="#scripts.frame_counter.ZigbeeFrameFinder.increment_sequence_number">increment_sequence_number</a></code></li>
+<li><code><a title="frame_counter.ZigbeeFrameFinder.increment_frame_counter" href="#frame_counter.ZigbeeFrameFinder.increment_frame_counter">increment_frame_counter</a></code></li>
+<li><code><a title="frame_counter.ZigbeeFrameFinder.increment_sequence_number" href="#frame_counter.ZigbeeFrameFinder.increment_sequence_number">increment_sequence_number</a></code></li>
 </ul>
 </li>
 </ul>

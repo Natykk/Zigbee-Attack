@@ -1,3 +1,7 @@
+"""
+Codeur de trames ZigBee.
+Ce module implémente un codeur pour les différentes couches de trames ZigBee.
+"""
 import logging
 
 class CodeurTrameZigbee:

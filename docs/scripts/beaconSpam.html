@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.5">
-<title>scripts.beaconSpam API documentation</title>
+<title>beaconSpam API documentation</title>
 <meta name="description" content="Ce module implémente un spammer de paquets Beacon WiFi. Il permet de configurer une interface réseau pour envoyer des paquets Beacon sur un canal …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,7 +33,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>scripts.beaconSpam</code></h1>
+<h1 class="title">Module <code>beaconSpam</code></h1>
 </header>
 <section id="section-intro">
 <p>Ce module implémente un spammer de paquets Beacon WiFi. Il permet de configurer une interface réseau pour envoyer des paquets Beacon sur un canal spécifique, surveiller le nombre de paquets envoyés, et gérer l'envoi en utilisant des threads.</p>
@@ -49,7 +49,7 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="scripts.beaconSpam.WifiSpammer"><code class="flex name class">
+<dt id="beaconSpam.WifiSpammer"><code class="flex name class">
 <span>class <span class="ident">WifiSpammer</span></span>
 <span>(</span><span>interface: str,<br>channel: int = 1,<br>ssid: str = 'JamESP',<br>max_queue_size: int = 1000)</span>
 </code></dt>
@@ -248,7 +248,7 @@ el.replaceWith(d);
 </dl></div>
 <h3>Methods</h3>
 <dl>
-<dt id="scripts.beaconSpam.WifiSpammer.create_beacon_packet"><code class="name flex">
+<dt id="beaconSpam.WifiSpammer.create_beacon_packet"><code class="name flex">
 <span>def <span class="ident">create_beacon_packet</span></span>(<span>self) ‑> scapy.layers.dot11.RadioTap</span>
 </code></dt>
 <dd>
@@ -281,7 +281,7 @@ el.replaceWith(d);
 <dd>Un paquet RadioTap contenant un Beacon WiFi configuré avec le SSID et le canal.</dd>
 </dl></div>
 </dd>
-<dt id="scripts.beaconSpam.WifiSpammer.monitor_progress"><code class="name flex">
+<dt id="beaconSpam.WifiSpammer.monitor_progress"><code class="name flex">
 <span>def <span class="ident">monitor_progress</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -304,7 +304,7 @@ el.replaceWith(d);
 <div class="desc"><p>Surveille la progression de l'envoi des paquets Beacon.</p>
 <p>Affiche en temps réel le nombre de paquets envoyés et le taux d'envoi en paquets par seconde.</p></div>
 </dd>
-<dt id="scripts.beaconSpam.WifiSpammer.packet_sender"><code class="name flex">
+<dt id="beaconSpam.WifiSpammer.packet_sender"><code class="name flex">
 <span>def <span class="ident">packet_sender</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -335,7 +335,7 @@ el.replaceWith(d);
 <h2 id="notes">Notes</h2>
 <p>Cette méthode est exécutée dans un thread pour envoyer les paquets Beacon par lots de 10.</p></div>
 </dd>
-<dt id="scripts.beaconSpam.WifiSpammer.set_channel"><code class="name flex">
+<dt id="beaconSpam.WifiSpammer.set_channel"><code class="name flex">
 <span>def <span class="ident">set_channel</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -368,7 +368,7 @@ el.replaceWith(d);
 <dd>Si une erreur survient lors de la configuration du canal.</dd>
 </dl></div>
 </dd>
-<dt id="scripts.beaconSpam.WifiSpammer.start_scan"><code class="name flex">
+<dt id="beaconSpam.WifiSpammer.start_scan"><code class="name flex">
 <span>def <span class="ident">start_scan</span></span>(<span>self, num_sender_threads: int = 4)</span>
 </code></dt>
 <dd>
@@ -443,21 +443,16 @@ le progrès de l'envoi.</p></div>
 </ul>
 </div>
 <ul id="index">
-<li><h3>Super-module</h3>
-<ul>
-<li><code><a title="scripts" href="index.html">scripts</a></code></li>
-</ul>
-</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="scripts.beaconSpam.WifiSpammer" href="#scripts.beaconSpam.WifiSpammer">WifiSpammer</a></code></h4>
+<h4><code><a title="beaconSpam.WifiSpammer" href="#beaconSpam.WifiSpammer">WifiSpammer</a></code></h4>
 <ul class="">
-<li><code><a title="scripts.beaconSpam.WifiSpammer.create_beacon_packet" href="#scripts.beaconSpam.WifiSpammer.create_beacon_packet">create_beacon_packet</a></code></li>
-<li><code><a title="scripts.beaconSpam.WifiSpammer.monitor_progress" href="#scripts.beaconSpam.WifiSpammer.monitor_progress">monitor_progress</a></code></li>
-<li><code><a title="scripts.beaconSpam.WifiSpammer.packet_sender" href="#scripts.beaconSpam.WifiSpammer.packet_sender">packet_sender</a></code></li>
-<li><code><a title="scripts.beaconSpam.WifiSpammer.set_channel" href="#scripts.beaconSpam.WifiSpammer.set_channel">set_channel</a></code></li>
-<li><code><a title="scripts.beaconSpam.WifiSpammer.start_scan" href="#scripts.beaconSpam.WifiSpammer.start_scan">start_scan</a></code></li>
+<li><code><a title="beaconSpam.WifiSpammer.create_beacon_packet" href="#beaconSpam.WifiSpammer.create_beacon_packet">create_beacon_packet</a></code></li>
+<li><code><a title="beaconSpam.WifiSpammer.monitor_progress" href="#beaconSpam.WifiSpammer.monitor_progress">monitor_progress</a></code></li>
+<li><code><a title="beaconSpam.WifiSpammer.packet_sender" href="#beaconSpam.WifiSpammer.packet_sender">packet_sender</a></code></li>
+<li><code><a title="beaconSpam.WifiSpammer.set_channel" href="#beaconSpam.WifiSpammer.set_channel">set_channel</a></code></li>
+<li><code><a title="beaconSpam.WifiSpammer.start_scan" href="#beaconSpam.WifiSpammer.start_scan">start_scan</a></code></li>
 </ul>
 </li>
 </ul>

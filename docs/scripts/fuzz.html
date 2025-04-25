@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>fuzz API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>fuzz</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="fuzz.define_zigbee_off_light"><code class="name flex">
+<span>def <span class="ident">define_zigbee_off_light</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def define_zigbee_off_light():
+    s_initialize(&#34;zigbee_off_light&#34;)
+    s_block_start(&#34;zigbee_header&#34;)
+    s_bytes(b&#34;\x61\x61\x88\x24\xef\xf4\x3b\xd2\x00\x00\x48\x18\x3b\xd2\x00\x00&#34;, fuzzable=False)
+    s_bytes(b&#34;\x1e&#34;, fuzzable=False)
+    s_bytes(b&#34;\xb2\xa1\x32\x60\xfe\xff\xbd\x4d\x74\x2f\x3c\x60\xfe\xff\xbd\x4d\x74&#34;, fuzzable=False)
+    s_block_end(&#34;zigbee_header&#34;)
+    s_block_start(&#34;zigbee_payload&#34;)
+    s_bytes(b&#34;\x40\x0a\x06\x00\x04\x01\x01&#34;, fuzzable=False)
+    # Commande fuzzable avec toutes les valeurs possibles
+    s_byte(0x00, fuzzable=True, fuzz_values=[0x00, 0x01, 0x02, 0xFF, 0x10, 0x7F])
+    s_block_end(&#34;zigbee_payload&#34;)
+    return s_get(&#34;zigbee_off_light&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fuzz.define_zigbee_on_off_switch"><code class="name flex">
+<span>def <span class="ident">define_zigbee_on_off_switch</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def define_zigbee_on_off_switch():
+    s_initialize(&#34;zigbee_on_off_switch&#34;)
+    s_block_start(&#34;zigbee_header&#34;)
+    s_bytes(b&#34;\x61\x61\x88\xAA\xef\xf4\x3b\xd2\x00\x00\x48\x18\x3b\xd2\x00\x00&#34;, fuzzable=False)
+    s_bytes(b&#34;\x1e&#34;, fuzzable=False)
+    s_bytes(b&#34;\xC0\xa1\x32\x60\xfe\xff\xbd\x4d\x74\x2f\x3c\x60\xfe\xff\xbd\x4d\x74&#34;, fuzzable=False)
+    s_block_end(&#34;zigbee_header&#34;)
+    s_block_start(&#34;zigbee_payload&#34;)
+    s_bytes(b&#34;\x40\x0a\x06\x00\x04\x01\x01&#34;, fuzzable=False)
+    # Commande fuzzable avec toutes les valeurs possibles
+    s_byte(0x01, fuzzable=True, fuzz_values=[0x00, 0x01, 0x02, 0xFF, 0x10, 0x7F])
+    s_block_end(&#34;zigbee_payload&#34;)
+    return s_get(&#34;zigbee_on_off_switch&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fuzz.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    zigbee_conn = ZigbeeSerialConnection(port=&#34;/dev/ttyUSB0&#34;, baudrate=115200)
+    generator = ZigBeeHAZCLOnOffPayloadGenerator()
+    try:
+        target = Target(connection=zigbee_conn)
+        with open(&#39;boofuzz-results.csv&#39;, &#39;w&#39;) as csv_file:
+            session = Session(
+                target=target,
+                sleep_time=1,
+                fuzz_loggers=[FuzzLoggerCsv(file_handle=csv_file)],
+                web_port=26000
+            )
+            web_url = f&#34;http://localhost:{session.web_port}&#34;
+            logging.info(&#34;Interface Web disponible sur %s&#34;, web_url)
+
+            print(&#34;Connexion aux cibles...&#34;)
+            session.connect(define_zigbee_off_light())
+            print(&#34;Connexion aux cibles...&#34;)
+            session.connect(define_zigbee_on_off_switch())
+
+            # Ajout des payloads générés comme nouveaux cas de test
+            anomaly_payloads = generator.generate_anomaly_payloads(num_payloads=50)
+            for idx, payload in enumerate(anomaly_payloads):
+                case_name = f&#34;anomaly_{idx}&#34;
+                s_initialize(case_name)
+                s_bytes(payload, fuzzable=True)  # Fuzzing sur l&#39;ensemble du payload
+                session.connect(s_get(case_name))
+
+            session.fuzz()
+    except Exception as e:
+        logging.error(&#34;Erreur dans le fuzzing: %s&#34;, e)
+    finally:
+        if zigbee_conn:
+            zigbee_conn.close()</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="fuzz.ZigbeeSerialConnection"><code class="flex name class">
+<span>class <span class="ident">ZigbeeSerialConnection</span></span>
+<span>(</span><span>port='/dev/ttyUSB0', baudrate=115200, timeout=1)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ZigbeeSerialConnection:
+    &#34;&#34;&#34;Connexion série pour envoyer les trames Zigbee.&#34;&#34;&#34;
+    def __init__(self, port=&#34;/dev/ttyUSB0&#34;, baudrate=115200, timeout=1):
+        self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+        self.ser = port
+        self.info = f&#34;ZigbeeSerialConnection: {port} @ {baudrate}bps&#34;
+        self.open()
+        # Envoyer le mode TX dès l&#39;ouverture
+        self.send(b&#34;#CMD#MODE_TX&#34;)
+        response = self.recv()
+        logging.info(&#34;Réponse initiale: %s&#34;, response.hex() if response else &#34;Aucune réponse&#34;)
+
+    def open(self):
+        try:
+            if not self.ser or not self.ser.is_open:
+                self.ser = serial.Serial(self.port, baudrate=self.baudrate, timeout=self.timeout)
+                logging.info(&#34;Connexion ouverte sur %s&#34;, self.port)
+        except serial.SerialException as e:
+            logging.error(&#34;Erreur d&#39;ouverture du port série: %s&#34;, e)
+            raise
+
+    def close(self):
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+            logging.info(&#34;Connexion fermée sur %s&#34;, self.port)
+
+    def send(self, data):
+        try:
+            logging.info(&#34;Envoi des données : %s&#34;, data.hex())
+            self.ser.write(data)
+            self.ser.flush()
+        except serial.SerialException as e:
+            logging.error(&#34;Erreur lors de l&#39;envoi: %s&#34;, e)
+
+    def recv(self, bufsize=1024):
+        try:
+            return self.ser.read(bufsize)
+        except serial.SerialException as e:
+            logging.error(&#34;Erreur lors de la réception: %s&#34;, e)
+            return b&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Connexion série pour envoyer les trames Zigbee.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="fuzz.ZigbeeSerialConnection.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self):
+    if self.ser and self.ser.is_open:
+        self.ser.close()
+        logging.info(&#34;Connexion fermée sur %s&#34;, self.port)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fuzz.ZigbeeSerialConnection.open"><code class="name flex">
+<span>def <span class="ident">open</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def open(self):
+    try:
+        if not self.ser or not self.ser.is_open:
+            self.ser = serial.Serial(self.port, baudrate=self.baudrate, timeout=self.timeout)
+            logging.info(&#34;Connexion ouverte sur %s&#34;, self.port)
+    except serial.SerialException as e:
+        logging.error(&#34;Erreur d&#39;ouverture du port série: %s&#34;, e)
+        raise</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fuzz.ZigbeeSerialConnection.recv"><code class="name flex">
+<span>def <span class="ident">recv</span></span>(<span>self, bufsize=1024)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def recv(self, bufsize=1024):
+    try:
+        return self.ser.read(bufsize)
+    except serial.SerialException as e:
+        logging.error(&#34;Erreur lors de la réception: %s&#34;, e)
+        return b&#34;&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fuzz.ZigbeeSerialConnection.send"><code class="name flex">
+<span>def <span class="ident">send</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def send(self, data):
+    try:
+        logging.info(&#34;Envoi des données : %s&#34;, data.hex())
+        self.ser.write(data)
+        self.ser.flush()
+    except serial.SerialException as e:
+        logging.error(&#34;Erreur lors de l&#39;envoi: %s&#34;, e)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="fuzz.define_zigbee_off_light" href="#fuzz.define_zigbee_off_light">define_zigbee_off_light</a></code></li>
+<li><code><a title="fuzz.define_zigbee_on_off_switch" href="#fuzz.define_zigbee_on_off_switch">define_zigbee_on_off_switch</a></code></li>
+<li><code><a title="fuzz.main" href="#fuzz.main">main</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="fuzz.ZigbeeSerialConnection" href="#fuzz.ZigbeeSerialConnection">ZigbeeSerialConnection</a></code></h4>
+<ul class="">
+<li><code><a title="fuzz.ZigbeeSerialConnection.close" href="#fuzz.ZigbeeSerialConnection.close">close</a></code></li>
+<li><code><a title="fuzz.ZigbeeSerialConnection.open" href="#fuzz.ZigbeeSerialConnection.open">open</a></code></li>
+<li><code><a title="fuzz.ZigbeeSerialConnection.recv" href="#fuzz.ZigbeeSerialConnection.recv">recv</a></code></li>
+<li><code><a title="fuzz.ZigbeeSerialConnection.send" href="#fuzz.ZigbeeSerialConnection.send">send</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>
